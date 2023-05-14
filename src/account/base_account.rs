@@ -4,7 +4,6 @@ use ethers::{providers::{Middleware, JsonRpcClient, Provider}, types::{U256, Nam
 
 #[async_trait]
 pub trait BaseAccount: Sync + Send + Debug {
-
     type Error: Sync + Send + Error + FromErr<<Self::Inner as Middleware>::Error>;
     type Provider: JsonRpcClient;
     type Inner: Middleware<Provider = Self::Provider>;
@@ -22,7 +21,9 @@ pub trait BaseAccount: Sync + Send + Debug {
     }
 
     // TODO: Could also make it sync and have a initialize method on BaseAccount
-    async fn get_nonce(&self) -> Result<U256, Box<dyn std::error::Error>>;
+    async fn get_nonce(&self) -> Result<U256, Self::Error> {
+        self.inner().get_transaction_count(self.get_account_address(), None).await.map_err(FromErr::from)
+    }
 
     async fn encode_execute(&self) -> Result<Vec<u8>, Box<dyn std::error::Error>>;
 
