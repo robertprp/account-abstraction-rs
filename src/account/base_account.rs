@@ -53,18 +53,22 @@ pub trait BaseAccount: Sync + Send + Debug {
 
         println!("{:?}", result);
         match result {
-            Ok(_) => {
-                Err(ProviderError::CustomError(String::from("Get sender address must revert"))).map_err(FromErr::from)
-            }
+            Ok(_) => Err(ProviderError::CustomError(String::from(
+                "Get sender address must revert",
+            )))
+            .map_err(FromErr::from),
             Err(e) => {
-                if e.is_revert() {
-                    let Some(sender_address) = e.decode_revert::<SenderAddressResult>() else {
+                if let Some(revert_err) = e.as_revert() {
+                    let Ok(sender_address) = SenderAddressResult::decode(revert_err) else {
                         return Err(ProviderError::CustomError(String::from("Decode sender address result error"))).map_err(FromErr::from)
                     };
 
-                    Ok(sender_address.address)
+                    Ok(sender_address.sender)
                 } else {
-                     Err(ProviderError::CustomError(String::from("Get sender address must revert"))).map_err(FromErr::from)
+                    Err(ProviderError::CustomError(String::from(
+                        "Get sender address must revert",
+                    )))
+                    .map_err(FromErr::from)
                 }
             }
         }
