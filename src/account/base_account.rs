@@ -1,12 +1,22 @@
 use async_trait::async_trait;
-use std::{error::Error, fmt::Debug};
-use ethers::{providers::{Middleware, JsonRpcClient, Provider, ProviderError}, types::{U256, Bytes, Address}, prelude::{EthError}};
+use ethers::{
+    abi::{AbiDecode, AbiEncode},
+    prelude::{ContractRevert, EthError},
+    providers::{JsonRpcClient, Middleware, Provider, ProviderError},
+    types::{Address, Bytes, U256},
+    utils::hex::ToHex,
+};
+use std::{error::Error, fmt::Debug, println};
 
 use crate::contracts::EntryPoint;
 
 #[async_trait]
 pub trait BaseAccount: Sync + Send + Debug {
-    type Error: Sync + Send + Error + FromErr<<Self::Inner as Middleware>::Error> + FromErr<ProviderError>;
+    type Error: Sync
+        + Send
+        + Error
+        + FromErr<<Self::Inner as Middleware>::Error>
+        + FromErr<ProviderError>;
     type Provider: JsonRpcClient;
     type Inner: Middleware<Provider = Self::Provider>;
 
@@ -17,18 +27,18 @@ pub trait BaseAccount: Sync + Send + Debug {
     fn get_rpc_url(&self) -> &str;
 
     fn get_entry_point(&self) -> EntryPoint<Self::Inner>;
-    
+
     fn provider(&self) -> &Provider<Self::Provider> {
         self.inner().provider()
     }
 
-    async fn get_account_init_code(&self) -> Result<Bytes, Self::Error> {
-        self.inner().get_code(self.get_account_address(), None).await.map_err(FromErr::from)
-    }
+    async fn get_account_init_code(&self) -> Result<Bytes, Self::Error>;
 
-    // TODO: Could also make it sync and have a initialize method on BaseAccount
     async fn get_nonce(&self) -> Result<U256, Self::Error> {
-        self.inner().get_transaction_count(self.get_account_address(), None).await.map_err(FromErr::from)
+        self.inner()
+            .get_transaction_count(self.get_account_address(), None)
+            .await
+            .map_err(FromErr::from)
     }
 
     async fn encode_execute(&self) -> Result<Vec<u8>, Box<dyn std::error::Error>>;
