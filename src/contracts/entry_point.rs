@@ -7,14 +7,16 @@ pub use entry_point::*;
     clippy::upper_case_acronyms,
     clippy::type_complexity,
     dead_code,
-    non_camel_case_types,
+    non_camel_case_types
 )]
 pub mod entry_point {
     #[rustfmt::skip]
     const __ABI: &str = "[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"preOpGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"paid\",\"type\":\"uint256\"},{\"internalType\":\"uint48\",\"name\":\"validAfter\",\"type\":\"uint48\"},{\"internalType\":\"uint48\",\"name\":\"validUntil\",\"type\":\"uint48\"},{\"internalType\":\"bool\",\"name\":\"targetSuccess\",\"type\":\"bool\"},{\"internalType\":\"bytes\",\"name\":\"targetResult\",\"type\":\"bytes\"}],\"name\":\"ExecutionResult\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"opIndex\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"reason\",\"type\":\"string\"}],\"name\":\"FailedOp\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"SenderAddressResult\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"aggregator\",\"type\":\"address\"}],\"name\":\"SignatureValidationFailed\",\"type\":\"error\"},{\"inputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"preOpGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"prefund\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"sigFailed\",\"type\":\"bool\"},{\"internalType\":\"uint48\",\"name\":\"validAfter\",\"type\":\"uint48\"},{\"internalType\":\"uint48\",\"name\":\"validUntil\",\"type\":\"uint48\"},{\"internalType\":\"bytes\",\"name\":\"paymasterContext\",\"type\":\"bytes\"}],\"internalType\":\"struct IEntryPoint.ReturnInfo\",\"name\":\"returnInfo\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"stake\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"unstakeDelaySec\",\"type\":\"uint256\"}],\"internalType\":\"struct IStakeManager.StakeInfo\",\"name\":\"senderInfo\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"stake\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"unstakeDelaySec\",\"type\":\"uint256\"}],\"internalType\":\"struct IStakeManager.StakeInfo\",\"name\":\"factoryInfo\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"stake\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"unstakeDelaySec\",\"type\":\"uint256\"}],\"internalType\":\"struct IStakeManager.StakeInfo\",\"name\":\"paymasterInfo\",\"type\":\"tuple\"}],\"name\":\"ValidationResult\",\"type\":\"error\"},{\"inputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"preOpGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"prefund\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"sigFailed\",\"type\":\"bool\"},{\"internalType\":\"uint48\",\"name\":\"validAfter\",\"type\":\"uint48\"},{\"internalType\":\"uint48\",\"name\":\"validUntil\",\"type\":\"uint48\"},{\"internalType\":\"bytes\",\"name\":\"paymasterContext\",\"type\":\"bytes\"}],\"internalType\":\"struct IEntryPoint.ReturnInfo\",\"name\":\"returnInfo\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"stake\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"unstakeDelaySec\",\"type\":\"uint256\"}],\"internalType\":\"struct IStakeManager.StakeInfo\",\"name\":\"senderInfo\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"stake\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"unstakeDelaySec\",\"type\":\"uint256\"}],\"internalType\":\"struct IStakeManager.StakeInfo\",\"name\":\"factoryInfo\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"stake\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"unstakeDelaySec\",\"type\":\"uint256\"}],\"internalType\":\"struct IStakeManager.StakeInfo\",\"name\":\"paymasterInfo\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"aggregator\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"stake\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"unstakeDelaySec\",\"type\":\"uint256\"}],\"internalType\":\"struct IStakeManager.StakeInfo\",\"name\":\"stakeInfo\",\"type\":\"tuple\"}],\"internalType\":\"struct IEntryPoint.AggregatorStakeInfo\",\"name\":\"aggregatorInfo\",\"type\":\"tuple\"}],\"name\":\"ValidationResultWithAggregation\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"userOpHash\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"factory\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"paymaster\",\"type\":\"address\"}],\"name\":\"AccountDeployed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"totalDeposit\",\"type\":\"uint256\"}],\"name\":\"Deposited\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"aggregator\",\"type\":\"address\"}],\"name\":\"SignatureAggregatorChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"totalStaked\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"unstakeDelaySec\",\"type\":\"uint256\"}],\"name\":\"StakeLocked\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"withdrawTime\",\"type\":\"uint256\"}],\"name\":\"StakeUnlocked\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"withdrawAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"StakeWithdrawn\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"userOpHash\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"paymaster\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"success\",\"type\":\"bool\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"actualGasCost\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"actualGasUsed\",\"type\":\"uint256\"}],\"name\":\"UserOperationEvent\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"userOpHash\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"revertReason\",\"type\":\"bytes\"}],\"name\":\"UserOperationRevertReason\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"withdrawAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Withdrawn\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"SIG_VALIDATION_FAILED\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"initCode\",\"type\":\"bytes\"},{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"paymasterAndData\",\"type\":\"bytes\"}],\"name\":\"_validateSenderAndPaymaster\",\"outputs\":[],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint32\",\"name\":\"unstakeDelaySec\",\"type\":\"uint32\"}],\"name\":\"addStake\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"depositTo\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"deposits\",\"outputs\":[{\"internalType\":\"uint112\",\"name\":\"deposit\",\"type\":\"uint112\"},{\"internalType\":\"bool\",\"name\":\"staked\",\"type\":\"bool\"},{\"internalType\":\"uint112\",\"name\":\"stake\",\"type\":\"uint112\"},{\"internalType\":\"uint32\",\"name\":\"unstakeDelaySec\",\"type\":\"uint32\"},{\"internalType\":\"uint48\",\"name\":\"withdrawTime\",\"type\":\"uint48\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"getDepositInfo\",\"outputs\":[{\"components\":[{\"internalType\":\"uint112\",\"name\":\"deposit\",\"type\":\"uint112\"},{\"internalType\":\"bool\",\"name\":\"staked\",\"type\":\"bool\"},{\"internalType\":\"uint112\",\"name\":\"stake\",\"type\":\"uint112\"},{\"internalType\":\"uint32\",\"name\":\"unstakeDelaySec\",\"type\":\"uint32\"},{\"internalType\":\"uint48\",\"name\":\"withdrawTime\",\"type\":\"uint48\"}],\"internalType\":\"struct IStakeManager.DepositInfo\",\"name\":\"info\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"initCode\",\"type\":\"bytes\"}],\"name\":\"getSenderAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"initCode\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"callData\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"callGasLimit\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"verificationGasLimit\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"preVerificationGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxPriorityFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"paymasterAndData\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"internalType\":\"struct UserOperation\",\"name\":\"userOp\",\"type\":\"tuple\"}],\"name\":\"getUserOpHash\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"initCode\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"callData\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"callGasLimit\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"verificationGasLimit\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"preVerificationGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxPriorityFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"paymasterAndData\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"internalType\":\"struct UserOperation[]\",\"name\":\"userOps\",\"type\":\"tuple[]\"},{\"internalType\":\"contract IAggregator\",\"name\":\"aggregator\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"internalType\":\"struct IEntryPoint.UserOpsPerAggregator[]\",\"name\":\"opsPerAggregator\",\"type\":\"tuple[]\"},{\"internalType\":\"address payable\",\"name\":\"beneficiary\",\"type\":\"address\"}],\"name\":\"handleAggregatedOps\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"initCode\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"callData\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"callGasLimit\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"verificationGasLimit\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"preVerificationGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxPriorityFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"paymasterAndData\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"internalType\":\"struct UserOperation[]\",\"name\":\"ops\",\"type\":\"tuple[]\"},{\"internalType\":\"address payable\",\"name\":\"beneficiary\",\"type\":\"address\"}],\"name\":\"handleOps\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"callData\",\"type\":\"bytes\"},{\"components\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"callGasLimit\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"verificationGasLimit\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"preVerificationGas\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"paymaster\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"maxFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxPriorityFeePerGas\",\"type\":\"uint256\"}],\"internalType\":\"struct EntryPoint.MemoryUserOp\",\"name\":\"mUserOp\",\"type\":\"tuple\"},{\"internalType\":\"bytes32\",\"name\":\"userOpHash\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"prefund\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"contextOffset\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"preOpGas\",\"type\":\"uint256\"}],\"internalType\":\"struct EntryPoint.UserOpInfo\",\"name\":\"opInfo\",\"type\":\"tuple\"},{\"internalType\":\"bytes\",\"name\":\"context\",\"type\":\"bytes\"}],\"name\":\"innerHandleOp\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"actualGasCost\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"initCode\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"callData\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"callGasLimit\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"verificationGasLimit\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"preVerificationGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxPriorityFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"paymasterAndData\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"internalType\":\"struct UserOperation\",\"name\":\"op\",\"type\":\"tuple\"},{\"internalType\":\"address\",\"name\":\"target\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"targetCallData\",\"type\":\"bytes\"}],\"name\":\"simulateHandleOp\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"initCode\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"callData\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"callGasLimit\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"verificationGasLimit\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"preVerificationGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxPriorityFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"paymasterAndData\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"internalType\":\"struct UserOperation\",\"name\":\"userOp\",\"type\":\"tuple\"}],\"name\":\"simulateValidation\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"unlockStake\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address payable\",\"name\":\"withdrawAddress\",\"type\":\"address\"}],\"name\":\"withdrawStake\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address payable\",\"name\":\"withdrawAddress\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"withdrawAmount\",\"type\":\"uint256\"}],\"name\":\"withdrawTo\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"}]";
     ///The parsed JSON ABI of the contract.
-    pub static ENTRYPOINT_ABI: ::ethers::contract::Lazy<::ethers::core::abi::Abi> = ::ethers::contract::Lazy::new(||
-    ::ethers::core::utils::__serde_json::from_str(__ABI).expect("ABI is always valid"));
+    pub static ENTRYPOINT_ABI: ::ethers::contract::Lazy<::ethers::core::abi::Abi> =
+        ::ethers::contract::Lazy::new(|| {
+            ::ethers::core::utils::__serde_json::from_str(__ABI).expect("ABI is always valid")
+        });
     pub struct EntryPoint<M>(::ethers::contract::Contract<M>);
     impl<M> ::core::clone::Clone for EntryPoint<M> {
         fn clone(&self) -> Self {
@@ -34,7 +36,9 @@ pub mod entry_point {
     }
     impl<M> ::core::fmt::Debug for EntryPoint<M> {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-            f.debug_tuple(stringify!(EntryPoint)).field(&self.address()).finish()
+            f.debug_tuple(stringify!(EntryPoint))
+                .field(&self.address())
+                .finish()
         }
     }
     impl<M: ::ethers::providers::Middleware> EntryPoint<M> {
@@ -44,13 +48,11 @@ pub mod entry_point {
             address: T,
             client: ::std::sync::Arc<M>,
         ) -> Self {
-            Self(
-                ::ethers::contract::Contract::new(
-                    address.into(),
-                    ENTRYPOINT_ABI.clone(),
-                    client,
-                ),
-            )
+            Self(::ethers::contract::Contract::new(
+                address.into(),
+                ENTRYPOINT_ABI.clone(),
+                client,
+            ))
         }
         ///Calls the contract's `SIG_VALIDATION_FAILED` (0x8f41ec5a) function
         pub fn sig_validation_failed(
@@ -68,10 +70,7 @@ pub mod entry_point {
             paymaster_and_data: ::ethers::core::types::Bytes,
         ) -> ::ethers::contract::builders::ContractCall<M, ()> {
             self.0
-                .method_hash(
-                    [149, 113, 34, 171],
-                    (init_code, sender, paymaster_and_data),
-                )
+                .method_hash([149, 113, 34, 171], (init_code, sender, paymaster_and_data))
                 .expect("method not found (this should never happen)")
         }
         ///Calls the contract's `addStake` (0x0396cb60) function
@@ -105,10 +104,7 @@ pub mod entry_point {
         pub fn deposits(
             &self,
             p0: ::ethers::core::types::Address,
-        ) -> ::ethers::contract::builders::ContractCall<
-            M,
-            (u128, bool, u128, u32, u64),
-        > {
+        ) -> ::ethers::contract::builders::ContractCall<M, (u128, bool, u128, u32, u64)> {
             self.0
                 .method_hash([252, 126, 40, 109], p0)
                 .expect("method not found (this should never happen)")
@@ -219,21 +215,14 @@ pub mod entry_point {
         ///Gets the contract's `AccountDeployed` event
         pub fn account_deployed_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            AccountDeployedFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, AccountDeployedFilter>
+        {
             self.0.event()
         }
         ///Gets the contract's `Deposited` event
         pub fn deposited_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            DepositedFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, DepositedFilter> {
             self.0.event()
         }
         ///Gets the contract's `SignatureAggregatorChanged` event
@@ -249,41 +238,29 @@ pub mod entry_point {
         ///Gets the contract's `StakeLocked` event
         pub fn stake_locked_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            StakeLockedFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, StakeLockedFilter>
+        {
             self.0.event()
         }
         ///Gets the contract's `StakeUnlocked` event
         pub fn stake_unlocked_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            StakeUnlockedFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, StakeUnlockedFilter>
+        {
             self.0.event()
         }
         ///Gets the contract's `StakeWithdrawn` event
         pub fn stake_withdrawn_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            StakeWithdrawnFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, StakeWithdrawnFilter>
+        {
             self.0.event()
         }
         ///Gets the contract's `UserOperationEvent` event
         pub fn user_operation_event_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            UserOperationEventFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, UserOperationEventFilter>
+        {
             self.0.event()
         }
         ///Gets the contract's `UserOperationRevertReason` event
@@ -299,26 +276,18 @@ pub mod entry_point {
         ///Gets the contract's `Withdrawn` event
         pub fn withdrawn_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            WithdrawnFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, WithdrawnFilter> {
             self.0.event()
         }
         /// Returns an `Event` builder for all the events of this contract.
         pub fn events(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            EntryPointEvents,
-        > {
-            self.0.event_with_filter(::core::default::Default::default())
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, EntryPointEvents> {
+            self.0
+                .event_with_filter(::core::default::Default::default())
         }
     }
-    impl<M: ::ethers::providers::Middleware> From<::ethers::contract::Contract<M>>
-    for EntryPoint<M> {
+    impl<M: ::ethers::providers::Middleware> From<::ethers::contract::Contract<M>> for EntryPoint<M> {
         fn from(contract: ::ethers::contract::Contract<M>) -> Self {
             Self::new(contract.address(), contract.client())
         }
@@ -332,7 +301,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[etherror(
         name = "ExecutionResult",
@@ -355,7 +324,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[etherror(name = "FailedOp", abi = "FailedOp(uint256,string)")]
     pub struct FailedOp {
@@ -371,7 +340,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[etherror(name = "SenderAddressResult", abi = "SenderAddressResult(address)")]
     pub struct SenderAddressResult {
@@ -386,7 +355,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[etherror(
         name = "SignatureValidationFailed",
@@ -404,7 +373,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[etherror(
         name = "ValidationResult",
@@ -432,7 +401,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[etherror(
         name = "ValidationResultWithAggregation",
@@ -473,38 +442,34 @@ pub mod entry_point {
             data: impl AsRef<[u8]>,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::AbiError> {
             let data = data.as_ref();
-            if let Ok(decoded)
-                = <::std::string::String as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <::std::string::String as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::RevertString(decoded));
             }
-            if let Ok(decoded)
-                = <ExecutionResult as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <ExecutionResult as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::ExecutionResult(decoded));
             }
-            if let Ok(decoded)
-                = <FailedOp as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <FailedOp as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::FailedOp(decoded));
             }
-            if let Ok(decoded)
-                = <SenderAddressResult as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) =
+                <SenderAddressResult as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::SenderAddressResult(decoded));
             }
-            if let Ok(decoded)
-                = <SignatureValidationFailed as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <SignatureValidationFailed as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::SignatureValidationFailed(decoded));
             }
-            if let Ok(decoded)
-                = <ValidationResult as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <ValidationResult as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::ValidationResult(decoded));
             }
-            if let Ok(decoded)
-                = <ValidationResultWithAggregation as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <ValidationResultWithAggregation as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::ValidationResultWithAggregation(decoded));
             }
             Err(::ethers::core::abi::Error::InvalidData.into())
@@ -513,21 +478,15 @@ pub mod entry_point {
     impl ::ethers::core::abi::AbiEncode for EntryPointErrors {
         fn encode(self) -> ::std::vec::Vec<u8> {
             match self {
-                Self::ExecutionResult(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::FailedOp(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::ExecutionResult(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::FailedOp(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::SenderAddressResult(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
                 Self::SignatureValidationFailed(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::ValidationResult(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::ValidationResult(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::ValidationResultWithAggregation(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
@@ -570,12 +529,8 @@ pub mod entry_point {
             match self {
                 Self::ExecutionResult(element) => ::core::fmt::Display::fmt(element, f),
                 Self::FailedOp(element) => ::core::fmt::Display::fmt(element, f),
-                Self::SenderAddressResult(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
-                Self::SignatureValidationFailed(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::SenderAddressResult(element) => ::core::fmt::Display::fmt(element, f),
+                Self::SignatureValidationFailed(element) => ::core::fmt::Display::fmt(element, f),
                 Self::ValidationResult(element) => ::core::fmt::Display::fmt(element, f),
                 Self::ValidationResultWithAggregation(element) => {
                     ::core::fmt::Display::fmt(element, f)
@@ -627,7 +582,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(
         name = "AccountDeployed",
@@ -649,7 +604,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(name = "Deposited", abi = "Deposited(address,uint256)")]
     pub struct DepositedFilter {
@@ -665,7 +620,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(
         name = "SignatureAggregatorChanged",
@@ -683,7 +638,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(name = "StakeLocked", abi = "StakeLocked(address,uint256,uint256)")]
     pub struct StakeLockedFilter {
@@ -700,7 +655,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(name = "StakeUnlocked", abi = "StakeUnlocked(address,uint256)")]
     pub struct StakeUnlockedFilter {
@@ -716,9 +671,12 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
-    #[ethevent(name = "StakeWithdrawn", abi = "StakeWithdrawn(address,address,uint256)")]
+    #[ethevent(
+        name = "StakeWithdrawn",
+        abi = "StakeWithdrawn(address,address,uint256)"
+    )]
     pub struct StakeWithdrawnFilter {
         #[ethevent(indexed)]
         pub account: ::ethers::core::types::Address,
@@ -733,7 +691,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(
         name = "UserOperationEvent",
@@ -759,7 +717,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(
         name = "UserOperationRevertReason",
@@ -781,7 +739,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(name = "Withdrawn", abi = "Withdrawn(address,address,uint256)")]
     pub struct WithdrawnFilter {
@@ -840,23 +798,15 @@ pub mod entry_point {
     impl ::core::fmt::Display for EntryPointEvents {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
             match self {
-                Self::AccountDeployedFilter(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::AccountDeployedFilter(element) => ::core::fmt::Display::fmt(element, f),
                 Self::DepositedFilter(element) => ::core::fmt::Display::fmt(element, f),
                 Self::SignatureAggregatorChangedFilter(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
                 Self::StakeLockedFilter(element) => ::core::fmt::Display::fmt(element, f),
-                Self::StakeUnlockedFilter(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
-                Self::StakeWithdrawnFilter(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
-                Self::UserOperationEventFilter(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::StakeUnlockedFilter(element) => ::core::fmt::Display::fmt(element, f),
+                Self::StakeWithdrawnFilter(element) => ::core::fmt::Display::fmt(element, f),
+                Self::UserOperationEventFilter(element) => ::core::fmt::Display::fmt(element, f),
                 Self::UserOperationRevertReasonFilter(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
@@ -918,7 +868,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "SIG_VALIDATION_FAILED", abi = "SIG_VALIDATION_FAILED()")]
     pub struct SigValidationFailedCall;
@@ -931,7 +881,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "_validateSenderAndPaymaster",
@@ -951,7 +901,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "addStake", abi = "addStake(uint32)")]
     pub struct AddStakeCall {
@@ -966,7 +916,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "balanceOf", abi = "balanceOf(address)")]
     pub struct BalanceOfCall {
@@ -981,7 +931,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "depositTo", abi = "depositTo(address)")]
     pub struct DepositToCall {
@@ -996,7 +946,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "deposits", abi = "deposits(address)")]
     pub struct DepositsCall(pub ::ethers::core::types::Address);
@@ -1009,7 +959,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "getDepositInfo", abi = "getDepositInfo(address)")]
     pub struct GetDepositInfoCall {
@@ -1024,7 +974,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "getSenderAddress", abi = "getSenderAddress(bytes)")]
     pub struct GetSenderAddressCall {
@@ -1039,7 +989,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "getUserOpHash",
@@ -1057,7 +1007,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "handleAggregatedOps",
@@ -1076,7 +1026,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "handleOps",
@@ -1095,7 +1045,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "innerHandleOp",
@@ -1115,7 +1065,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "simulateHandleOp",
@@ -1135,7 +1085,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "simulateValidation",
@@ -1153,7 +1103,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "unlockStake", abi = "unlockStake()")]
     pub struct UnlockStakeCall;
@@ -1166,7 +1116,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "withdrawStake", abi = "withdrawStake(address)")]
     pub struct WithdrawStakeCall {
@@ -1181,7 +1131,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "withdrawTo", abi = "withdrawTo(address,uint256)")]
     pub struct WithdrawToCall {
@@ -1214,84 +1164,72 @@ pub mod entry_point {
             data: impl AsRef<[u8]>,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::AbiError> {
             let data = data.as_ref();
-            if let Ok(decoded)
-                = <SigValidationFailedCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <SigValidationFailedCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::SigValidationFailed(decoded));
             }
-            if let Ok(decoded)
-                = <ValidateSenderAndPaymasterCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <ValidateSenderAndPaymasterCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::ValidateSenderAndPaymaster(decoded));
             }
-            if let Ok(decoded)
-                = <AddStakeCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <AddStakeCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::AddStake(decoded));
             }
-            if let Ok(decoded)
-                = <BalanceOfCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <BalanceOfCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::BalanceOf(decoded));
             }
-            if let Ok(decoded)
-                = <DepositToCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <DepositToCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::DepositTo(decoded));
             }
-            if let Ok(decoded)
-                = <DepositsCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <DepositsCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::Deposits(decoded));
             }
-            if let Ok(decoded)
-                = <GetDepositInfoCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) =
+                <GetDepositInfoCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::GetDepositInfo(decoded));
             }
-            if let Ok(decoded)
-                = <GetSenderAddressCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <GetSenderAddressCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::GetSenderAddress(decoded));
             }
-            if let Ok(decoded)
-                = <GetUserOpHashCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <GetUserOpHashCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::GetUserOpHash(decoded));
             }
-            if let Ok(decoded)
-                = <HandleAggregatedOpsCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <HandleAggregatedOpsCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::HandleAggregatedOps(decoded));
             }
-            if let Ok(decoded)
-                = <HandleOpsCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <HandleOpsCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::HandleOps(decoded));
             }
-            if let Ok(decoded)
-                = <InnerHandleOpCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <InnerHandleOpCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::InnerHandleOp(decoded));
             }
-            if let Ok(decoded)
-                = <SimulateHandleOpCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <SimulateHandleOpCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::SimulateHandleOp(decoded));
             }
-            if let Ok(decoded)
-                = <SimulateValidationCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <SimulateValidationCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::SimulateValidation(decoded));
             }
-            if let Ok(decoded)
-                = <UnlockStakeCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <UnlockStakeCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::UnlockStake(decoded));
             }
-            if let Ok(decoded)
-                = <WithdrawStakeCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <WithdrawStakeCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::WithdrawStake(decoded));
             }
-            if let Ok(decoded)
-                = <WithdrawToCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <WithdrawToCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::WithdrawTo(decoded));
             }
             Err(::ethers::core::abi::Error::InvalidData.into())
@@ -1306,63 +1244,33 @@ pub mod entry_point {
                 Self::ValidateSenderAndPaymaster(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::AddStake(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::BalanceOf(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::DepositTo(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::Deposits(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::GetDepositInfo(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::GetSenderAddress(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::GetUserOpHash(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::AddStake(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::BalanceOf(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::DepositTo(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::Deposits(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::GetDepositInfo(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::GetSenderAddress(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::GetUserOpHash(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::HandleAggregatedOps(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::HandleOps(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::InnerHandleOp(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::SimulateHandleOp(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::HandleOps(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::InnerHandleOp(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::SimulateHandleOp(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::SimulateValidation(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::UnlockStake(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::WithdrawStake(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::WithdrawTo(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::UnlockStake(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::WithdrawStake(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::WithdrawTo(element) => ::ethers::core::abi::AbiEncode::encode(element),
             }
         }
     }
     impl ::core::fmt::Display for EntryPointCalls {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
             match self {
-                Self::SigValidationFailed(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
-                Self::ValidateSenderAndPaymaster(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::SigValidationFailed(element) => ::core::fmt::Display::fmt(element, f),
+                Self::ValidateSenderAndPaymaster(element) => ::core::fmt::Display::fmt(element, f),
                 Self::AddStake(element) => ::core::fmt::Display::fmt(element, f),
                 Self::BalanceOf(element) => ::core::fmt::Display::fmt(element, f),
                 Self::DepositTo(element) => ::core::fmt::Display::fmt(element, f),
@@ -1370,15 +1278,11 @@ pub mod entry_point {
                 Self::GetDepositInfo(element) => ::core::fmt::Display::fmt(element, f),
                 Self::GetSenderAddress(element) => ::core::fmt::Display::fmt(element, f),
                 Self::GetUserOpHash(element) => ::core::fmt::Display::fmt(element, f),
-                Self::HandleAggregatedOps(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::HandleAggregatedOps(element) => ::core::fmt::Display::fmt(element, f),
                 Self::HandleOps(element) => ::core::fmt::Display::fmt(element, f),
                 Self::InnerHandleOp(element) => ::core::fmt::Display::fmt(element, f),
                 Self::SimulateHandleOp(element) => ::core::fmt::Display::fmt(element, f),
-                Self::SimulateValidation(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::SimulateValidation(element) => ::core::fmt::Display::fmt(element, f),
                 Self::UnlockStake(element) => ::core::fmt::Display::fmt(element, f),
                 Self::WithdrawStake(element) => ::core::fmt::Display::fmt(element, f),
                 Self::WithdrawTo(element) => ::core::fmt::Display::fmt(element, f),
@@ -1479,7 +1383,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct SigValidationFailedReturn(pub ::ethers::core::types::U256);
     ///Container type for all return fields from the `balanceOf` function with signature `balanceOf(address)` and selector `0x70a08231`
@@ -1491,7 +1395,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct BalanceOfReturn(pub ::ethers::core::types::U256);
     ///Container type for all return fields from the `deposits` function with signature `deposits(address)` and selector `0xfc7e286d`
@@ -1503,7 +1407,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct DepositsReturn {
         pub deposit: u128,
@@ -1521,7 +1425,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct GetDepositInfoReturn {
         pub info: DepositInfo,
@@ -1535,7 +1439,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct GetUserOpHashReturn(pub [u8; 32]);
     ///Container type for all return fields from the `innerHandleOp` function with signature `innerHandleOp(bytes,((address,uint256,uint256,uint256,uint256,address,uint256,uint256),bytes32,uint256,uint256,uint256),bytes)` and selector `0x1d732756`
@@ -1547,7 +1451,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct InnerHandleOpReturn {
         pub actual_gas_cost: ::ethers::core::types::U256,
@@ -1561,7 +1465,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct MemoryUserOp {
         pub sender: ::ethers::core::types::Address,
@@ -1582,7 +1486,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct UserOpInfo {
         pub m_user_op: MemoryUserOp,
@@ -1600,7 +1504,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct UserOpsPerAggregator {
         pub user_ops: ::std::vec::Vec<UserOperation>,
@@ -1616,7 +1520,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct DepositInfo {
         pub deposit: u128,
@@ -1634,7 +1538,7 @@ pub mod entry_point {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct UserOperation {
         pub sender: ::ethers::core::types::Address,

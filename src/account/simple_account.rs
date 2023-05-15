@@ -1,3 +1,3 @@
-use super::{BaseAccount};
+use super::BaseAccount;
 
 struct SimpleAccount;
