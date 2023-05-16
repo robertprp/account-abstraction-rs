@@ -8,6 +8,8 @@ use thiserror::Error;
 use std::{fmt::Debug};
 use crate::contracts::{EntryPoint, SenderAddressResult, UserOperation};
 
+use super::utils;
+
 #[async_trait]
 pub trait BaseAccount: Sync + Send + Debug {
     // type Error: Sync
@@ -24,6 +26,8 @@ pub trait BaseAccount: Sync + Send + Debug {
     fn get_account_address(&self) -> Address;
 
     fn get_rpc_url(&self) -> &str;
+    
+    fn get_entry_point_address(&self) -> Address;
 
     fn get_entry_point(&self) -> EntryPoint<Self::Inner>;
 
@@ -46,10 +50,10 @@ pub trait BaseAccount: Sync + Send + Debug {
 
     async fn encode_execute(&self) -> Result<Vec<u8>, AccountError<Self::Inner>>;
 
-    async fn get_user_op_hash(&self, user_op: UserOperation) -> Result<[u8; 32], AccountError<Self::Inner>> {
-        let entry_point = self.get_entry_point();
-
-        entry_point.get_user_op_hash(user_op).call().await.map_err(|e| AccountError::ContractError(e))
+    async fn get_user_op_hash(&self, user_op: UserOperation) -> [u8; 32] {
+        let chain_id = self.inner().get_chainid().await.unwrap();
+        let entry_point_address = self.get_entry_point_address();
+        utils::get_user_op_hash(user_op, entry_point_address, chain_id)
     }
 
     async fn sign_user_op_hash(&self) -> Result<(), AccountError<Self::Inner>>;
