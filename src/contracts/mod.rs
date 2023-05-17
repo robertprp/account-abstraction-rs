@@ -17,7 +17,7 @@ impl From<UserOperationRequest> for UserOperation {
             call_gas_limit: request.call_gas_limit.unwrap_or_else(|| U256::zero()),
             verification_gas_limit: request
                 .verification_gas_limit
-                .unwrap_or_else(|| U256::zero()),
+                .unwrap_or_else(|| U256::from(21000)),
             pre_verification_gas: request.pre_verification_gas.unwrap_or_else(|| U256::zero()),
             max_fee_per_gas: request.max_fee_per_gas.unwrap_or_else(|| U256::zero()),
             max_priority_fee_per_gas: request
