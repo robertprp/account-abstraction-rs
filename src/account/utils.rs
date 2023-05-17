@@ -1,14 +1,19 @@
 use crate::contracts::UserOperation;
 use ethers::abi::AbiEncode;
+use ethers::types::Bytes;
 use ethers::{abi::Address, types::U256, utils::keccak256};
 
-pub fn pack_user_op(user_op: UserOperation) -> Vec<u8> {
-    let user_op_without_sig = UserOperationWithoutSignature::from(user_op);
-    user_op_without_sig.encode()
+pub fn pack_user_op(user_op: UserOperation, include_signature: bool) -> Vec<u8> {
+    if include_signature {
+        user_op.encode()
+    } else {
+        let user_op_without_sig = UserOperationWithoutSignature::from(user_op);
+        user_op_without_sig.encode()
+    }
 }
 
 pub fn hash_user_op(user_op: UserOperation) -> [u8; 32] {
-    let user_op_hash = keccak256(pack_user_op(user_op));
+    let user_op_hash = keccak256(pack_user_op(user_op, false));
     user_op_hash
 }
 
