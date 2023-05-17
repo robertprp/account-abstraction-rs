@@ -138,3 +138,58 @@ impl GasOverheads {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::str::FromStr;
+
+    use super::*;
+    use ethers::core::types::{Address, Bytes, U256};
+
+    #[test]
+    fn test_calc_pre_verification_gas() {
+        let user_op = UserOperation {
+            sender: Address::from_str("0x9078d4859dfd1f76b01178578d7095119718d8c9").unwrap(),
+            nonce: U256::default(),
+            init_code: Bytes::default(),
+            call_data: Bytes::default(),
+            call_gas_limit: U256::default(),
+            verification_gas_limit: U256::default(),
+            pre_verification_gas: U256::default(),
+            max_fee_per_gas: U256::default(),
+            max_priority_fee_per_gas: U256::default(),
+            paymaster_and_data: Bytes::default(),
+            signature: Bytes::default(),
+        };
+
+        let result = calc_pre_verification_gas(user_op, None);
+
+        assert_eq!(result, U256::from(45060));
+    }
+    
+    #[test]
+    fn test_calc_pre_verification_gas_none_equals_default() {
+        let user_op = UserOperation {
+            sender: Address::from_str("0x9078d4859dfd1f76b01178578d7095119718d8c9").unwrap(),
+            nonce: U256::default(),
+            init_code: Bytes::default(),
+            call_data: Bytes::default(),
+            call_gas_limit: U256::default(),
+            verification_gas_limit: U256::default(),
+            pre_verification_gas: U256::default(),
+            max_fee_per_gas: U256::default(),
+            max_priority_fee_per_gas: U256::default(),
+            paymaster_and_data: Bytes::default(),
+            signature: Bytes::default(),
+        };
+
+        let default_overheads = GasOverheads::default();
+
+        let default_gas =
+            calc_pre_verification_gas(user_op.clone(), Option::Some(default_overheads));
+
+        let result = calc_pre_verification_gas(user_op, None);
+
+        assert_eq!(result, default_gas);
+    }
+}
