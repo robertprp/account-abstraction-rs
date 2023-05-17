@@ -36,8 +36,8 @@ pub trait BaseAccount: Sync + Send + Debug {
         U256::from(100000)
     }
 
-    fn get_pre_verification_gas(&self) -> U256 {
-        U256::from(0)
+    fn get_pre_verification_gas(&self, user_op: UserOperation) -> U256 {
+        utils::calc_pre_verification_gas(user_op, None)
     }
 
     fn provider(&self) -> &Provider<Self::Provider> {
