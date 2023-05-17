@@ -61,8 +61,6 @@ pub trait BaseAccount: Sync + Send + Debug {
         utils::get_user_op_hash(user_op, entry_point_address, chain_id)
     }
 
-    async fn sign_user_op_hash(&self) -> Result<(), AccountError<Self::Inner>>;
-
     async fn get_counterfactual_address(&self) -> Result<Address, AccountError<Self::Inner>> {
         let init_code = self.get_account_init_code().await?;
         let entry_point = self.get_entry_point();
@@ -89,6 +87,26 @@ pub trait BaseAccount: Sync + Send + Debug {
                 }
             }
         }
+    }
+
+    async fn sign_user_op_hash(
+        &self,
+        user_op_hash: [u8; 32],
+    ) -> Result<Bytes, AccountError<Self::Inner>>;
+
+    async fn create_signed_user_op(
+        &self,
+        user_op: UserOperation,
+    ) -> Result<Bytes, AccountError<Self::Inner>> {
+        let chain_id = self
+            .inner()
+            .get_chainid()
+            .await
+            .map_err(|e| AccountError::MiddlewareError(e))?;
+        let entry_point_address = self.get_entry_point_address();
+        let user_op_hash = utils::get_user_op_hash(user_op, entry_point_address, chain_id);
+        let signature = self.sign_user_op_hash(user_op_hash).await;
+        signature
     }
 }
 
