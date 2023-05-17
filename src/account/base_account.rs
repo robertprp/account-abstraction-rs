@@ -1,12 +1,13 @@
+use crate::contracts::{EntryPoint, SenderAddressResult, UserOperation};
 use async_trait::async_trait;
 use ethers::{
-    abi::{AbiDecode},
+    abi::AbiDecode,
+    prelude::ContractError,
     providers::{JsonRpcClient, Middleware, Provider, ProviderError},
-    types::{Address, Bytes, U256}, prelude::{ContractError},
+    types::{Address, Bytes, U256},
 };
+use std::fmt::Debug;
 use thiserror::Error;
-use std::{fmt::Debug};
-use crate::contracts::{EntryPoint, SenderAddressResult, UserOperation};
 
 use super::utils;
 
@@ -26,16 +27,17 @@ pub trait BaseAccount: Sync + Send + Debug {
     fn get_account_address(&self) -> Address;
 
     fn get_rpc_url(&self) -> &str;
-    
+
     fn get_entry_point_address(&self) -> Address;
 
-    fn get_entry_point(&self) -> EntryPoint<Self::Inner> {
-        let address: Address = self.get_entry_point_address();
-        EntryPoint::new(address, self.inner.clone())
-    }
+    fn get_entry_point(&self) -> EntryPoint<Self::Inner>;
 
     fn get_verification_gas_limit(&self) -> U256 {
         U256::from(100000)
+    }
+
+    fn get_pre_verification_gas(&self) -> U256 {
+        U256::from(0)
     }
 
     fn provider(&self) -> &Provider<Self::Provider> {
@@ -101,16 +103,16 @@ pub enum AccountError<M: Middleware> {
 
     #[error("revert error: {0}")]
     RevertError(String),
-    
+
     #[error("contract error: {0}")]
     ContractError(ContractError<M>),
-    
+
     #[error("contract error: {0}")]
     MiddlewareError(M::Error),
-    
+
     #[error("nonce error")]
     NonceError,
-    
+
     #[error("contract error: {0}")]
     ProviderError(ProviderError),
 }
