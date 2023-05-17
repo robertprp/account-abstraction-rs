@@ -29,7 +29,10 @@ pub trait BaseAccount: Sync + Send + Debug {
     
     fn get_entry_point_address(&self) -> Address;
 
-    fn get_entry_point(&self) -> EntryPoint<Self::Inner>;
+    fn get_entry_point(&self) -> EntryPoint<Self::Inner> {
+        let address: Address = self.get_entry_point_address();
+        EntryPoint::new(address, self.inner.clone())
+    }
 
     fn get_verification_gas_limit(&self) -> U256 {
         U256::from(100000)
