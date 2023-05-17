@@ -6,7 +6,7 @@ use ethers::{
     providers::{JsonRpcClient, Middleware, Provider, ProviderError},
     types::{transaction::eip2718::TypedTransaction, Address, Bytes, TransactionRequest, U256},
 };
-use std::{fmt::Debug};
+use std::fmt::Debug;
 use thiserror::Error;
 
 use super::utils;
@@ -119,7 +119,7 @@ pub trait BaseAccount: Sync + Send + Debug {
         user_op_hash: [u8; 32],
     ) -> Result<Bytes, AccountError<Self::Inner>>;
 
-    async fn create_signed_user_op(
+    async fn sign_user_op(
         &self,
         user_op: UserOperation,
     ) -> Result<Bytes, AccountError<Self::Inner>> {

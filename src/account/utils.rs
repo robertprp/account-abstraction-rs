@@ -166,7 +166,7 @@ mod tests {
 
         assert_eq!(result, U256::from(45060));
     }
-    
+
     #[test]
     fn test_calc_pre_verification_gas_none_equals_default() {
         let user_op = UserOperation {
