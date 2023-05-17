@@ -4,9 +4,9 @@ use ethers::{
     abi::AbiDecode,
     prelude::ContractError,
     providers::{JsonRpcClient, Middleware, Provider, ProviderError},
-    types::{Address, Bytes, U256},
+    types::{transaction::eip2718::TypedTransaction, Address, Bytes, TransactionRequest, U256},
 };
-use std::fmt::Debug;
+use std::{fmt::Debug};
 use thiserror::Error;
 
 use super::utils;
@@ -54,6 +54,31 @@ pub trait BaseAccount: Sync + Send + Debug {
     }
 
     async fn encode_execute(&self) -> Result<Vec<u8>, AccountError<Self::Inner>>;
+
+    async fn estimate_creation_gas(&self) -> Result<U256, AccountError<Self::Inner>> {
+        let init_code = self.get_account_init_code().await?;
+
+        if init_code.is_empty() {
+            Ok(U256::zero())
+        } else {
+            let deployer_address = &init_code[0..20];
+            let deployer_address = ethers::types::Address::from_slice(deployer_address);
+            let deployer_call_data = &init_code[20..];
+
+            let typed_tx: TypedTransaction = TransactionRequest::new()
+                .to(deployer_address)
+                .data(deployer_call_data.to_vec())
+                .into();
+
+            let gas_estimate = self
+                .inner()
+                .estimate_gas(&typed_tx, None)
+                .await
+                .map_err(|e| AccountError::MiddlewareError(e))?;
+
+            Ok(gas_estimate)
+        }
+    }
 
     async fn get_user_op_hash(&self, user_op: UserOperation) -> [u8; 32] {
         let chain_id = self.inner().get_chainid().await.unwrap();
