@@ -1,4 +1,5 @@
 use crate::contracts::{EntryPoint, SenderAddressResult, UserOperation};
+use crate::paymaster::{Paymaster, PaymasterError};
 use async_trait::async_trait;
 use ethers::{
     abi::AbiDecode,
@@ -243,18 +244,6 @@ pub trait BaseAccount: Sync + Send + Debug {
         let user_op = self.create_unsigned_user_op(transaction).await?;
         self.sign_user_op(user_op).await
     }
-}
-
-#[async_trait]
-pub trait Paymaster: Send + Sync {
-    async fn get_paymaster_and_data(&self, user_op: UserOperation)
-        -> Result<Bytes, PaymasterError>;
-}
-
-#[derive(Debug, Error)]
-pub enum PaymasterError {
-    #[error("custom error: {0}")]
-    Custom(String),
 }
 
 pub struct TransactionDetailsForUserOp {
