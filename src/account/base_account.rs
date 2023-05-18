@@ -53,7 +53,7 @@ pub trait BaseAccount: Sync + Send + Debug {
             .map_err(|e| AccountError::MiddlewareError(e))
     }
 
-    async fn encode_execute(&self) -> Result<Vec<u8>, AccountError<Self::Inner>>;
+    async fn encode_execute(&self, target: Address, value: U256, data: Vec<u8>) -> Result<Vec<u8>, AccountError<Self::Inner>>;
 
     async fn estimate_creation_gas(&self) -> Result<U256, AccountError<Self::Inner>> {
         let init_code = self.get_account_init_code().await?;
@@ -131,8 +131,49 @@ pub trait BaseAccount: Sync + Send + Debug {
         let entry_point_address = self.get_entry_point_address();
         let user_op_hash = utils::get_user_op_hash(user_op, entry_point_address, chain_id);
         let signature = self.sign_user_op_hash(user_op_hash).await;
+
         signature
     }
+
+    // Helpers
+
+    async fn encode_user_op_call_data_and_gas_limit(&self, details: TransactionDetailsForUserOp) -> Result<(Vec<u8>, U256), AccountError<Self::Inner>> {
+        let value = details.value.unwrap_or(U256::zero());
+        let call_data = self.encode_execute(details.target, value, details.data).await?;
+        
+        let call_gas_limit = match details.gas_limit {
+            Some(limit) => limit,
+            None => {
+                let tx_request = TransactionRequest::new()
+                    .from(self.get_entry_point_address())
+                    .to(self.get_account_address())
+                    .data(call_data.clone());
+        
+                let typed_tx: TypedTransaction = tx_request.into();
+        
+                self.inner()
+                    .estimate_gas(&typed_tx, None)
+                    .await
+                    .map_err(|e| AccountError::MiddlewareError(e))?
+            },
+        };
+    
+        Ok((call_data, call_gas_limit))
+    }
+
+    // async fn sign_transaction_info(
+    //     &self,
+    //     transaction: TransactionInfo,
+    // ) -> Result<Bytes, AccountError<Self::Inner>>;
+}
+
+pub struct TransactionDetailsForUserOp {
+    pub target: Address,
+    pub data: Vec<u8>,
+    pub value: Option<U256>,
+    pub gas_limit: Option<U256>,
+    pub max_fee_per_gas: Option<U256>,
+    pub max_priority_fee_per_gas: Option<U256>,
 }
 
 pub trait FromErr<T> {
