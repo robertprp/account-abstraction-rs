@@ -60,8 +60,8 @@ pub trait BaseAccount: Sync + Send + Debug {
         &self,
         target: Address,
         value: U256,
-        data: Vec<u8>,
-    ) -> Result<Vec<u8>, AccountError<Self::Inner>>;
+        data: &Bytes,
+    ) -> Result<Vec<u8>, AccountError<Self::Inner>>; // [u8; 32]?
 
     async fn estimate_creation_gas(&self) -> Result<U256, AccountError<Self::Inner>> {
         let init_code = self.get_account_init_code().await?;
@@ -147,14 +147,15 @@ pub trait BaseAccount: Sync + Send + Debug {
 
     async fn encode_user_op_call_data_and_gas_limit(
         &self,
-        details: TransactionDetailsForUserOp,
-    ) -> Result<(Vec<u8>, U256), AccountError<Self::Inner>> {
-        let value = details.value.unwrap_or(U256::zero());
-        let call_data = self
-            .encode_execute(details.target, value, details.data)
-            .await?;
+        target: Address,
+        value: Option<U256>,
+        data: &Bytes,
+        gas_limit: Option<U256>,
+    ) -> Result<(Bytes, U256), AccountError<Self::Inner>> {
+        let value = value.unwrap_or(U256::zero());
+        let call_data = self.encode_execute(target, value, data.into()).await?;
 
-        let call_gas_limit = match details.gas_limit {
+        let call_gas_limit = match gas_limit {
             Some(limit) => limit,
             None => {
                 let tx_request = TransactionRequest::new()
@@ -171,7 +172,68 @@ pub trait BaseAccount: Sync + Send + Debug {
             }
         };
 
-        Ok((call_data, call_gas_limit))
+        Ok((call_data.into(), call_gas_limit))
+    }
+
+    async fn create_unsigned_user_op(
+        &self,
+        info: TransactionDetailsForUserOp,
+    ) -> Result<UserOperation, AccountError<Self::Inner>> {
+        let (call_data, call_gas_limit) = self
+            .encode_user_op_call_data_and_gas_limit(
+                info.target,
+                info.value,
+                &info.data.into(),
+                info.gas_limit,
+            )
+            .await?;
+        let init_code = self.get_account_init_code().await?;
+        let init_gas = self.estimate_creation_gas().await?;
+        let verification_gas_limit = self.get_verification_gas_limit().add(init_gas);
+        let (max_fee_per_gas, max_priority_fee_per_gas) = {
+            if let (Some(max_fee_per_gas), Some(max_priority_fee_per_gas)) =
+                (info.max_fee_per_gas, info.max_priority_fee_per_gas)
+            {
+                (max_fee_per_gas, max_priority_fee_per_gas)
+            } else {
+                let gas_estimate = self
+                    .provider()
+                    .estimate_eip1559_fees(None)
+                    .await
+                    .map_err(|e| AccountError::ProviderError(e))?;
+                gas_estimate
+            }
+        };
+
+        let mut partial_user_op = UserOperation {
+            sender: self.get_account_address(),
+            nonce: self.get_nonce().await?,
+            init_code,
+            call_data,
+            call_gas_limit,
+            verification_gas_limit,
+            pre_verification_gas: U256::zero(), // This will be set later
+            max_fee_per_gas,
+            max_priority_fee_per_gas,
+            paymaster_and_data: Bytes::default(),
+            signature: Bytes::default(),
+        };
+
+        if let Some(paymaster_api) = self.get_paymaster() {
+            let pre_verification_gas = self.get_pre_verification_gas(partial_user_op.clone());
+            partial_user_op.pre_verification_gas = pre_verification_gas;
+            let paymaster_and_data = paymaster_api
+                .get_paymaster_and_data(partial_user_op.clone())
+                .await
+                .map_err(|e| AccountError::PaymasterError(e))?;
+            partial_user_op.paymaster_and_data = paymaster_and_data;
+        } else {
+            partial_user_op.paymaster_and_data = Bytes::new();
+        }
+
+        partial_user_op.pre_verification_gas =
+            self.get_pre_verification_gas(partial_user_op.clone());
+        Ok(partial_user_op)
     }
 
     // async fn sign_transaction_info(
