@@ -24,6 +24,10 @@ pub trait BaseAccount: Sync + Send + Debug {
 
     fn inner(&self) -> &Self::Inner;
 
+    fn provider(&self) -> &Provider<Self::Provider> {
+        self.inner().provider()
+    }
+
     fn get_account_address(&self) -> Address;
 
     fn get_rpc_url(&self) -> &str;
@@ -38,10 +42,6 @@ pub trait BaseAccount: Sync + Send + Debug {
 
     fn get_pre_verification_gas(&self, user_op: UserOperation) -> U256 {
         utils::calc_pre_verification_gas(user_op, None)
-    }
-
-    fn provider(&self) -> &Provider<Self::Provider> {
-        self.inner().provider()
     }
 
     async fn get_account_init_code(&self) -> Result<Bytes, AccountError<Self::Inner>>;
