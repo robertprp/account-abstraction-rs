@@ -1,5 +1,6 @@
 use crate::contracts::{EntryPoint, SenderAddressResult, UserOperation};
 use crate::paymaster::{Paymaster, PaymasterError};
+use crate::types::FromErr;
 use async_trait::async_trait;
 use ethers::{
     abi::AbiDecode,
@@ -54,7 +55,7 @@ pub trait BaseAccount: Sync + Send + Debug {
         self.inner()
             .get_transaction_count(self.get_account_address(), None)
             .await
-            .map_err(|e| AccountError::MiddlewareError(e))
+            .map_err(FromErr::from)
     }
 
     async fn encode_execute(
@@ -83,7 +84,7 @@ pub trait BaseAccount: Sync + Send + Debug {
                 .inner()
                 .estimate_gas(&typed_tx, None)
                 .await
-                .map_err(|e| AccountError::MiddlewareError(e))?;
+                .map_err(FromErr::from)?;
 
             Ok(gas_estimate)
         }
@@ -136,7 +137,7 @@ pub trait BaseAccount: Sync + Send + Debug {
             .inner()
             .get_chainid()
             .await
-            .map_err(|e| AccountError::MiddlewareError(e))?;
+            .map_err(FromErr::from)?;
         let entry_point_address = self.get_entry_point_address();
         let user_op_hash = utils::get_user_op_hash(user_op, entry_point_address, chain_id);
         let signature = self.sign_user_op_hash(user_op_hash).await;
@@ -169,7 +170,7 @@ pub trait BaseAccount: Sync + Send + Debug {
                 self.inner()
                     .estimate_gas(&typed_tx, None)
                     .await
-                    .map_err(|e| AccountError::MiddlewareError(e))?
+                    .map_err(FromErr::from)?
             }
         };
 
@@ -255,10 +256,6 @@ pub struct TransactionDetailsForUserOp {
     pub max_priority_fee_per_gas: Option<U256>,
 }
 
-pub trait FromErr<T> {
-    fn from(src: T) -> Self;
-}
-
 #[derive(Debug, Error)]
 pub enum AccountError<M: Middleware> {
     #[error("decode error: {0}")]
@@ -281,6 +278,12 @@ pub enum AccountError<M: Middleware> {
 
     #[error("paymaster error: {0}")]
     PaymasterError(PaymasterError),
+}
+
+impl<M: Middleware> FromErr<M::Error> for AccountError<M> {
+    fn from(src: M::Error) -> Self {
+        AccountError::MiddlewareError(src)
+    }
 }
 
 }
