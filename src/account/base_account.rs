@@ -53,7 +53,12 @@ pub trait BaseAccount: Sync + Send + Debug {
             .map_err(|e| AccountError::MiddlewareError(e))
     }
 
-    async fn encode_execute(&self, target: Address, value: U256, data: Vec<u8>) -> Result<Vec<u8>, AccountError<Self::Inner>>;
+    async fn encode_execute(
+        &self,
+        target: Address,
+        value: U256,
+        data: Vec<u8>,
+    ) -> Result<Vec<u8>, AccountError<Self::Inner>>;
 
     async fn estimate_creation_gas(&self) -> Result<U256, AccountError<Self::Inner>> {
         let init_code = self.get_account_init_code().await?;
@@ -137,10 +142,15 @@ pub trait BaseAccount: Sync + Send + Debug {
 
     // Helpers
 
-    async fn encode_user_op_call_data_and_gas_limit(&self, details: TransactionDetailsForUserOp) -> Result<(Vec<u8>, U256), AccountError<Self::Inner>> {
+    async fn encode_user_op_call_data_and_gas_limit(
+        &self,
+        details: TransactionDetailsForUserOp,
+    ) -> Result<(Vec<u8>, U256), AccountError<Self::Inner>> {
         let value = details.value.unwrap_or(U256::zero());
-        let call_data = self.encode_execute(details.target, value, details.data).await?;
-        
+        let call_data = self
+            .encode_execute(details.target, value, details.data)
+            .await?;
+
         let call_gas_limit = match details.gas_limit {
             Some(limit) => limit,
             None => {
@@ -148,16 +158,16 @@ pub trait BaseAccount: Sync + Send + Debug {
                     .from(self.get_entry_point_address())
                     .to(self.get_account_address())
                     .data(call_data.clone());
-        
+
                 let typed_tx: TypedTransaction = tx_request.into();
-        
+
                 self.inner()
                     .estimate_gas(&typed_tx, None)
                     .await
                     .map_err(|e| AccountError::MiddlewareError(e))?
-            },
+            }
         };
-    
+
         Ok((call_data, call_gas_limit))
     }
 
