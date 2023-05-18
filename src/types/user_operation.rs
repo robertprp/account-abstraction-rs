@@ -1,20 +1,6 @@
 use ethers::types::{Address, Bytes, U256};
 use serde::{Deserialize, Serialize};
 
-// pub struct UserOperation {
-//     pub sender: ::ethers::core::types::Address,
-//     pub nonce: ::ethers::core::types::U256,
-//     pub init_code: ::ethers::core::types::Bytes,
-//     pub call_data: ::ethers::core::types::Bytes,
-//     pub call_gas_limit: ::ethers::core::types::U256,
-//     pub verification_gas_limit: ::ethers::core::types::U256,
-//     pub pre_verification_gas: ::ethers::core::types::U256,
-//     pub max_fee_per_gas: ::ethers::core::types::U256,
-//     pub max_priority_fee_per_gas: ::ethers::core::types::U256,
-//     pub paymaster_and_data: ::ethers::core::types::Bytes,
-//     pub signature: ::ethers::core::types::Bytes,
-// }
-
 /// Parameters for sending a user operation
 #[derive(Clone, Default, Serialize, Deserialize, PartialEq, Eq, Debug)]
 pub struct UserOperationRequest {

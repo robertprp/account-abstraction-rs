@@ -133,11 +133,7 @@ pub trait BaseAccount: Sync + Send + Debug {
         &self,
         user_op: UserOperation,
     ) -> Result<Bytes, AccountError<Self::Inner>> {
-        let chain_id = self
-            .inner()
-            .get_chainid()
-            .await
-            .map_err(FromErr::from)?;
+        let chain_id = self.inner().get_chainid().await.map_err(FromErr::from)?;
         let entry_point_address = self.get_entry_point_address();
         let user_op_hash = utils::get_user_op_hash(user_op, entry_point_address, chain_id);
         let signature = self.sign_user_op_hash(user_op_hash).await;
