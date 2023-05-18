@@ -236,10 +236,13 @@ pub trait BaseAccount: Sync + Send + Debug {
         Ok(partial_user_op)
     }
 
-    // async fn sign_transaction_info(
-    //     &self,
-    //     transaction: TransactionInfo,
-    // ) -> Result<Bytes, AccountError<Self::Inner>>;
+    async fn sign_transaction_info(
+        &self,
+        transaction: TransactionDetailsForUserOp,
+    ) -> Result<Bytes, AccountError<Self::Inner>> {
+        let user_op = self.create_unsigned_user_op(transaction).await?;
+        self.sign_user_op(user_op).await
+    }
 }
 
 #[async_trait]
