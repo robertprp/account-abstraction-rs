@@ -7,6 +7,7 @@ use ethers::{
     types::{transaction::eip2718::TypedTransaction, Address, Bytes, TransactionRequest, U256},
 };
 use std::fmt::Debug;
+use std::ops::Add;
 use thiserror::Error;
 
 use super::utils;
@@ -35,6 +36,8 @@ pub trait BaseAccount: Sync + Send + Debug {
     fn get_entry_point_address(&self) -> Address;
 
     fn get_entry_point(&self) -> EntryPoint<Self::Inner>;
+
+    fn get_paymaster(&self) -> Option<Box<dyn Paymaster + Send + Sync>>;
 
     fn get_verification_gas_limit(&self) -> U256 {
         U256::from(100000)
@@ -177,6 +180,18 @@ pub trait BaseAccount: Sync + Send + Debug {
     // ) -> Result<Bytes, AccountError<Self::Inner>>;
 }
 
+#[async_trait]
+pub trait Paymaster: Send + Sync {
+    async fn get_paymaster_and_data(&self, user_op: UserOperation)
+        -> Result<Bytes, PaymasterError>;
+}
+
+#[derive(Debug, Error)]
+pub enum PaymasterError {
+    #[error("custom error: {0}")]
+    Custom(String),
+}
+
 pub struct TransactionDetailsForUserOp {
     pub target: Address,
     pub data: Vec<u8>,
@@ -209,4 +224,9 @@ pub enum AccountError<M: Middleware> {
 
     #[error("contract error: {0}")]
     ProviderError(ProviderError),
+
+    #[error("paymaster error: {0}")]
+    PaymasterError(PaymasterError),
+}
+
 }
