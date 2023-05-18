@@ -6,3 +6,6 @@ pub use simple_account::*;
 
 mod utils;
 pub use utils::*;
+
+mod middleware;
+pub use middleware::*;
