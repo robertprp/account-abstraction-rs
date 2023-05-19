@@ -32,13 +32,21 @@ where
     async fn send_user_operation<U: Into<UserOperationRequest> + Send + Sync>(
         &self,
         user_op: U,
-    ) -> Result<UserOpHash, SmartAccountMiddlewareError<M>> {
-        let mut user_op_request: UserOperationRequest = user_op.into();
-        self.fill_user_operation(&mut user_op_request).await?;
+    ) -> Result<UserOpHash, SmartAccountMiddlewareError<M>>
+    where
+        A: BaseAccount<Inner = M>,
+    {
+        let mut user_op: UserOperationRequest = user_op.into();
+        self.fill_user_operation(&mut user_op).await?;
+
+        if user_op.signature.is_none() {
+            let signature: Bytes = self.sign_user_operation(user_op.clone()).await?;
+            user_op.signature = Some(signature)
+        }
 
         self.inner()
             .provider()
-            .request("eth_sendUserOperation", utils::serialize(&user_op_request))
+            .request("eth_sendUserOperation", utils::serialize(&user_op))
             .await
             .map_err(SmartAccountMiddlewareError::ProviderError)
     }
