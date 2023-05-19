@@ -45,8 +45,8 @@ pub trait BaseAccount: Sync + Send + Debug {
         U256::from(100000)
     }
 
-    fn get_pre_verification_gas(&self, user_op: UserOperation) -> U256 {
-        utils::calc_pre_verification_gas(user_op, None)
+    fn get_pre_verification_gas<U: Into<UserOperation> + Send + Sync>(&self, user_op: U) -> U256 {
+        utils::calc_pre_verification_gas(user_op.into(), None)
     }
 
     async fn get_account_init_code(&self) -> Result<Bytes, AccountError<Self::Inner>>;
@@ -90,10 +90,10 @@ pub trait BaseAccount: Sync + Send + Debug {
         }
     }
 
-    async fn get_user_op_hash(&self, user_op: UserOperation) -> [u8; 32] {
+    async fn get_user_op_hash<U: Into<UserOperation> + Send + Sync>(&self, user_op: U) -> [u8; 32] {
         let chain_id = self.inner().get_chainid().await.unwrap();
         let entry_point_address = self.get_entry_point_address();
-        utils::get_user_op_hash(user_op, entry_point_address, chain_id)
+        utils::get_user_op_hash(user_op.into(), entry_point_address, chain_id)
     }
 
     async fn get_counterfactual_address(&self) -> Result<Address, AccountError<Self::Inner>> {
@@ -129,13 +129,13 @@ pub trait BaseAccount: Sync + Send + Debug {
         user_op_hash: [u8; 32],
     ) -> Result<Bytes, AccountError<Self::Inner>>;
 
-    async fn sign_user_op(
+    async fn sign_user_op<U: Into<UserOperation> + Send + Sync>(
         &self,
-        user_op: UserOperation,
+        user_op: U,
     ) -> Result<Bytes, AccountError<Self::Inner>> {
         let chain_id = self.inner().get_chainid().await.map_err(FromErr::from)?;
         let entry_point_address = self.get_entry_point_address();
-        let user_op_hash = utils::get_user_op_hash(user_op, entry_point_address, chain_id);
+        let user_op_hash = utils::get_user_op_hash(user_op.into(), entry_point_address, chain_id);
         let signature = self.sign_user_op_hash(user_op_hash).await;
 
         signature
