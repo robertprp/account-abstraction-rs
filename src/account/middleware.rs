@@ -1,9 +1,14 @@
 use super::{base_account::BaseAccount, AccountError};
 
-use crate::types::FromErr;
+use crate::{
+    types::{user_operation::{UserOperationRequest, UserOpHash}, FromErr},
+};
 
 use async_trait::async_trait;
-use ethers::providers::{Middleware, MiddlewareError};
+use ethers::{
+    providers::{Middleware, MiddlewareError, ProviderError},
+    utils,
+};
 use std::fmt::Debug;
 use thiserror::Error;
 
@@ -21,6 +26,29 @@ where
     pub fn new(inner: M, account: A) -> Self {
         Self { inner, account }
     }
+
+    async fn send_user_operation<U: Into<UserOperationRequest> + Send + Sync>(
+        &self,
+        user_op: U,
+    ) -> Result<UserOpHash, SmartAccountMiddlewareError<M>> {
+        let mut user_op_request: UserOperationRequest = user_op.into();
+        self.fill_user_operation(& mut user_op_request).await?;
+
+        self
+            .inner()
+            .provider()
+            .request("eth_sendUserOperation", utils::serialize(&user_op_request))
+            .await
+            .map_err(SmartAccountMiddlewareError::ProviderError)
+    }
+
+    async fn fill_user_operation(
+        &self,
+        tx: &mut UserOperationRequest,
+    ) -> Result<(),SmartAccountMiddlewareError<M>> {
+        Ok(())
+    }
+
 }
 
 #[async_trait]
@@ -47,6 +75,9 @@ pub enum SmartAccountMiddlewareError<M: Middleware> {
 
     #[error("account error {0}")]
     AccountError(AccountError<M>),
+
+    #[error("provider error {0}")]
+    ProviderError(ProviderError),
 }
 
 impl<M: Middleware> MiddlewareError for SmartAccountMiddlewareError<M> {
