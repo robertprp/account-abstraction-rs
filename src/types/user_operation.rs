@@ -1,4 +1,4 @@
-use ethers::types::{Address, Bytes, U256, H256};
+use ethers::types::{Address, Bytes, H256, U256};
 use serde::{Deserialize, Serialize};
 
 /// Parameters for sending a user operation

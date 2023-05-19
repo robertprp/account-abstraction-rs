@@ -1,7 +1,8 @@
 use super::{base_account::BaseAccount, AccountError};
 
-use crate::{
-    types::{user_operation::{UserOperationRequest, UserOpHash}, FromErr},
+use crate::types::{
+    user_operation::{UserOpHash, UserOperationRequest},
+    FromErr,
 };
 
 use async_trait::async_trait;
@@ -32,10 +33,9 @@ where
         user_op: U,
     ) -> Result<UserOpHash, SmartAccountMiddlewareError<M>> {
         let mut user_op_request: UserOperationRequest = user_op.into();
-        self.fill_user_operation(& mut user_op_request).await?;
+        self.fill_user_operation(&mut user_op_request).await?;
 
-        self
-            .inner()
+        self.inner()
             .provider()
             .request("eth_sendUserOperation", utils::serialize(&user_op_request))
             .await
@@ -45,7 +45,7 @@ where
     async fn fill_user_operation(
         &self,
         tx: &mut UserOperationRequest,
-    ) -> Result<(),SmartAccountMiddlewareError<M>> {
+    ) -> Result<(), SmartAccountMiddlewareError<M>> {
         Ok(())
     }
 
