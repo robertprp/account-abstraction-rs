@@ -53,8 +53,18 @@ where
 
     async fn fill_user_operation(
         &self,
-        tx: &mut UserOperationRequest,
+        user_op: &mut UserOperationRequest,
     ) -> Result<(), SmartAccountMiddlewareError<M>> {
+        if user_op.nonce.is_none() {
+            let nonce = self
+                .inner()
+                .get_transaction_count(self.account.get_account_address(), None)
+                .await
+                .map_err(SmartAccountMiddlewareError::MiddlewareError)?;
+            
+            user_op.set_nonce(nonce);
+        }
+
         Ok(())
     }
 
@@ -65,8 +75,7 @@ where
     where
         A: BaseAccount<Inner = M>,
     {
-        self
-            .account
+        self.account
             .sign_user_op(user_op)
             .await
             .map_err(|e| SmartAccountMiddlewareError::AccountError(e))

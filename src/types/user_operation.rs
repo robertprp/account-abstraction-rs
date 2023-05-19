@@ -91,6 +91,11 @@ impl UserOperationRequest {
         self
     }
 
+    pub fn set_nonce<T: Into<U256>>(&mut self, nonce: T) -> &mut Self {
+        self.nonce = Some(nonce.into());
+        self
+    }
+
     #[must_use]
     pub fn init_code<T: Into<Bytes>>(mut self, init_code: T) -> Self {
         self.init_code = Some(init_code.into());
