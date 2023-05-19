@@ -54,14 +54,17 @@ where
     async fn fill_user_operation(
         &self,
         user_op: &mut UserOperationRequest,
-    ) -> Result<(), SmartAccountMiddlewareError<M>> {
+    ) -> Result<(), SmartAccountMiddlewareError<M>>
+    where
+        A: BaseAccount<Inner = M>,
+    {
         if user_op.nonce.is_none() {
             let nonce = self
-                .inner()
-                .get_transaction_count(self.account.get_account_address(), None)
+                .account
+                .get_nonce()
                 .await
-                .map_err(SmartAccountMiddlewareError::MiddlewareError)?;
-            
+                .map_err(SmartAccountMiddlewareError::AccountError)?;
+
             user_op.set_nonce(nonce);
         }
 

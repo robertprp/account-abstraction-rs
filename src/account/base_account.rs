@@ -51,12 +51,7 @@ pub trait BaseAccount: Sync + Send + Debug {
 
     async fn get_account_init_code(&self) -> Result<Bytes, AccountError<Self::Inner>>;
 
-    async fn get_nonce(&self) -> Result<U256, AccountError<Self::Inner>> {
-        self.inner()
-            .get_transaction_count(self.get_account_address(), None)
-            .await
-            .map_err(FromErr::from)
-    }
+    async fn get_nonce(&self) -> Result<U256, AccountError<Self::Inner>>;
 
     async fn encode_execute(
         &self,
