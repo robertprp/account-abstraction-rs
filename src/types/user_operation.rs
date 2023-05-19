@@ -1,4 +1,4 @@
-use ethers::types::{Address, Bytes, U256};
+use ethers::types::{Address, Bytes, U256, H256};
 use serde::{Deserialize, Serialize};
 
 /// Parameters for sending a user operation
@@ -145,3 +145,5 @@ impl UserOperationRequest {
         self
     }
 }
+
+pub type UserOpHash = H256;
