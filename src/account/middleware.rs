@@ -8,6 +8,7 @@ use crate::types::{
 use async_trait::async_trait;
 use ethers::{
     providers::{Middleware, MiddlewareError, ProviderError},
+    types::Bytes,
     utils,
 };
 use std::fmt::Debug;
@@ -47,6 +48,20 @@ where
         tx: &mut UserOperationRequest,
     ) -> Result<(), SmartAccountMiddlewareError<M>> {
         Ok(())
+    }
+
+    async fn sign_user_operation(
+        &self,
+        user_op: UserOperationRequest,
+    ) -> Result<Bytes, SmartAccountMiddlewareError<M>>
+    where
+        A: BaseAccount<Inner = M>,
+    {
+        self
+            .account
+            .sign_user_op(user_op)
+            .await
+            .map_err(|e| SmartAccountMiddlewareError::AccountError(e))
     }
 
 }
