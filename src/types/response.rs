@@ -1,4 +1,4 @@
-use ethers::types::{Address, Bytes, H256, U256, U64, TransactionReceipt};
+use ethers::types::{Address, Bytes, TransactionReceipt, H256, U256, U64};
 use serde::{Deserialize, Serialize};
 
 /// Details of a signed user operation
@@ -63,7 +63,6 @@ pub struct UserOperation {
     #[serde(default, rename = "transactionHash")]
     pub transaction_hash: H256,
 }
-
 
 /// Details of an executed user operation
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Default)]
