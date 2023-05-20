@@ -72,6 +72,10 @@ where
             user_op.set_nonce(nonce);
         }
 
+        if user_op.sender.is_none() {
+            user_op.sender = Some(self.account.get_account_address());
+        }
+
         if let (Some(target), Some(data)) = (user_op.target, &user_op.data) {
             let (call_data, call_gas_limit) = self
                 .account
