@@ -212,6 +212,15 @@ where
             .map_err(SmartAccountMiddlewareError::ProviderError)
     }
 
+    async fn get_supported_entry_points(
+        &self,
+    ) -> Result<Vec<String>, SmartAccountMiddlewareError<M>> {
+        self.inner()
+            .provider()
+            .request("eth_supportedEntryPoints", ())
+            .await
+            .map_err(SmartAccountMiddlewareError::ProviderError)
+    }
 }
 
 #[async_trait]
