@@ -187,6 +187,9 @@ pub enum SmartAccountMiddlewareError<M: Middleware> {
     #[error("account error {0}")]
     AccountError(AccountError<M>),
 
+    #[error("account error {0}")]
+    PaymasterError(PaymasterError),
+
     #[error("provider error {0}")]
     ProviderError(ProviderError),
 }
