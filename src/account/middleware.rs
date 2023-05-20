@@ -11,8 +11,7 @@ use crate::{
 use async_trait::async_trait;
 use ethers::{
     providers::{Middleware, MiddlewareError, ProviderError},
-    types::Bytes,
-    utils,
+    types::{Bytes, U256}, utils,
 };
 use std::{fmt::Debug, ops::Add};
 use thiserror::Error;
@@ -157,7 +156,32 @@ where
         self.account
             .sign_user_op(user_op)
             .await
-            .map_err(|e| SmartAccountMiddlewareError::AccountError(e))
+            .map_err(SmartAccountMiddlewareError::AccountError)
+    }
+
+    async fn estimate_user_operation_gas(
+        &self,
+        user_op: UserOperationRequest,
+    ) -> Result<U256, SmartAccountMiddlewareError<M>>
+    where
+        A: BaseAccount<Inner = M>,
+    {
+        let (Some(target), Some(data)) = (user_op.contract_target, &user_op.tx_data) else {
+            return Ok(U256::zero())
+        };
+
+        let (_, call_gas_limit) = self
+            .account
+            .encode_user_op_call_data_and_gas_limit(
+                target,
+                user_op.tx_value,
+                data,
+                user_op.call_gas_limit,
+            )
+            .await
+            .map_err(SmartAccountMiddlewareError::AccountError)?;
+
+        Ok(call_gas_limit)
     }
 
 }
