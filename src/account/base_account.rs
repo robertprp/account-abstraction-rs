@@ -49,9 +49,38 @@ pub trait BaseAccount: Sync + Send + Debug {
         utils::calc_pre_verification_gas(user_op.into(), None)
     }
 
+    async fn get_nonce(&self) -> Result<U256, AccountError<Self::Inner>>;
+
     async fn get_account_init_code(&self) -> Result<Bytes, AccountError<Self::Inner>>;
 
-    async fn get_nonce(&self) -> Result<U256, AccountError<Self::Inner>>;
+    async fn get_init_code(&self) -> Result<Bytes, AccountError<Self::Inner>> {
+        if self.check_is_deployed().await? {
+            return self.get_account_init_code().await;
+        }
+
+        Ok(Bytes::new())
+    }
+
+    fn is_deployed(&self) -> bool;
+    fn set_is_deployed(&self, is_deployed: bool);
+
+    async fn check_is_deployed(&self) -> Result<bool, AccountError<Self::Inner>> {
+        if !self.is_deployed() {
+            return Ok(self.is_deployed());
+        }
+
+        let sender_address_code = self
+            .provider()
+            .get_code(self.get_account_address(), None)
+            .await
+            .map_err(AccountError::ProviderError)?;
+
+        if sender_address_code.len() > 2 {
+            self.set_is_deployed(false);
+        }
+
+        Ok(self.is_deployed())
+    }
 
     async fn encode_execute(
         &self,
