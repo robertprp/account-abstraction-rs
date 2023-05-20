@@ -73,12 +73,17 @@ pub struct UserOperationRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub signature: Option<Bytes>,
 
+
     /// Helper properties for encodeExecute
-    pub target: Option<Address>,
 
-    pub value: Option<U256>,
+    /// Target contract
+    pub contract_target: Option<Address>,
 
-    pub data: Option<Bytes>,
+    // Transaction's value
+    pub tx_value: Option<U256>,
+
+    // Transaction data
+    pub tx_data: Option<Bytes>,
 }
 
 impl UserOperationRequest {
@@ -158,20 +163,20 @@ impl UserOperationRequest {
     }
 
     #[must_use]
-    pub fn target<T: Into<Address>>(mut self, target: T) -> Self {
-        self.target = Some(target.into());
+    pub fn contract_target<T: Into<Address>>(mut self, contract_target: T) -> Self {
+        self.contract_target = Some(contract_target.into());
         self
     }
 
     #[must_use]
-    pub fn value<T: Into<U256>>(mut self, value: T) -> Self {
-        self.value = Some(value.into());
+    pub fn tx_value<T: Into<U256>>(mut self, tx_value: T) -> Self {
+        self.tx_value = Some(tx_value.into());
         self
     }
 
     #[must_use]
-    pub fn data<T: Into<Bytes>>(mut self, data: T) -> Self {
-        self.data = Some(data.into());
+    pub fn tx_data<T: Into<Bytes>>(mut self, tx_data: T) -> Self {
+        self.tx_data = Some(tx_data.into());
         self
     }
 }

@@ -79,12 +79,12 @@ where
             user_op.sender = Some(self.account.get_account_address());
         }
 
-        if let (Some(target), Some(data)) = (user_op.target, &user_op.data) {
+        if let (Some(target), Some(data)) = (user_op.contract_target, &user_op.tx_data) {
             let (call_data, call_gas_limit) = self
                 .account
                 .encode_user_op_call_data_and_gas_limit(
                     target,
-                    user_op.value,
+                    user_op.tx_value,
                     data,
                     user_op.call_gas_limit,
                 )
