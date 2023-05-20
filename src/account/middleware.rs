@@ -11,7 +11,7 @@ use ethers::{
     types::Bytes,
     utils,
 };
-use std::fmt::Debug;
+use std::{fmt::Debug, ops::Add};
 use thiserror::Error;
 
 #[derive(Clone, Debug)]
@@ -106,8 +106,16 @@ where
             }
         }
 
-        if user_op.pre_verification_gas.is_none() {
-            user_op.pre_verification_gas = Some(self.account.get_pre_verification_gas(user_op.clone()));
+        if user_op.pre_verification_gas.is_none() || user_op.verification_gas_limit.is_none() {
+            user_op.pre_verification_gas =
+                Some(self.account.get_pre_verification_gas(user_op.clone()));
+            let init_gas = self
+                .account
+                .estimate_creation_gas()
+                .await
+                .map_err(SmartAccountMiddlewareError::AccountError)?;
+            user_op.verification_gas_limit =
+                Some(self.account.get_verification_gas_limit().add(init_gas));
         }
 
         Ok(())
