@@ -68,6 +68,11 @@ where
             user_op.set_nonce(nonce);
         }
 
+
+        if user_op.init_code.is_none() {
+            user_op.init_code = Some(self.account.get_init_code().await.map_err(SmartAccountMiddlewareError::AccountError)?);
+        }
+
         if user_op.max_fee_per_gas.is_none() || user_op.max_priority_fee_per_gas.is_none() {
             let (max_fee_per_gas, max_priority_fee_per_gas) =
                 self.estimate_eip1559_fees(None).await?;
@@ -79,6 +84,10 @@ where
             if user_op.max_fee_per_gas.is_none() {
                 user_op.max_fee_per_gas = Some(max_fee_per_gas);
             }
+        }
+
+        if user_op.pre_verification_gas.is_none() {
+            user_op.pre_verification_gas = Some(self.account.get_pre_verification_gas(user_op.clone()));
         }
 
         Ok(())
