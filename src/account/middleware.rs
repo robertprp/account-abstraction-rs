@@ -68,9 +68,29 @@ where
             user_op.set_nonce(nonce);
         }
 
+        if let (Some(target), Some(data)) = (user_op.target, &user_op.data) {
+            let (call_data, call_gas_limit) = self
+                .account
+                .encode_user_op_call_data_and_gas_limit(
+                    target,
+                    user_op.value,
+                    data,
+                    user_op.call_gas_limit,
+                )
+                .await
+                .map_err(SmartAccountMiddlewareError::AccountError)?;
+
+            user_op.call_data = Some(call_data);
+            user_op.call_gas_limit = Some(call_gas_limit);
+        }
 
         if user_op.init_code.is_none() {
-            user_op.init_code = Some(self.account.get_init_code().await.map_err(SmartAccountMiddlewareError::AccountError)?);
+            user_op.init_code = Some(
+                self.account
+                    .get_init_code()
+                    .await
+                    .map_err(SmartAccountMiddlewareError::AccountError)?,
+            );
         }
 
         if user_op.max_fee_per_gas.is_none() || user_op.max_priority_fee_per_gas.is_none() {
