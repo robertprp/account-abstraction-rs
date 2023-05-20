@@ -68,6 +68,19 @@ where
             user_op.set_nonce(nonce);
         }
 
+        if user_op.max_fee_per_gas.is_none() || user_op.max_priority_fee_per_gas.is_none() {
+            let (max_fee_per_gas, max_priority_fee_per_gas) =
+                self.estimate_eip1559_fees(None).await?;
+
+            if user_op.max_priority_fee_per_gas.is_none() {
+                user_op.max_priority_fee_per_gas = Some(max_priority_fee_per_gas);
+            }
+
+            if user_op.max_fee_per_gas.is_none() {
+                user_op.max_fee_per_gas = Some(max_fee_per_gas);
+            }
+        }
+
         Ok(())
     }
 
