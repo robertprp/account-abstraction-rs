@@ -1,4 +1,4 @@
-use crate::types::user_operation::UserOperationRequest;
+use crate::types::request::UserOperationRequest;
 use ethers::types::{Address, Bytes, U256};
 
 mod entry_point;
