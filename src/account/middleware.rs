@@ -4,7 +4,7 @@ use crate::{
     paymaster::PaymasterError,
     types::{
         request::{UserOpHash, UserOperationRequest},
-        FromErr, UserOperation,
+        FromErr, UserOperation, UserOperationReceipt,
     },
 };
 
@@ -160,6 +160,7 @@ where
             .map_err(SmartAccountMiddlewareError::AccountError)
     }
 
+    // TODO: Could also call eth_estimateUserOperationGas
     async fn estimate_user_operation_gas(
         &self,
         user_op: UserOperationRequest,
@@ -194,6 +195,19 @@ where
         self.inner()
             .provider()
             .request("eth_getUserOperationByHash", [hash])
+            .await
+            .map_err(SmartAccountMiddlewareError::ProviderError)
+    }
+
+    async fn get_user_operation_receipt<T: Send + Sync + Into<UserOpHash>>(
+        &self,
+        user_op_hash: T,
+    ) -> Result<Option<UserOperationReceipt>, SmartAccountMiddlewareError<M>> {
+        let hash = user_op_hash.into();
+
+        self.inner()
+            .provider()
+            .request("eth_getUserOperationReceipt", [hash])
             .await
             .map_err(SmartAccountMiddlewareError::ProviderError)
     }
