@@ -1,8 +1,11 @@
 use super::{base_account::BaseAccount, AccountError};
 
-use crate::types::{
-    user_operation::{UserOpHash, UserOperationRequest},
-    FromErr,
+use crate::{
+    paymaster::PaymasterError,
+    types::{
+        user_operation::{UserOpHash, UserOperationRequest},
+        FromErr,
+    },
 };
 
 use async_trait::async_trait;
@@ -114,9 +117,7 @@ where
             }
         }
 
-        if user_op.pre_verification_gas.is_none() || user_op.verification_gas_limit.is_none() {
-            user_op.pre_verification_gas =
-                Some(self.account.get_pre_verification_gas(user_op.clone()));
+        if user_op.pre_verification_gas.is_none() {
             let init_gas = self
                 .account
                 .estimate_creation_gas()
@@ -125,6 +126,23 @@ where
             user_op.verification_gas_limit =
                 Some(self.account.get_verification_gas_limit().add(init_gas));
         }
+
+        if let Some(paymaster_api) = self.account.get_paymaster() {
+            let pre_verification_gas = self.account.get_pre_verification_gas(user_op.clone());
+
+            user_op.pre_verification_gas = Some(pre_verification_gas);
+
+            let paymaster_and_data = paymaster_api
+                .get_paymaster_and_data(user_op.clone().into())
+                .await
+                .map_err(SmartAccountMiddlewareError::PaymasterError)?;
+
+            user_op.paymaster_and_data = Some(paymaster_and_data);
+        } else {
+            user_op.paymaster_and_data = Some(Bytes::new());
+        }
+
+        user_op.pre_verification_gas = Some(self.account.get_pre_verification_gas(user_op.clone()));
 
         Ok(())
     }
