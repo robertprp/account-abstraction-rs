@@ -61,7 +61,7 @@ pub trait BaseAccount: Sync + Send + Debug {
     ) -> Result<Vec<u8>, AccountError<Self::Inner>>; // [u8; 32]?
 
     async fn estimate_creation_gas(&self) -> Result<U256, AccountError<Self::Inner>> {
-        let init_code = self.get_account_init_code().await?;
+        let init_code = self.get_init_code().await?;
 
         if init_code.is_empty() {
             Ok(U256::zero())
@@ -180,7 +180,7 @@ pub trait BaseAccount: Sync + Send + Debug {
                 info.gas_limit,
             )
             .await?;
-        let init_code = self.get_account_init_code().await?;
+        let init_code = self.get_init_code().await?;
         let init_gas = self.estimate_creation_gas().await?;
         let verification_gas_limit = self.get_verification_gas_limit().add(init_gas);
         let (max_fee_per_gas, max_priority_fee_per_gas) = {
