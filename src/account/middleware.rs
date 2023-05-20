@@ -29,6 +29,10 @@ where
         Self { inner, account }
     }
 
+    fn account(&self) -> &A {
+        &self.account
+    }
+
     async fn send_user_operation<U: Into<UserOperationRequest> + Send + Sync>(
         &self,
         user_op: U,
