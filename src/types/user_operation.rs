@@ -72,6 +72,13 @@ pub struct UserOperationRequest {
     /// Sender address
     #[serde(skip_serializing_if = "Option::is_none")]
     pub signature: Option<Bytes>,
+
+    /// Helper properties for encodeExecute
+    pub target: Option<Address>,
+
+    pub value: Option<U256>,
+
+    pub data: Option<Bytes>,
 }
 
 impl UserOperationRequest {
@@ -147,6 +154,24 @@ impl UserOperationRequest {
     #[must_use]
     pub fn signature<T: Into<Bytes>>(mut self, signature: T) -> Self {
         self.signature = Some(signature.into());
+        self
+    }
+
+    #[must_use]
+    pub fn target<T: Into<Address>>(mut self, target: T) -> Self {
+        self.target = Some(target.into());
+        self
+    }
+
+    #[must_use]
+    pub fn value<T: Into<U256>>(mut self, value: T) -> Self {
+        self.value = Some(value.into());
+        self
+    }
+
+    #[must_use]
+    pub fn data<T: Into<Bytes>>(mut self, data: T) -> Self {
+        self.data = Some(data.into());
         self
     }
 }
