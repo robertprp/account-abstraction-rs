@@ -3,15 +3,16 @@ use super::{base_account::BaseAccount, AccountError};
 use crate::{
     paymaster::PaymasterError,
     types::{
-        user_operation::{UserOpHash, UserOperationRequest},
-        FromErr,
+        request::{UserOpHash, UserOperationRequest},
+        FromErr, UserOperation,
     },
 };
 
 use async_trait::async_trait;
 use ethers::{
     providers::{Middleware, MiddlewareError, ProviderError},
-    types::{Bytes, U256}, utils,
+    types::{Bytes, U256},
+    utils,
 };
 use std::{fmt::Debug, ops::Add};
 use thiserror::Error;
@@ -182,6 +183,19 @@ where
             .map_err(SmartAccountMiddlewareError::AccountError)?;
 
         Ok(call_gas_limit)
+    }
+
+    async fn get_user_operation<T: Send + Sync + Into<UserOpHash>>(
+        &self,
+        user_op_hash: T,
+    ) -> Result<Option<UserOperation>, SmartAccountMiddlewareError<M>> {
+        let hash = user_op_hash.into();
+
+        self.inner()
+            .provider()
+            .request("eth_getUserOperationByHash", [hash])
+            .await
+            .map_err(SmartAccountMiddlewareError::ProviderError)
     }
 
 }
