@@ -1,7 +1,7 @@
 use super::{base_account::BaseAccount, AccountError};
 
 use crate::{
-    paymaster::{PaymasterError, Paymaster},
+    paymaster::{Paymaster, PaymasterError},
     types::{
         request::{UserOpHash, UserOperationRequest},
         FromErr, UserOperation, UserOperationReceipt,

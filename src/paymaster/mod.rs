@@ -2,8 +2,8 @@ use crate::contracts::UserOperation;
 
 use async_trait::async_trait;
 use ethers::types::Bytes;
-use thiserror::Error;
 use std::fmt::Debug;
+use thiserror::Error;
 
 #[async_trait]
 pub trait Paymaster: Sync + Send + Debug {

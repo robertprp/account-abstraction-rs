@@ -1,14 +1,15 @@
 use super::{AccountError, BaseAccount};
 
-use crate::contracts::{EntryPoint, SimpleAccountCalls, ExecuteCall};
 use crate::contracts::{
     CreateAccountCall, SimpleAccount as SimpleAccountContract, SimpleAccountFactoryCalls,
 };
+use crate::contracts::{EntryPoint, ExecuteCall, SimpleAccountCalls, UserOperation};
 use crate::paymaster::{Paymaster, PaymasterError};
 
 use async_trait::async_trait;
 use ethers::abi::AbiEncode;
 use ethers::providers::Http;
+use ethers::signers::Signer;
 use ethers::{
     providers::Provider,
     types::{Address, Bytes, U256},
