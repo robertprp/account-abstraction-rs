@@ -22,6 +22,7 @@ pub trait BaseAccount: Sync + Send + Debug {
     //     + FromErr<<Self::Inner as Middleware>::Error>
     //     + FromErr<ProviderError>;
 
+    type Paymaster: Paymaster;
     type Provider: JsonRpcClient;
     type Inner: Middleware<Provider = Self::Provider>;
 
@@ -39,7 +40,7 @@ pub trait BaseAccount: Sync + Send + Debug {
 
     fn get_entry_point(&self) -> EntryPoint<Self::Inner>;
 
-    fn get_paymaster(&self) -> Option<Box<dyn Paymaster + Send + Sync>>;
+    fn get_paymaster(&self) -> Option<Self::Paymaster>;
 
     fn get_verification_gas_limit(&self) -> U256 {
         U256::from(100000)

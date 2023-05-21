@@ -4,7 +4,7 @@ use crate::contracts::{EntryPoint, SimpleAccountCalls, ExecuteCall};
 use crate::contracts::{
     CreateAccountCall, SimpleAccount as SimpleAccountContract, SimpleAccountFactoryCalls,
 };
-use crate::paymaster::Paymaster;
+use crate::paymaster::{Paymaster, PaymasterError};
 
 use async_trait::async_trait;
 use ethers::abi::AbiEncode;
@@ -26,6 +26,8 @@ struct SimpleAccount {
 
 #[async_trait]
 impl BaseAccount for SimpleAccount {
+
+    type Paymaster = SimplePaymaster;
     type Provider = Http;
     type Inner = Provider<Http>;
 
@@ -56,8 +58,8 @@ impl BaseAccount for SimpleAccount {
         EntryPoint::new(address, self.inner.clone())
     }
 
-    fn get_paymaster(&self) -> Option<Box<dyn Paymaster + Send + Sync>> {
-        unimplemented!()
+    fn get_paymaster(&self) -> Option<Self::Paymaster> {
+        None
     }
 
     async fn get_account_init_code(&self) -> Result<Bytes, AccountError<Self::Inner>> {
@@ -119,5 +121,15 @@ impl BaseAccount for SimpleAccount {
         user_op_hash: [u8; 32],
     ) -> Result<Bytes, AccountError<Self::Inner>> {
         unimplemented!() // You will need to provide an actual implementation.
+    }
+}
+
+#[derive(Debug)]
+struct SimplePaymaster;
+
+#[async_trait]
+impl Paymaster for SimplePaymaster {
+    async fn get_paymaster_and_data(&self, user_op: UserOperation) -> Result<Bytes, PaymasterError> {
+        Ok(Bytes::new())
     }
 }
