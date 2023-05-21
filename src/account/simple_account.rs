@@ -1,6 +1,6 @@
 use super::{AccountError, BaseAccount};
 
-use crate::contracts::EntryPoint;
+use crate::contracts::{EntryPoint, SimpleAccountCalls};
 use crate::contracts::{CreateAccountCall, SimpleAccountFactoryCalls};
 use crate::paymaster::Paymaster;
 
