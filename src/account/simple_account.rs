@@ -1,7 +1,9 @@
 use super::{AccountError, BaseAccount};
 
-use crate::contracts::{EntryPoint, SimpleAccountCalls};
-use crate::contracts::{CreateAccountCall, SimpleAccountFactoryCalls};
+use crate::contracts::EntryPoint;
+use crate::contracts::{
+    CreateAccountCall, SimpleAccount as SimpleAccountContract, SimpleAccountFactoryCalls,
+};
 use crate::paymaster::Paymaster;
 
 use async_trait::async_trait;
@@ -81,7 +83,15 @@ impl BaseAccount for SimpleAccount {
     }
 
     async fn get_nonce(&self) -> Result<U256, AccountError<Self::Inner>> {
-        unimplemented!() // You will need to provide an actual implementation.
+        let account_address = self.get_account_address().await?;
+        let simple_account = SimpleAccountContract::new(account_address, self.inner.clone());
+        let nonce = simple_account
+            .nonce()
+            .call()
+            .await
+            .map_err(AccountError::ContractError)?;
+
+        Ok(nonce)
     }
 
     async fn is_deployed(&self) -> bool {
