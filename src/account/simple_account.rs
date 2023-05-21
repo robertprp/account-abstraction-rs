@@ -1,6 +1,6 @@
 use super::{AccountError, BaseAccount};
 
-use crate::contracts::EntryPoint;
+use crate::contracts::{EntryPoint, SimpleAccountCalls, ExecuteCall};
 use crate::contracts::{
     CreateAccountCall, SimpleAccount as SimpleAccountContract, SimpleAccountFactoryCalls,
 };
@@ -106,9 +106,12 @@ impl BaseAccount for SimpleAccount {
         &self,
         target: Address,
         value: U256,
-        data: &Bytes,
+        data: Bytes,
     ) -> Result<Vec<u8>, AccountError<Self::Inner>> {
-        unimplemented!() // You will need to provide an actual implementation.
+        let call =
+            SimpleAccountCalls::Execute(ExecuteCall { dest: target, value, func: data });
+
+        Ok(call.encode())
     }
 
     async fn sign_user_op_hash(
