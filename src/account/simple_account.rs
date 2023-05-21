@@ -24,6 +24,7 @@ struct SimpleAccount<S: Signer> {
     signer: S,
     account_address: RwLock<Option<Address>>,
     is_deployed: RwLock<bool>,
+    rpc_url: String,
 }
 
 #[async_trait]
@@ -48,7 +49,7 @@ where
     }
 
     fn get_rpc_url(&self) -> &str {
-        unimplemented!()
+        self.rpc_url.as_str()
     }
 
     fn get_entry_point_address(&self) -> Address {
@@ -114,8 +115,11 @@ where
         value: U256,
         data: Bytes,
     ) -> Result<Vec<u8>, AccountError<Self::Inner>> {
-        let call =
-            SimpleAccountCalls::Execute(ExecuteCall { dest: target, value, func: data });
+        let call = SimpleAccountCalls::Execute(ExecuteCall {
+            dest: target,
+            value,
+            func: data,
+        });
 
         Ok(call.encode())
     }

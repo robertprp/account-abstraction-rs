@@ -299,6 +299,9 @@ pub enum AccountError<M: Middleware> {
 
     #[error("paymaster error: {0}")]
     PaymasterError(PaymasterError),
+
+    #[error("signer error")]
+    SignerError,
 }
 
 impl<M: Middleware> FromErr<M::Error> for AccountError<M> {
