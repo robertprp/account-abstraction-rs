@@ -7,14 +7,16 @@ pub use simple_account::*;
     clippy::upper_case_acronyms,
     clippy::type_complexity,
     dead_code,
-    non_camel_case_types,
+    non_camel_case_types
 )]
 pub mod simple_account {
     #[rustfmt::skip]
     const __ABI: &str = "[\n    {\n      \"inputs\": [\n        {\n          \"internalType\": \"contract IEntryPoint\",\n          \"name\": \"anEntryPoint\",\n          \"type\": \"address\"\n        }\n      ],\n      \"stateMutability\": \"nonpayable\",\n      \"type\": \"constructor\"\n    },\n    {\n      \"anonymous\": false,\n      \"inputs\": [\n        {\n          \"indexed\": false,\n          \"internalType\": \"address\",\n          \"name\": \"previousAdmin\",\n          \"type\": \"address\"\n        },\n        {\n          \"indexed\": false,\n          \"internalType\": \"address\",\n          \"name\": \"newAdmin\",\n          \"type\": \"address\"\n        }\n      ],\n      \"name\": \"AdminChanged\",\n      \"type\": \"event\"\n    },\n    {\n      \"anonymous\": false,\n      \"inputs\": [\n        {\n          \"indexed\": true,\n          \"internalType\": \"address\",\n          \"name\": \"beacon\",\n          \"type\": \"address\"\n        }\n      ],\n      \"name\": \"BeaconUpgraded\",\n      \"type\": \"event\"\n    },\n    {\n      \"anonymous\": false,\n      \"inputs\": [\n        {\n          \"indexed\": false,\n          \"internalType\": \"uint8\",\n          \"name\": \"version\",\n          \"type\": \"uint8\"\n        }\n      ],\n      \"name\": \"Initialized\",\n      \"type\": \"event\"\n    },\n    {\n      \"anonymous\": false,\n      \"inputs\": [\n        {\n          \"indexed\": true,\n          \"internalType\": \"contract IEntryPoint\",\n          \"name\": \"entryPoint\",\n          \"type\": \"address\"\n        },\n        {\n          \"indexed\": true,\n          \"internalType\": \"address\",\n          \"name\": \"owner\",\n          \"type\": \"address\"\n        }\n      ],\n      \"name\": \"SimpleAccountInitialized\",\n      \"type\": \"event\"\n    },\n    {\n      \"anonymous\": false,\n      \"inputs\": [\n        {\n          \"indexed\": true,\n          \"internalType\": \"address\",\n          \"name\": \"implementation\",\n          \"type\": \"address\"\n        }\n      ],\n      \"name\": \"Upgraded\",\n      \"type\": \"event\"\n    },\n    {\n      \"inputs\": [],\n      \"name\": \"addDeposit\",\n      \"outputs\": [],\n      \"stateMutability\": \"payable\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [],\n      \"name\": \"entryPoint\",\n      \"outputs\": [\n        {\n          \"internalType\": \"contract IEntryPoint\",\n          \"name\": \"\",\n          \"type\": \"address\"\n        }\n      ],\n      \"stateMutability\": \"view\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [\n        {\n          \"internalType\": \"address\",\n          \"name\": \"dest\",\n          \"type\": \"address\"\n        },\n        {\n          \"internalType\": \"uint256\",\n          \"name\": \"value\",\n          \"type\": \"uint256\"\n        },\n        {\n          \"internalType\": \"bytes\",\n          \"name\": \"func\",\n          \"type\": \"bytes\"\n        }\n      ],\n      \"name\": \"execute\",\n      \"outputs\": [],\n      \"stateMutability\": \"nonpayable\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [\n        {\n          \"internalType\": \"address[]\",\n          \"name\": \"dest\",\n          \"type\": \"address[]\"\n        },\n        {\n          \"internalType\": \"bytes[]\",\n          \"name\": \"func\",\n          \"type\": \"bytes[]\"\n        }\n      ],\n      \"name\": \"executeBatch\",\n      \"outputs\": [],\n      \"stateMutability\": \"nonpayable\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [],\n      \"name\": \"getDeposit\",\n      \"outputs\": [\n        {\n          \"internalType\": \"uint256\",\n          \"name\": \"\",\n          \"type\": \"uint256\"\n        }\n      ],\n      \"stateMutability\": \"view\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [\n        {\n          \"internalType\": \"address\",\n          \"name\": \"anOwner\",\n          \"type\": \"address\"\n        }\n      ],\n      \"name\": \"initialize\",\n      \"outputs\": [],\n      \"stateMutability\": \"nonpayable\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [],\n      \"name\": \"nonce\",\n      \"outputs\": [\n        {\n          \"internalType\": \"uint256\",\n          \"name\": \"\",\n          \"type\": \"uint256\"\n        }\n      ],\n      \"stateMutability\": \"view\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [],\n      \"name\": \"owner\",\n      \"outputs\": [\n        {\n          \"internalType\": \"address\",\n          \"name\": \"\",\n          \"type\": \"address\"\n        }\n      ],\n      \"stateMutability\": \"view\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [],\n      \"name\": \"proxiableUUID\",\n      \"outputs\": [\n        {\n          \"internalType\": \"bytes32\",\n          \"name\": \"\",\n          \"type\": \"bytes32\"\n        }\n      ],\n      \"stateMutability\": \"view\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [\n        {\n          \"internalType\": \"address\",\n          \"name\": \"newImplementation\",\n          \"type\": \"address\"\n        }\n      ],\n      \"name\": \"upgradeTo\",\n      \"outputs\": [],\n      \"stateMutability\": \"nonpayable\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [\n        {\n          \"internalType\": \"address\",\n          \"name\": \"newImplementation\",\n          \"type\": \"address\"\n        },\n        {\n          \"internalType\": \"bytes\",\n          \"name\": \"data\",\n          \"type\": \"bytes\"\n        }\n      ],\n      \"name\": \"upgradeToAndCall\",\n      \"outputs\": [],\n      \"stateMutability\": \"payable\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [\n        {\n          \"components\": [\n            {\n              \"internalType\": \"address\",\n              \"name\": \"sender\",\n              \"type\": \"address\"\n            },\n            {\n              \"internalType\": \"uint256\",\n              \"name\": \"nonce\",\n              \"type\": \"uint256\"\n            },\n            {\n              \"internalType\": \"bytes\",\n              \"name\": \"initCode\",\n              \"type\": \"bytes\"\n            },\n            {\n              \"internalType\": \"bytes\",\n              \"name\": \"callData\",\n              \"type\": \"bytes\"\n            },\n            {\n              \"internalType\": \"uint256\",\n              \"name\": \"callGasLimit\",\n              \"type\": \"uint256\"\n            },\n            {\n              \"internalType\": \"uint256\",\n              \"name\": \"verificationGasLimit\",\n              \"type\": \"uint256\"\n            },\n            {\n              \"internalType\": \"uint256\",\n              \"name\": \"preVerificationGas\",\n              \"type\": \"uint256\"\n            },\n            {\n              \"internalType\": \"uint256\",\n              \"name\": \"maxFeePerGas\",\n              \"type\": \"uint256\"\n            },\n            {\n              \"internalType\": \"uint256\",\n              \"name\": \"maxPriorityFeePerGas\",\n              \"type\": \"uint256\"\n            },\n            {\n              \"internalType\": \"bytes\",\n              \"name\": \"paymasterAndData\",\n              \"type\": \"bytes\"\n            },\n            {\n              \"internalType\": \"bytes\",\n              \"name\": \"signature\",\n              \"type\": \"bytes\"\n            }\n          ],\n          \"internalType\": \"struct UserOperation\",\n          \"name\": \"userOp\",\n          \"type\": \"tuple\"\n        },\n        {\n          \"internalType\": \"bytes32\",\n          \"name\": \"userOpHash\",\n          \"type\": \"bytes32\"\n        },\n        {\n          \"internalType\": \"address\",\n          \"name\": \"aggregator\",\n          \"type\": \"address\"\n        },\n        {\n          \"internalType\": \"uint256\",\n          \"name\": \"missingAccountFunds\",\n          \"type\": \"uint256\"\n        }\n      ],\n      \"name\": \"validateUserOp\",\n      \"outputs\": [\n        {\n          \"internalType\": \"uint256\",\n          \"name\": \"deadline\",\n          \"type\": \"uint256\"\n        }\n      ],\n      \"stateMutability\": \"nonpayable\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [\n        {\n          \"internalType\": \"address payable\",\n          \"name\": \"withdrawAddress\",\n          \"type\": \"address\"\n        },\n        {\n          \"internalType\": \"uint256\",\n          \"name\": \"amount\",\n          \"type\": \"uint256\"\n        }\n      ],\n      \"name\": \"withdrawDepositTo\",\n      \"outputs\": [],\n      \"stateMutability\": \"nonpayable\",\n      \"type\": \"function\"\n    },\n    {\n      \"stateMutability\": \"payable\",\n      \"type\": \"receive\"\n    }\n  ]";
     ///The parsed JSON ABI of the contract.
-    pub static SIMPLEACCOUNT_ABI: ::ethers::contract::Lazy<::ethers::core::abi::Abi> = ::ethers::contract::Lazy::new(||
-    ::ethers::core::utils::__serde_json::from_str(__ABI).expect("ABI is always valid"));
+    pub static SIMPLEACCOUNT_ABI: ::ethers::contract::Lazy<::ethers::core::abi::Abi> =
+        ::ethers::contract::Lazy::new(|| {
+            ::ethers::core::utils::__serde_json::from_str(__ABI).expect("ABI is always valid")
+        });
     pub struct SimpleAccount<M>(::ethers::contract::Contract<M>);
     impl<M> ::core::clone::Clone for SimpleAccount<M> {
         fn clone(&self) -> Self {
@@ -34,7 +36,9 @@ pub mod simple_account {
     }
     impl<M> ::core::fmt::Debug for SimpleAccount<M> {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-            f.debug_tuple(stringify!(SimpleAccount)).field(&self.address()).finish()
+            f.debug_tuple(stringify!(SimpleAccount))
+                .field(&self.address())
+                .finish()
         }
     }
     impl<M: ::ethers::providers::Middleware> SimpleAccount<M> {
@@ -44,13 +48,11 @@ pub mod simple_account {
             address: T,
             client: ::std::sync::Arc<M>,
         ) -> Self {
-            Self(
-                ::ethers::contract::Contract::new(
-                    address.into(),
-                    SIMPLEACCOUNT_ABI.clone(),
-                    client,
-                ),
-            )
+            Self(::ethers::contract::Contract::new(
+                address.into(),
+                SIMPLEACCOUNT_ABI.clone(),
+                client,
+            ))
         }
         ///Calls the contract's `addDeposit` (0x4a58db19) function
         pub fn add_deposit(&self) -> ::ethers::contract::builders::ContractCall<M, ()> {
@@ -61,10 +63,7 @@ pub mod simple_account {
         ///Calls the contract's `entryPoint` (0xb0d691fe) function
         pub fn entry_point(
             &self,
-        ) -> ::ethers::contract::builders::ContractCall<
-            M,
-            ::ethers::core::types::Address,
-        > {
+        ) -> ::ethers::contract::builders::ContractCall<M, ::ethers::core::types::Address> {
             self.0
                 .method_hash([176, 214, 145, 254], ())
                 .expect("method not found (this should never happen)")
@@ -118,18 +117,13 @@ pub mod simple_account {
         ///Calls the contract's `owner` (0x8da5cb5b) function
         pub fn owner(
             &self,
-        ) -> ::ethers::contract::builders::ContractCall<
-            M,
-            ::ethers::core::types::Address,
-        > {
+        ) -> ::ethers::contract::builders::ContractCall<M, ::ethers::core::types::Address> {
             self.0
                 .method_hash([141, 165, 203, 91], ())
                 .expect("method not found (this should never happen)")
         }
         ///Calls the contract's `proxiableUUID` (0x52d1902d) function
-        pub fn proxiable_uuid(
-            &self,
-        ) -> ::ethers::contract::builders::ContractCall<M, [u8; 32]> {
+        pub fn proxiable_uuid(&self) -> ::ethers::contract::builders::ContractCall<M, [u8; 32]> {
             self.0
                 .method_hash([82, 209, 144, 45], ())
                 .expect("method not found (this should never happen)")
@@ -181,31 +175,22 @@ pub mod simple_account {
         ///Gets the contract's `AdminChanged` event
         pub fn admin_changed_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            AdminChangedFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, AdminChangedFilter>
+        {
             self.0.event()
         }
         ///Gets the contract's `BeaconUpgraded` event
         pub fn beacon_upgraded_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            BeaconUpgradedFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, BeaconUpgradedFilter>
+        {
             self.0.event()
         }
         ///Gets the contract's `Initialized` event
         pub fn initialized_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            InitializedFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, InitializedFilter>
+        {
             self.0.event()
         }
         ///Gets the contract's `SimpleAccountInitialized` event
@@ -221,26 +206,21 @@ pub mod simple_account {
         ///Gets the contract's `Upgraded` event
         pub fn upgraded_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            UpgradedFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, UpgradedFilter> {
             self.0.event()
         }
         /// Returns an `Event` builder for all the events of this contract.
         pub fn events(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            SimpleAccountEvents,
-        > {
-            self.0.event_with_filter(::core::default::Default::default())
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, SimpleAccountEvents>
+        {
+            self.0
+                .event_with_filter(::core::default::Default::default())
         }
     }
     impl<M: ::ethers::providers::Middleware> From<::ethers::contract::Contract<M>>
-    for SimpleAccount<M> {
+        for SimpleAccount<M>
+    {
         fn from(contract: ::ethers::contract::Contract<M>) -> Self {
             Self::new(contract.address(), contract.client())
         }
@@ -253,7 +233,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(name = "AdminChanged", abi = "AdminChanged(address,address)")]
     pub struct AdminChangedFilter {
@@ -268,7 +248,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(name = "BeaconUpgraded", abi = "BeaconUpgraded(address)")]
     pub struct BeaconUpgradedFilter {
@@ -283,7 +263,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(name = "Initialized", abi = "Initialized(uint8)")]
     pub struct InitializedFilter {
@@ -297,7 +277,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(
         name = "SimpleAccountInitialized",
@@ -317,7 +297,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(name = "Upgraded", abi = "Upgraded(address)")]
     pub struct UpgradedFilter {
@@ -358,12 +338,8 @@ pub mod simple_account {
     impl ::core::fmt::Display for SimpleAccountEvents {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
             match self {
-                Self::AdminChangedFilter(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
-                Self::BeaconUpgradedFilter(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::AdminChangedFilter(element) => ::core::fmt::Display::fmt(element, f),
+                Self::BeaconUpgradedFilter(element) => ::core::fmt::Display::fmt(element, f),
                 Self::InitializedFilter(element) => ::core::fmt::Display::fmt(element, f),
                 Self::SimpleAccountInitializedFilter(element) => {
                     ::core::fmt::Display::fmt(element, f)
@@ -406,7 +382,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "addDeposit", abi = "addDeposit()")]
     pub struct AddDepositCall;
@@ -419,7 +395,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "entryPoint", abi = "entryPoint()")]
     pub struct EntryPointCall;
@@ -432,7 +408,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "execute", abi = "execute(address,uint256,bytes)")]
     pub struct ExecuteCall {
@@ -449,7 +425,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "executeBatch", abi = "executeBatch(address[],bytes[])")]
     pub struct ExecuteBatchCall {
@@ -465,7 +441,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "getDeposit", abi = "getDeposit()")]
     pub struct GetDepositCall;
@@ -478,7 +454,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "initialize", abi = "initialize(address)")]
     pub struct InitializeCall {
@@ -493,7 +469,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "nonce", abi = "nonce()")]
     pub struct NonceCall;
@@ -506,7 +482,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "owner", abi = "owner()")]
     pub struct OwnerCall;
@@ -519,7 +495,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "proxiableUUID", abi = "proxiableUUID()")]
     pub struct ProxiableUUIDCall;
@@ -532,7 +508,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "upgradeTo", abi = "upgradeTo(address)")]
     pub struct UpgradeToCall {
@@ -547,7 +523,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "upgradeToAndCall", abi = "upgradeToAndCall(address,bytes)")]
     pub struct UpgradeToAndCallCall {
@@ -563,7 +539,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "validateUserOp",
@@ -584,7 +560,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "withdrawDepositTo", abi = "withdrawDepositTo(address,uint256)")]
     pub struct WithdrawDepositToCall {
@@ -613,60 +589,51 @@ pub mod simple_account {
             data: impl AsRef<[u8]>,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::AbiError> {
             let data = data.as_ref();
-            if let Ok(decoded)
-                = <AddDepositCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <AddDepositCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::AddDeposit(decoded));
             }
-            if let Ok(decoded)
-                = <EntryPointCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <EntryPointCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::EntryPoint(decoded));
             }
-            if let Ok(decoded)
-                = <ExecuteCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <ExecuteCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::Execute(decoded));
             }
-            if let Ok(decoded)
-                = <ExecuteBatchCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <ExecuteBatchCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::ExecuteBatch(decoded));
             }
-            if let Ok(decoded)
-                = <GetDepositCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <GetDepositCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::GetDeposit(decoded));
             }
-            if let Ok(decoded)
-                = <InitializeCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <InitializeCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::Initialize(decoded));
             }
-            if let Ok(decoded)
-                = <NonceCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <NonceCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::Nonce(decoded));
             }
-            if let Ok(decoded)
-                = <OwnerCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <OwnerCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::Owner(decoded));
             }
-            if let Ok(decoded)
-                = <ProxiableUUIDCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <ProxiableUUIDCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::ProxiableUUID(decoded));
             }
-            if let Ok(decoded)
-                = <UpgradeToCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <UpgradeToCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::UpgradeTo(decoded));
             }
-            if let Ok(decoded)
-                = <UpgradeToAndCallCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <UpgradeToAndCallCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::UpgradeToAndCall(decoded));
             }
-            if let Ok(decoded)
-                = <ValidateUserOpCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) =
+                <ValidateUserOpCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::ValidateUserOp(decoded));
             }
-            if let Ok(decoded)
-                = <WithdrawDepositToCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <WithdrawDepositToCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::WithdrawDepositTo(decoded));
             }
             Err(::ethers::core::abi::Error::InvalidData.into())
@@ -675,39 +642,19 @@ pub mod simple_account {
     impl ::ethers::core::abi::AbiEncode for SimpleAccountCalls {
         fn encode(self) -> Vec<u8> {
             match self {
-                Self::AddDeposit(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::EntryPoint(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::AddDeposit(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::EntryPoint(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::Execute(element) => ::ethers::core::abi::AbiEncode::encode(element),
-                Self::ExecuteBatch(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::GetDeposit(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::Initialize(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::ExecuteBatch(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::GetDeposit(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::Initialize(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::Nonce(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::Owner(element) => ::ethers::core::abi::AbiEncode::encode(element),
-                Self::ProxiableUUID(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::UpgradeTo(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::UpgradeToAndCall(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::ValidateUserOp(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::WithdrawDepositTo(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::ProxiableUUID(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::UpgradeTo(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::UpgradeToAndCall(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::ValidateUserOp(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::WithdrawDepositTo(element) => ::ethers::core::abi::AbiEncode::encode(element),
             }
         }
     }
@@ -804,7 +751,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct EntryPointReturn(pub ::ethers::core::types::Address);
     ///Container type for all return fields from the `getDeposit` function with signature `getDeposit()` and selector `0xc399ec88`
@@ -816,7 +763,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct GetDepositReturn(pub ::ethers::core::types::U256);
     ///Container type for all return fields from the `nonce` function with signature `nonce()` and selector `0xaffed0e0`
@@ -828,7 +775,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct NonceReturn(pub ::ethers::core::types::U256);
     ///Container type for all return fields from the `owner` function with signature `owner()` and selector `0x8da5cb5b`
@@ -840,7 +787,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct OwnerReturn(pub ::ethers::core::types::Address);
     ///Container type for all return fields from the `proxiableUUID` function with signature `proxiableUUID()` and selector `0x52d1902d`
@@ -852,7 +799,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct ProxiableUUIDReturn(pub [u8; 32]);
     ///Container type for all return fields from the `validateUserOp` function with signature `validateUserOp((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,bytes,bytes),bytes32,address,uint256)` and selector `0x0825d1fc`
@@ -864,7 +811,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct ValidateUserOpReturn {
         pub deadline: ::ethers::core::types::U256,
@@ -878,7 +825,7 @@ pub mod simple_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct UserOperation {
         pub sender: ::ethers::core::types::Address,
