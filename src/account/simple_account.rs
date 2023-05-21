@@ -19,16 +19,19 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 
 #[derive(Debug)]
-struct SimpleAccount {
+struct SimpleAccount<S: Signer> {
     inner: Arc<Provider<Http>>,
+    signer: S,
     account_address: RwLock<Option<Address>>,
     is_deployed: RwLock<bool>,
 }
 
 #[async_trait]
-impl BaseAccount for SimpleAccount {
-
-    type Paymaster = SimplePaymaster;
+impl<S> BaseAccount for SimpleAccount<S>
+where
+    S: Signer,
+{
+    type Paymaster = EmptyPaymaster;
     type Provider = Http;
     type Inner = Provider<Http>;
 
@@ -121,16 +124,23 @@ impl BaseAccount for SimpleAccount {
         &self,
         user_op_hash: [u8; 32],
     ) -> Result<Bytes, AccountError<Self::Inner>> {
-        unimplemented!() // You will need to provide an actual implementation.
+        let Ok(signed_hash) = self.signer.sign_message(&user_op_hash).await else {
+            return Err(AccountError::SignerError);
+        };
+
+        Ok(signed_hash.to_vec().into())
     }
 }
 
 #[derive(Debug)]
-struct SimplePaymaster;
+struct EmptyPaymaster;
 
 #[async_trait]
-impl Paymaster for SimplePaymaster {
-    async fn get_paymaster_and_data(&self, user_op: UserOperation) -> Result<Bytes, PaymasterError> {
+impl Paymaster for EmptyPaymaster {
+    async fn get_paymaster_and_data(
+        &self,
+        user_op: UserOperation,
+    ) -> Result<Bytes, PaymasterError> {
         Ok(Bytes::new())
     }
 }

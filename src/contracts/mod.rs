@@ -8,7 +8,7 @@ mod simple_account_factory;
 pub use simple_account_factory::*;
 
 mod simple_account;
-pub use simple_account::{NonceCall, SimpleAccount, SimpleAccountCalls, ExecuteCall};
+pub use simple_account::{ExecuteCall, NonceCall, SimpleAccount, SimpleAccountCalls};
 
 #[derive(
     Clone,
