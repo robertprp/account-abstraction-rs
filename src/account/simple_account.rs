@@ -1,19 +1,19 @@
-use super::{BaseAccount, AccountError};
+use super::{AccountError, BaseAccount};
 
 use crate::contracts::EntryPoint;
-use crate::paymaster::Paymaster;
 use crate::contracts::{CreateAccountCall, SimpleAccountFactoryCalls};
+use crate::paymaster::Paymaster;
 
 use async_trait::async_trait;
+use ethers::abi::AbiEncode;
 use ethers::providers::Http;
 use ethers::{
     providers::Provider,
     types::{Address, Bytes, U256},
 };
-use tokio::sync::RwLock;
 use std::fmt::Debug;
-use ethers::abi::AbiEncode;
 use std::sync::Arc;
+use tokio::sync::RwLock;
 
 #[derive(Debug)]
 struct SimpleAccount {
@@ -63,9 +63,7 @@ impl BaseAccount for SimpleAccount {
             .parse()
             .unwrap();
 
-        let owner: Address = ""
-            .parse()
-            .unwrap();
+        let owner: Address = "".parse().unwrap();
 
         let index = U256::from(1);
 
