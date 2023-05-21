@@ -84,7 +84,7 @@ where
             );
         }
 
-        if let (Some(target), Some(data)) = (user_op.contract_target, &user_op.tx_data) {
+        if let (Some(target), Some(data)) = (user_op.contract_target, user_op.tx_data.clone()) {
             let (call_data, call_gas_limit) = self
                 .account
                 .encode_user_op_call_data_and_gas_limit(
@@ -173,7 +173,7 @@ where
     where
         A: BaseAccount<Inner = M>,
     {
-        let (Some(target), Some(data)) = (user_op.contract_target, &user_op.tx_data) else {
+        let (Some(target), Some(data)) = (user_op.contract_target, user_op.tx_data.clone()) else {
             return Ok(U256::zero())
         };
 

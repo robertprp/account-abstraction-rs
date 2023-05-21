@@ -86,7 +86,7 @@ pub trait BaseAccount: Sync + Send + Debug {
         &self,
         target: Address,
         value: U256,
-        data: &Bytes,
+        data: Bytes,
     ) -> Result<Vec<u8>, AccountError<Self::Inner>>; // [u8; 32]?
 
     async fn estimate_creation_gas(&self) -> Result<U256, AccountError<Self::Inner>> {
@@ -171,7 +171,7 @@ pub trait BaseAccount: Sync + Send + Debug {
         &self,
         target: Address,
         value: Option<U256>,
-        data: &Bytes,
+        data: Bytes,
         gas_limit: Option<U256>,
     ) -> Result<(Bytes, U256), AccountError<Self::Inner>> {
         let value = value.unwrap_or(U256::zero());
@@ -205,7 +205,7 @@ pub trait BaseAccount: Sync + Send + Debug {
             .encode_user_op_call_data_and_gas_limit(
                 info.target,
                 info.value,
-                &info.data.into(),
+                info.data.into(),
                 info.gas_limit,
             )
             .await?;
