@@ -61,12 +61,12 @@ pub trait BaseAccount: Sync + Send + Debug {
         Ok(Bytes::new())
     }
 
-    fn is_deployed(&self) -> bool;
-    fn set_is_deployed(&self, is_deployed: bool);
+    async fn is_deployed(&self) -> bool;
+    async fn set_is_deployed(&self, is_deployed: bool);
 
     async fn check_is_deployed(&self) -> Result<bool, AccountError<Self::Inner>> {
-        if !self.is_deployed() {
-            return Ok(self.is_deployed());
+        if self.is_deployed().await {
+            return Ok(self.is_deployed().await);
         }
 
         let sender_address_code = self
@@ -76,10 +76,10 @@ pub trait BaseAccount: Sync + Send + Debug {
             .map_err(AccountError::ProviderError)?;
 
         if sender_address_code.len() > 2 {
-            self.set_is_deployed(false);
+            self.set_is_deployed(true).await;
         }
 
-        Ok(self.is_deployed())
+        Ok(self.is_deployed().await)
     }
 
     async fn encode_execute(
