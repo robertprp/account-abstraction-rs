@@ -31,7 +31,7 @@ pub trait BaseAccount: Sync + Send + Debug {
         self.inner().provider()
     }
 
-    fn get_account_address(&self) -> Address;
+    async fn get_account_address(&self) -> Result<Address, AccountError<Self::Inner>>;
 
     fn get_rpc_url(&self) -> &str;
 
@@ -71,7 +71,7 @@ pub trait BaseAccount: Sync + Send + Debug {
 
         let sender_address_code = self
             .provider()
-            .get_code(self.get_account_address(), None)
+            .get_code(self.get_account_address().await?, None)
             .await
             .map_err(AccountError::ProviderError)?;
 
@@ -182,7 +182,7 @@ pub trait BaseAccount: Sync + Send + Debug {
             None => {
                 let tx_request = TransactionRequest::new()
                     .from(self.get_entry_point_address())
-                    .to(self.get_account_address())
+                    .to(self.get_account_address().await?)
                     .data(call_data.clone());
 
                 let typed_tx: TypedTransaction = tx_request.into();
@@ -228,7 +228,7 @@ pub trait BaseAccount: Sync + Send + Debug {
         };
 
         let mut partial_user_op = UserOperation {
-            sender: self.get_account_address(),
+            sender: self.get_account_address().await?,
             nonce: self.get_nonce().await?,
             init_code,
             call_data,

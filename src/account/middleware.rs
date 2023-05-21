@@ -76,7 +76,12 @@ where
         }
 
         if user_op.sender.is_none() {
-            user_op.sender = Some(self.account.get_account_address());
+            user_op.sender = Some(
+                self.account
+                    .get_account_address()
+                    .await
+                    .map_err(SmartAccountMiddlewareError::AccountError)?,
+            );
         }
 
         if let (Some(target), Some(data)) = (user_op.contract_target, &user_op.tx_data) {
