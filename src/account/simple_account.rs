@@ -18,6 +18,7 @@ use std::sync::Arc;
 #[derive(Debug)]
 struct SimpleAccount {
     inner: Arc<Provider<Http>>,
+    account_address: RwLock<Option<Address>>,
     is_deployed: RwLock<bool>,
 }
 
@@ -30,8 +31,12 @@ impl BaseAccount for SimpleAccount {
         &self.inner
     }
 
-    fn get_account_address(&self) -> Address {
-        unimplemented!() // You will need to provide an actual implementation.
+    async fn get_account_address(&self) -> Result<Address, AccountError<Self::Inner>> {
+        let Some(account_address) = *self.account_address.read().await else {
+            return self.get_counterfactual_address().await
+        };
+
+        Ok(account_address)
     }
 
     fn get_rpc_url(&self) -> &str {
