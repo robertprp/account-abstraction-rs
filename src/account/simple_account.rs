@@ -19,19 +19,34 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 
 #[derive(Debug)]
-struct SimpleAccount<S: Signer> {
+struct SimpleAccount {
     inner: Arc<Provider<Http>>,
-    signer: S,
+    owner: Address,
     account_address: RwLock<Option<Address>>,
     is_deployed: RwLock<bool>,
     rpc_url: String,
 }
 
+impl SimpleAccount {
+    fn new(
+        inner: Arc<Provider<Http>>,
+        owner: Address,
+        account_address: RwLock<Option<Address>>,
+        is_deployed: RwLock<bool>,
+        rpc_url: String,
+    ) -> Self {
+        Self {
+            inner,
+            owner,
+            account_address,
+            is_deployed,
+            rpc_url,
+        }
+    }
+}
+
 #[async_trait]
-impl<S> BaseAccount for SimpleAccount<S>
-where
-    S: Signer,
-{
+impl BaseAccount for SimpleAccount {
     type Paymaster = EmptyPaymaster;
     type Provider = Http;
     type Inner = Provider<Http>;
@@ -124,11 +139,12 @@ where
         Ok(call.encode())
     }
 
-    async fn sign_user_op_hash(
+    async fn sign_user_op_hash<S: Signer>(
         &self,
         user_op_hash: [u8; 32],
+        signer: S,
     ) -> Result<Bytes, AccountError<Self::Inner>> {
-        let Ok(signed_hash) = self.signer.sign_message(&user_op_hash).await else {
+        let Ok(signed_hash) = signer.sign_message(&user_op_hash).await else {
             return Err(AccountError::SignerError);
         };
 

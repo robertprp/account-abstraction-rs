@@ -2,6 +2,7 @@ use crate::contracts::{EntryPoint, SenderAddressResult, UserOperation};
 use crate::paymaster::{Paymaster, PaymasterError};
 use crate::types::FromErr;
 use async_trait::async_trait;
+use ethers::signers::{LocalWallet, Signer};
 use ethers::{
     abi::AbiDecode,
     prelude::ContractError,
@@ -149,19 +150,21 @@ pub trait BaseAccount: Sync + Send + Debug {
         }
     }
 
-    async fn sign_user_op_hash(
+    async fn sign_user_op_hash<S: Signer>(
         &self,
         user_op_hash: [u8; 32],
+        signer: S,
     ) -> Result<Bytes, AccountError<Self::Inner>>;
 
-    async fn sign_user_op<U: Into<UserOperation> + Send + Sync>(
+    async fn sign_user_op<U: Into<UserOperation> + Send + Sync, S: Signer>(
         &self,
         user_op: U,
+        signer: S,
     ) -> Result<Bytes, AccountError<Self::Inner>> {
         let chain_id = self.inner().get_chainid().await.map_err(FromErr::from)?;
         let entry_point_address = self.get_entry_point_address();
         let user_op_hash = utils::get_user_op_hash(user_op.into(), entry_point_address, chain_id);
-        let signature = self.sign_user_op_hash(user_op_hash).await;
+        let signature = self.sign_user_op_hash(user_op_hash, signer).await;
 
         signature
     }
@@ -259,12 +262,13 @@ pub trait BaseAccount: Sync + Send + Debug {
         Ok(partial_user_op)
     }
 
-    async fn sign_transaction_info(
+    async fn sign_transaction_info<S: Signer>(
         &self,
         transaction: TransactionDetailsForUserOp,
+        signer: S,
     ) -> Result<Bytes, AccountError<Self::Inner>> {
         let user_op = self.create_unsigned_user_op(transaction).await?;
-        self.sign_user_op(user_op).await
+        self.sign_user_op(user_op, signer).await
     }
 }
 

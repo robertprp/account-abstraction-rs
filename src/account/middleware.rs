@@ -11,6 +11,7 @@ use crate::{
 use async_trait::async_trait;
 use ethers::{
     providers::{Middleware, MiddlewareError, ProviderError},
+    signers::Signer,
     types::{Bytes, U256},
     utils,
 };
@@ -36,9 +37,11 @@ where
         &self.account
     }
 
-    async fn send_user_operation<U: Into<UserOperationRequest> + Send + Sync>(
+    async fn send_user_operation<U: Into<UserOperationRequest> + Send + Sync, S: Signer>(
         &self,
         user_op: U,
+        // TODO: Passing in signer through method param for now. Consider separate signer middleware.
+        signer: S,
     ) -> Result<UserOpHash, SmartAccountMiddlewareError<M>>
     where
         A: BaseAccount<Inner = M>,
@@ -47,7 +50,7 @@ where
         self.fill_user_operation(&mut user_op).await?;
 
         if user_op.signature.is_none() {
-            let signature: Bytes = self.sign_user_operation(user_op.clone()).await?;
+            let signature: Bytes = self.sign_user_operation(user_op.clone(), signer).await?;
             user_op.signature = Some(signature)
         }
 
@@ -152,15 +155,17 @@ where
         Ok(())
     }
 
-    async fn sign_user_operation(
+    async fn sign_user_operation<S: Signer>(
         &self,
         user_op: UserOperationRequest,
+        // TODO: Passing in signer through method param for now. Consider separate signer middleware.
+        signer: S,
     ) -> Result<Bytes, SmartAccountMiddlewareError<M>>
     where
         A: BaseAccount<Inner = M>,
     {
         self.account
-            .sign_user_op(user_op)
+            .sign_user_op(user_op, signer)
             .await
             .map_err(SmartAccountMiddlewareError::AccountError)
     }
