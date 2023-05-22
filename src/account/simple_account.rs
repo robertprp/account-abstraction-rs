@@ -168,3 +168,95 @@ impl Paymaster for EmptyPaymaster {
         Ok(Bytes::new())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::sync::Arc;
+
+    use ethers::{
+        prelude::k256::ecdsa::SigningKey,
+        providers::{Http, Provider},
+        signers::Wallet,
+        types::{Address, Bytes, U256},
+    };
+    use tokio::sync::RwLock;
+
+    use crate::{account::{simple_account::SimpleAccount, BaseAccount}, types::UserOperationRequest};
+
+    const RPC_URL: &str = "https://mainnet.infura.io/v3/c60b0bb42f8a4c6481ecd229eddaca27";
+
+    #[tokio::test]
+    async fn test_get_counterfactual_address() {
+        let account = make_simple_account();
+
+        let result = account.get_counterfactual_address().await.unwrap();
+
+        assert_eq!(result, "0x12fd82c9b1a44979838a19dfa5153bd093b0e75e".parse().unwrap())
+    }
+
+    #[tokio::test]
+    async fn test_sign_user_op() {
+        let account = make_simple_account();
+
+        let wallet = make_wallet();
+
+        let target_address: Address = "0xA87395ef99Fc13Bb043245521C559030aA1827a7".parse().unwrap();
+
+        let user_op = UserOperationRequest::new()
+            .contract_target(target_address)
+            .tx_value(100);
+
+        let result = account.sign_user_op(user_op, wallet).await.unwrap();
+
+        let expected_signature: Bytes = "0xb929bbb156d7a5e9486d697506d7c7cffea52c0ee3f4ae0837cf5dc9f51878351081d14b31eccff9c206441c18e65c3057154c5a046278d90221879ba4ebd0b11c".parse().unwrap();
+
+        assert_eq!(result, expected_signature)
+    }
+
+    #[tokio::test]
+    async fn test_account_init_code() {
+        let account = make_simple_account();
+
+        let result = account.get_account_init_code().await.unwrap();
+
+        let expected_init_code: Bytes = "0x9406cc6185a346906296840746125a0e449764545fbfb9cf0000000000000000000000009018d4859dfd1f86b01178578d7095119718d8c90000000000000000000000000000000000000000000000000000000000000000".parse().unwrap();
+
+        assert_eq!(result, expected_init_code)
+    }
+
+    #[tokio::test]
+    async fn test_encode_execute() {
+        let account = make_simple_account();
+
+        let target_address: Address = "0xA87395ef99Fc13Bb043245521C559030aA1827a7".parse().unwrap();
+
+        let call_data: Bytes = "0xa71bbebe00000000000000000000000000000000000000000000000000000000000000010021fb3f".parse().unwrap();
+
+        let result: Bytes = account.encode_execute(target_address, U256::from(100), call_data).await.unwrap().into();
+
+        let expected_result: Bytes = "0xb61d27f6000000000000000000000000a87395ef99fc13bb043245521c559030aa1827a7000000000000000000000000000000000000000000000000000000000000006400000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000028a71bbebe00000000000000000000000000000000000000000000000000000000000000010021fb3f000000000000000000000000000000000000000000000000".parse().unwrap();
+
+        assert_eq!(result, expected_result)
+    }
+
+    fn make_simple_account() -> SimpleAccount {
+        let account_address: Address = "0x9018d4859dFD1F86b01178578D7095119718D8c9"
+            .parse()
+            .unwrap();
+        let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
+
+        SimpleAccount::new(
+            Arc::new(provider),
+            account_address,
+            RwLock::new(None),
+            RwLock::new(false),
+            RPC_URL.to_string(),
+        )
+    }
+
+    fn make_wallet() -> Wallet<SigningKey> {
+        "4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318"
+                .parse()
+                .unwrap()
+    }
+}
