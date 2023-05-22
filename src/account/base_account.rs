@@ -56,7 +56,7 @@ pub trait BaseAccount: Sync + Send + Debug {
     async fn get_account_init_code(&self) -> Result<Bytes, AccountError<Self::Inner>>;
 
     async fn get_init_code(&self) -> Result<Bytes, AccountError<Self::Inner>> {
-        if self.check_is_deployed().await? {
+        if !self.check_is_deployed().await? {
             return self.get_account_init_code().await;
         }
 
