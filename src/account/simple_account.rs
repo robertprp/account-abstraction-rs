@@ -18,6 +18,9 @@ use std::fmt::Debug;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
+const ENTRY_POINT_ADDRESS: &str = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
+const SIMPLE_ACCOUNT_FACTORY_ADDRESS: &str = "0x9406Cc6185a346906296840746125a0E44976454";
+
 #[derive(Debug)]
 struct SimpleAccount {
     inner: Arc<Provider<Http>>,
@@ -68,7 +71,7 @@ impl BaseAccount for SimpleAccount {
     }
 
     fn get_entry_point_address(&self) -> Address {
-        "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789"
+        ENTRY_POINT_ADDRESS
             .parse()
             .unwrap()
     }
@@ -83,7 +86,7 @@ impl BaseAccount for SimpleAccount {
     }
 
     async fn get_account_init_code(&self) -> Result<Bytes, AccountError<Self::Inner>> {
-        let factory_address: Address = "0x9406Cc6185a346906296840746125a0E44976454"
+        let factory_address: Address = SIMPLE_ACCOUNT_FACTORY_ADDRESS
             .parse()
             .unwrap();
 
