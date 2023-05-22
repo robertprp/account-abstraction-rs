@@ -87,9 +87,10 @@ impl BaseAccount for SimpleAccount {
             .parse()
             .unwrap();
 
-        let owner: Address = "".parse().unwrap();
+        let owner: Address = self.owner;
 
-        let index = U256::from(1);
+        // TODO: Add optional index
+        let index = U256::from(0);
 
         let call =
             SimpleAccountFactoryCalls::CreateAccount(CreateAccountCall { owner, salt: index });
