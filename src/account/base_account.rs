@@ -2,7 +2,7 @@ use crate::contracts::{EntryPoint, SenderAddressResult, UserOperation};
 use crate::paymaster::{Paymaster, PaymasterError};
 use crate::types::FromErr;
 use async_trait::async_trait;
-use ethers::signers::{LocalWallet, Signer};
+use ethers::signers::{Signer};
 use ethers::{
     abi::AbiDecode,
     prelude::ContractError,
@@ -116,10 +116,11 @@ pub trait BaseAccount: Sync + Send + Debug {
         }
     }
 
-    async fn get_user_op_hash<U: Into<UserOperation> + Send + Sync>(&self, user_op: U) -> [u8; 32] {
-        let chain_id = self.inner().get_chainid().await.unwrap();
+    async fn get_user_op_hash<U: Into<UserOperation> + Send + Sync>(&self, user_op: U) -> Result<[u8; 32], AccountError<Self::Inner>> {
+        let chain_id = self.inner().get_chainid().await.map_err(FromErr::from)?;
         let entry_point_address = self.get_entry_point_address();
-        utils::get_user_op_hash(user_op.into(), entry_point_address, chain_id)
+
+        Ok(utils::get_user_op_hash(user_op.into(), entry_point_address, chain_id))
     }
 
     async fn get_counterfactual_address(&self) -> Result<Address, AccountError<Self::Inner>> {
@@ -161,9 +162,7 @@ pub trait BaseAccount: Sync + Send + Debug {
         user_op: U,
         signer: S,
     ) -> Result<Bytes, AccountError<Self::Inner>> {
-        let chain_id = self.inner().get_chainid().await.map_err(FromErr::from)?;
-        let entry_point_address = self.get_entry_point_address();
-        let user_op_hash = utils::get_user_op_hash(user_op.into(), entry_point_address, chain_id);
+        let user_op_hash = self.get_user_op_hash(user_op).await?;
         let signature = self.sign_user_op_hash(user_op_hash, signer).await;
 
         signature
