@@ -163,7 +163,7 @@ struct EmptyPaymaster;
 impl Paymaster for EmptyPaymaster {
     async fn get_paymaster_and_data(
         &self,
-        user_op: UserOperation,
+        _user_op: UserOperation,
     ) -> Result<Bytes, PaymasterError> {
         Ok(Bytes::new())
     }
@@ -176,12 +176,12 @@ mod tests {
     use ethers::{
         prelude::k256::ecdsa::SigningKey,
         providers::{Http, Provider},
-        signers::Wallet,
+        signers::{Wallet},
         types::{Address, Bytes, U256},
     };
     use tokio::sync::RwLock;
 
-    use crate::{account::{simple_account::SimpleAccount, BaseAccount}, types::UserOperationRequest};
+    use crate::{account::{simple_account::SimpleAccount, BaseAccount}};
 
     const RPC_URL: &str = "https://mainnet.infura.io/v3/c60b0bb42f8a4c6481ecd229eddaca27";
 
@@ -202,13 +202,23 @@ mod tests {
 
         let target_address: Address = "0xA87395ef99Fc13Bb043245521C559030aA1827a7".parse().unwrap();
 
-        let user_op = UserOperationRequest::new()
-            .contract_target(target_address)
-            .tx_value(100);
+        let user_op = crate::contracts::UserOperation {
+            sender: target_address,
+            nonce: U256::from(1),
+            init_code: Bytes::from(vec![]),
+            call_data: Bytes::from(vec![]),
+            call_gas_limit: U256::from(0),
+            verification_gas_limit: U256::from(21000),
+            pre_verification_gas: U256::from(0),
+            max_fee_per_gas: U256::from(0),
+            max_priority_fee_per_gas: U256::from(0),
+            paymaster_and_data: Bytes::from(vec![]),
+            signature: Bytes::from(vec![]),
+        };
 
         let result = account.sign_user_op(user_op, wallet).await.unwrap();
 
-        let expected_signature: Bytes = "0xb929bbb156d7a5e9486d697506d7c7cffea52c0ee3f4ae0837cf5dc9f51878351081d14b31eccff9c206441c18e65c3057154c5a046278d90221879ba4ebd0b11c".parse().unwrap();
+        let expected_signature: Bytes = "0xf638e4980e8e2244d951c212caeadb31e4ec53629c1c743e2046393ecfa065da2cbaeb4460ee7ac6f7c5e9b52d94c6198dd03a50ff852f1e6cc118d603b8db631c".parse().unwrap();
 
         assert_eq!(result, expected_signature)
     }

@@ -44,8 +44,8 @@ pub struct UserOperation {
     #[serde(rename = "paymasterAndData", default)]
     pub paymaster_and_data: Bytes,
 
-    /// Sender address
-    pub signature: String,
+    /// User op signature
+    pub signature: Bytes,
 
     #[serde(default = "ethers::types::Address::zero", rename = "entryPoint")]
     /// Entry point address
