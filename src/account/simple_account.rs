@@ -176,7 +176,7 @@ mod tests {
     use ethers::{
         prelude::k256::ecdsa::SigningKey,
         providers::{Http, Provider},
-        signers::{Wallet},
+        signers::{Wallet, Signer},
         types::{Address, Bytes, U256},
     };
     use tokio::sync::RwLock;
@@ -191,7 +191,7 @@ mod tests {
 
         let result = account.get_counterfactual_address().await.unwrap();
 
-        assert_eq!(result, "0x12fd82c9b1a44979838a19dfa5153bd093b0e75e".parse().unwrap())
+        assert_eq!(result, "0x982ffac966b962bddf89d3b26fee91da6f68df13".parse().unwrap())
     }
 
     #[tokio::test]
@@ -229,7 +229,7 @@ mod tests {
 
         let result = account.get_account_init_code().await.unwrap();
 
-        let expected_init_code: Bytes = "0x9406cc6185a346906296840746125a0e449764545fbfb9cf0000000000000000000000009018d4859dfd1f86b01178578d7095119718d8c90000000000000000000000000000000000000000000000000000000000000000".parse().unwrap();
+        let expected_init_code: Bytes = "0x9406cc6185a346906296840746125a0e449764545fbfb9cf0000000000000000000000002c7536e3605d9c16a7a3d7b1898e529396a65c230000000000000000000000000000000000000000000000000000000000000000".parse().unwrap();
 
         assert_eq!(result, expected_init_code)
     }
@@ -250,9 +250,7 @@ mod tests {
     }
 
     fn make_simple_account() -> SimpleAccount {
-        let account_address: Address = "0x9018d4859dFD1F86b01178578D7095119718D8c9"
-            .parse()
-            .unwrap();
+        let account_address: Address = make_wallet().address();
         let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
 
         SimpleAccount::new(
