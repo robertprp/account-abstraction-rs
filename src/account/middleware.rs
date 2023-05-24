@@ -61,7 +61,7 @@ where
             .map_err(SmartAccountMiddlewareError::ProviderError)
     }
 
-    async fn fill_user_operation(
+    pub async fn fill_user_operation(
         &self,
         user_op: &mut UserOperationRequest,
     ) -> Result<(), SmartAccountMiddlewareError<M>>
@@ -155,7 +155,7 @@ where
         Ok(())
     }
 
-    async fn sign_user_operation<S: Signer>(
+    pub async fn sign_user_operation<S: Signer>(
         &self,
         user_op: UserOperationRequest,
         // TODO: Passing in signer through method param for now. Consider separate signer middleware.
@@ -171,7 +171,7 @@ where
     }
 
     // TODO: Could also call eth_estimateUserOperationGas
-    async fn estimate_user_operation_gas(
+    pub async fn estimate_user_operation_gas(
         &self,
         user_op: UserOperationRequest,
     ) -> Result<U256, SmartAccountMiddlewareError<M>>
@@ -196,7 +196,7 @@ where
         Ok(call_gas_limit)
     }
 
-    async fn get_user_operation<T: Send + Sync + Into<UserOpHash>>(
+    pub async fn get_user_operation<T: Send + Sync + Into<UserOpHash>>(
         &self,
         user_op_hash: T,
     ) -> Result<Option<UserOperation>, SmartAccountMiddlewareError<M>> {
@@ -209,7 +209,7 @@ where
             .map_err(SmartAccountMiddlewareError::ProviderError)
     }
 
-    async fn get_user_operation_receipt<T: Send + Sync + Into<UserOpHash>>(
+    pub async fn get_user_operation_receipt<T: Send + Sync + Into<UserOpHash>>(
         &self,
         user_op_hash: T,
     ) -> Result<Option<UserOperationReceipt>, SmartAccountMiddlewareError<M>> {
@@ -222,7 +222,7 @@ where
             .map_err(SmartAccountMiddlewareError::ProviderError)
     }
 
-    async fn get_supported_entry_points(
+    pub async fn get_supported_entry_points(
         &self,
     ) -> Result<Vec<String>, SmartAccountMiddlewareError<M>> {
         self.inner()
