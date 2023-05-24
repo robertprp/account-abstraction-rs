@@ -56,7 +56,7 @@ where
 
         self.inner()
             .provider()
-            .request("eth_sendUserOperation", utils::serialize(&user_op))
+            .request("eth_sendUserOperation", [serialized_user_op, serialized_entry_point_address])
             .await
             .map_err(SmartAccountMiddlewareError::ProviderError)
     }
