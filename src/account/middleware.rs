@@ -33,15 +33,15 @@ where
         Self { inner, account }
     }
 
-    fn account(&self) -> &A {
+    pub fn account(&self) -> &A {
         &self.account
     }
 
-    async fn send_user_operation<U: Into<UserOperationRequest> + Send + Sync, S: Signer>(
+    pub async fn send_user_operation<U: Into<UserOperationRequest> + Send + Sync, S: Signer>(
         &self,
         user_op: U,
         // TODO: Passing in signer through method param for now. Consider separate signer middleware.
-        signer: S,
+        signer: &S,
     ) -> Result<UserOpHash, SmartAccountMiddlewareError<M>>
     where
         A: BaseAccount<Inner = M>,
@@ -159,7 +159,7 @@ where
         &self,
         user_op: UserOperationRequest,
         // TODO: Passing in signer through method param for now. Consider separate signer middleware.
-        signer: S,
+        signer: &S,
     ) -> Result<Bytes, SmartAccountMiddlewareError<M>>
     where
         A: BaseAccount<Inner = M>,

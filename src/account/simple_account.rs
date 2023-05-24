@@ -146,7 +146,7 @@ impl BaseAccount for SimpleAccount {
     async fn sign_user_op_hash<S: Signer>(
         &self,
         user_op_hash: [u8; 32],
-        signer: S,
+        signer: &S,
     ) -> Result<Bytes, AccountError<Self::Inner>> {
         let Ok(signed_hash) = signer.sign_message(&user_op_hash).await else {
             return Err(AccountError::SignerError);
@@ -216,7 +216,7 @@ mod tests {
             signature: Bytes::from(vec![]),
         };
 
-        let result = account.sign_user_op(user_op, wallet).await.unwrap();
+        let result = account.sign_user_op(user_op, &wallet).await.unwrap();
 
         let expected_signature: Bytes = "0xf638e4980e8e2244d951c212caeadb31e4ec53629c1c743e2046393ecfa065da2cbaeb4460ee7ac6f7c5e9b52d94c6198dd03a50ff852f1e6cc118d603b8db631c".parse().unwrap();
 

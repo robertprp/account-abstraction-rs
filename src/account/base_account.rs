@@ -154,13 +154,13 @@ pub trait BaseAccount: Sync + Send + Debug {
     async fn sign_user_op_hash<S: Signer>(
         &self,
         user_op_hash: [u8; 32],
-        signer: S,
+        signer: &S,
     ) -> Result<Bytes, AccountError<Self::Inner>>;
 
     async fn sign_user_op<U: Into<UserOperation> + Send + Sync, S: Signer>(
         &self,
         user_op: U,
-        signer: S,
+        signer: &S,
     ) -> Result<Bytes, AccountError<Self::Inner>> {
         let user_op_hash = self.get_user_op_hash(user_op).await?;
         let signature = self.sign_user_op_hash(user_op_hash, signer).await;
@@ -264,7 +264,7 @@ pub trait BaseAccount: Sync + Send + Debug {
     async fn sign_transaction_info<S: Signer>(
         &self,
         transaction: TransactionDetailsForUserOp,
-        signer: S,
+        signer: &S,
     ) -> Result<Bytes, AccountError<Self::Inner>> {
         let user_op = self.create_unsigned_user_op(transaction).await?;
         self.sign_user_op(user_op, signer).await
