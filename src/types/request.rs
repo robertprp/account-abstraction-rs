@@ -17,14 +17,13 @@ pub struct UserOperationRequest {
     pub init_code: Option<Bytes>,
 
     /// Call data
-    #[serde(rename = "callData", default, skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "callData", default)]
     pub call_data: Option<Bytes>,
 
     /// Call gas limit
     #[serde(
         rename = "callGasLimit",
-        default,
-        skip_serializing_if = "Option::is_none"
+        default
     )]
     pub call_gas_limit: Option<U256>,
 
@@ -76,12 +75,15 @@ pub struct UserOperationRequest {
     /// Helper properties for encodeExecute
 
     /// Target contract
+    #[serde(skip_serializing)]
     pub contract_target: Option<Address>,
 
     // Transaction's value
+    #[serde(skip_serializing)]
     pub tx_value: Option<U256>,
 
     // Transaction data
+    #[serde(skip_serializing)]
     pub tx_data: Option<Bytes>,
 }
 
