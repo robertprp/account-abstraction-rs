@@ -54,9 +54,16 @@ where
             user_op.signature = Some(signature)
         }
 
+        let serialized_user_op = utils::serialize(&user_op);
+        let serialized_entry_point_address =
+            utils::serialize(&self.account.get_entry_point_address());
+
         self.inner()
             .provider()
-            .request("eth_sendUserOperation", [serialized_user_op, serialized_entry_point_address])
+            .request(
+                "eth_sendUserOperation",
+                [serialized_user_op, serialized_entry_point_address],
+            )
             .await
             .map_err(SmartAccountMiddlewareError::ProviderError)
     }
