@@ -108,18 +108,6 @@ impl BaseAccount for SimpleAccount {
         Ok(result_bytes)
     }
 
-    async fn get_nonce(&self) -> Result<U256, AccountError<Self::Inner>> {
-        let account_address = self.get_account_address().await?;
-        let simple_account = SimpleAccountContract::new(account_address, self.inner.clone());
-        let nonce = simple_account
-            .nonce()
-            .call()
-            .await
-            .map_err(AccountError::ContractError)?;
-
-        Ok(nonce)
-    }
-
     async fn is_deployed(&self) -> bool {
         *self.is_deployed.read().await
     }

@@ -69,11 +69,7 @@ where
         A: BaseAccount<Inner = M>,
     {
         if user_op.nonce.is_none() {
-            let nonce = self
-                .account
-                .get_nonce()
-                .await
-                .map_err(SmartAccountMiddlewareError::AccountError)?;
+            let nonce = self.account.get_nonce().await.unwrap_or(U256::from(0));
 
             user_op.set_nonce(nonce);
         }

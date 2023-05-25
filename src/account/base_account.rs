@@ -51,7 +51,18 @@ pub trait BaseAccount: Sync + Send + Debug {
         utils::calc_pre_verification_gas(user_op.into(), None)
     }
 
-    async fn get_nonce(&self) -> Result<U256, AccountError<Self::Inner>>;
+    async fn get_nonce(&self) -> Result<U256, AccountError<Self::Inner>> {
+        // TODO: Use cache trait to cache nonce, address, etc. Can also initialize
+
+        let entry_point = self.get_entry_point();
+        let account_address = self.get_account_address().await?;
+
+        entry_point
+            .get_nonce(account_address, U256::from(0))
+            .call()
+            .await
+            .map_err(AccountError::ContractError)
+    }
 
     async fn get_account_init_code(&self) -> Result<Bytes, AccountError<Self::Inner>>;
 
