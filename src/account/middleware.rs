@@ -4,7 +4,7 @@ use crate::{
     paymaster::{Paymaster, PaymasterError},
     types::{
         request::{UserOpHash, UserOperationRequest},
-        FromErr, UserOperation, UserOperationReceipt,
+        FromErr, UserOperation, UserOperationGasEstimate, UserOperationReceipt,
     },
 };
 
@@ -180,35 +180,27 @@ where
             .map_err(SmartAccountMiddlewareError::AccountError)
     }
 
-    // TODO: Could also call eth_estimateUserOperationGas
-    pub async fn estimate_user_operation_gas(
+    pub async fn estimate_user_operation_gas<U: Into<UserOperationRequest> + Send + Sync>(
         &self,
-        user_op: UserOperationRequest,
-    ) -> Result<U256, SmartAccountMiddlewareError<M>>
+        user_op: U,
+    ) -> Result<UserOperationGasEstimate, SmartAccountMiddlewareError<M>>
     where
         A: BaseAccount<Inner = M>,
     {
-        let Some(target) = user_op.target_address else {
-            return Ok(U256::zero())
-        };
+        let user_op = user_op.into();
 
-        let tx_data = user_op
-            .tx_data
-            .clone()
-            .unwrap_or(user_op.call_data.clone().unwrap_or(Bytes::new()));
+        let serialized_user_op = utils::serialize(&user_op);
+        let serialized_entry_point_address =
+            utils::serialize(&self.account.get_entry_point_address());
 
-        let (_, call_gas_limit) = self
-            .account
-            .encode_user_op_call_data_and_gas_limit(
-                target,
-                user_op.tx_value,
-                tx_data,
-                user_op.call_gas_limit,
+        self.inner()
+            .provider()
+            .request(
+                "eth_estimateUserOperationGas",
+                [serialized_user_op, serialized_entry_point_address],
             )
             .await
-            .map_err(SmartAccountMiddlewareError::AccountError)?;
-
-        Ok(call_gas_limit)
+            .map_err(SmartAccountMiddlewareError::ProviderError)
     }
 
     pub async fn get_user_operation<T: Send + Sync + Into<UserOpHash>>(

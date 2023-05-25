@@ -126,3 +126,18 @@ pub struct UserOperationLog {
     pub log_index: String,
     removed: bool,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Default)]
+pub struct UserOperationGasEstimate {
+    /// Pre-verification gas
+    #[serde(rename = "preVerificationGas")]
+    pub pre_verification_gas: u64,
+
+    /// Verification gas
+    #[serde(rename = "verificationGas")]
+    pub verification_gas: u64,
+
+    /// Call gas limit
+    #[serde(rename = "callGasLimit")]
+    pub call_gas_limit: u64,
+}
