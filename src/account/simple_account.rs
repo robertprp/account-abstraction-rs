@@ -1,8 +1,6 @@
 use super::{AccountError, BaseAccount};
 
-use crate::contracts::{
-    CreateAccountCall, SimpleAccount as SimpleAccountContract, SimpleAccountFactoryCalls,
-};
+use crate::contracts::{CreateAccountCall, SimpleAccountFactoryCalls};
 use crate::contracts::{EntryPoint, ExecuteCall, SimpleAccountCalls, UserOperation};
 use crate::paymaster::{Paymaster, PaymasterError};
 
@@ -71,9 +69,7 @@ impl BaseAccount for SimpleAccount {
     }
 
     fn get_entry_point_address(&self) -> Address {
-        ENTRY_POINT_ADDRESS
-            .parse()
-            .unwrap()
+        ENTRY_POINT_ADDRESS.parse().unwrap()
     }
 
     fn get_entry_point(&self) -> EntryPoint<Self::Inner> {
@@ -86,9 +82,7 @@ impl BaseAccount for SimpleAccount {
     }
 
     async fn get_account_init_code(&self) -> Result<Bytes, AccountError<Self::Inner>> {
-        let factory_address: Address = SIMPLE_ACCOUNT_FACTORY_ADDRESS
-            .parse()
-            .unwrap();
+        let factory_address: Address = SIMPLE_ACCOUNT_FACTORY_ADDRESS.parse().unwrap();
 
         let owner: Address = self.owner;
 
@@ -164,14 +158,17 @@ mod tests {
     use ethers::{
         prelude::k256::ecdsa::SigningKey,
         providers::{Http, Provider},
-        signers::{Wallet, Signer},
+        signers::{LocalWallet, Signer, Wallet},
         types::{Address, Bytes, U256},
     };
     use tokio::sync::RwLock;
 
-    use crate::{account::{simple_account::SimpleAccount, BaseAccount}};
+    use crate::{
+        account::{simple_account::SimpleAccount, BaseAccount, SmartAccountMiddleware},
+        types::UserOperationRequest,
+    };
 
-    const RPC_URL: &str = "https://mainnet.infura.io/v3/c60b0bb42f8a4c6481ecd229eddaca27";
+    const RPC_URL: &str = "https://eth-goerli.g.alchemy.com/v2/Lekp6yzHz5yAPLKPNvGpMKaqbGunnXHS"; //"https://eth-mainnet.g.alchemy.com/v2/lRcdJTfR_zjZSef3yutTGE6OIY9YFx1E";
 
     #[tokio::test]
     async fn test_get_counterfactual_address() {
@@ -179,7 +176,12 @@ mod tests {
 
         let result = account.get_counterfactual_address().await.unwrap();
 
-        assert_eq!(result, "0x982ffac966b962bddf89d3b26fee91da6f68df13".parse().unwrap())
+        assert_eq!(
+            result,
+            "0x982ffac966b962bddf89d3b26fee91da6f68df13"
+                .parse()
+                .unwrap()
+        )
     }
 
     #[tokio::test]
@@ -188,7 +190,9 @@ mod tests {
 
         let wallet = make_wallet();
 
-        let target_address: Address = "0xA87395ef99Fc13Bb043245521C559030aA1827a7".parse().unwrap();
+        let target_address: Address = "0xA87395ef99Fc13Bb043245521C559030aA1827a7"
+            .parse()
+            .unwrap();
 
         let user_op = crate::contracts::UserOperation {
             sender: target_address,
@@ -226,11 +230,20 @@ mod tests {
     async fn test_encode_execute() {
         let account = make_simple_account();
 
-        let target_address: Address = "0xA87395ef99Fc13Bb043245521C559030aA1827a7".parse().unwrap();
+        let target_address: Address = "0xA87395ef99Fc13Bb043245521C559030aA1827a7"
+            .parse()
+            .unwrap();
 
-        let call_data: Bytes = "0xa71bbebe00000000000000000000000000000000000000000000000000000000000000010021fb3f".parse().unwrap();
+        let call_data: Bytes =
+            "0xa71bbebe00000000000000000000000000000000000000000000000000000000000000010021fb3f"
+                .parse()
+                .unwrap();
 
-        let result: Bytes = account.encode_execute(target_address, U256::from(100), call_data).await.unwrap().into();
+        let result: Bytes = account
+            .encode_execute(target_address, U256::from(100), call_data)
+            .await
+            .unwrap()
+            .into();
 
         let expected_result: Bytes = "0xb61d27f6000000000000000000000000a87395ef99fc13bb043245521c559030aa1827a7000000000000000000000000000000000000000000000000000000000000006400000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000028a71bbebe00000000000000000000000000000000000000000000000000000000000000010021fb3f000000000000000000000000000000000000000000000000".parse().unwrap();
 
@@ -252,7 +265,7 @@ mod tests {
 
     fn make_wallet() -> Wallet<SigningKey> {
         "4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318"
-                .parse()
-                .unwrap()
+            .parse()
+            .unwrap()
     }
 }
