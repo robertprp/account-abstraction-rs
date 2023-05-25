@@ -58,7 +58,9 @@ impl BaseAccount for SimpleAccount {
 
     async fn get_account_address(&self) -> Result<Address, AccountError<Self::Inner>> {
         let Some(account_address) = *self.account_address.read().await else {
-            return self.get_counterfactual_address().await
+            let address = self.get_counterfactual_address().await?;
+            *self.account_address.write().await = Some(address);
+            return Ok(address)
         };
 
         Ok(account_address)
