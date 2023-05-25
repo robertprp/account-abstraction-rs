@@ -1,4 +1,4 @@
-use ethers::types::{Address, Bytes, TransactionReceipt, H256, U256, U64};
+use ethers::types::{Address, Bytes, TransactionReceipt, H256, U256};
 use serde::{Deserialize, Serialize};
 
 /// Details of a signed user operation
@@ -9,6 +9,7 @@ pub struct UserOperation {
     pub sender: Address,
 
     /// Nonce
+    #[serde(default)]
     pub nonce: U256,
 
     /// Init code
@@ -45,23 +46,24 @@ pub struct UserOperation {
     pub paymaster_and_data: Bytes,
 
     /// User op signature
+    #[serde(default)]
     pub signature: Bytes,
 
     #[serde(default = "ethers::types::Address::zero", rename = "entryPoint")]
     /// Entry point address
     pub entry_point: Address,
 
-    /// Hash of the block this user operation was included within.
-    #[serde(rename = "blockHash")]
-    pub block_hash: H256,
+    /// Block hash. None when pending.
+    #[serde(default, rename = "blockHash")]
+    pub block_hash: Option<H256>,
 
     /// Number of the block this user operation was included within.
-    #[serde(rename = "blockNumber")]
-    pub block_number: U64,
+    #[serde(default, rename = "blockNumber")]
+    pub block_number: Option<u64>, // stackup return as integer whereas alchemy defines it has hex / U64.
 
     /// Transaction hash
     #[serde(default, rename = "transactionHash")]
-    pub transaction_hash: H256,
+    pub transaction_hash: Option<H256>,
 }
 
 /// Details of an executed user operation
