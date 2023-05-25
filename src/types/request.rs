@@ -17,13 +17,14 @@ pub struct UserOperationRequest {
     pub init_code: Option<Bytes>,
 
     /// Call data
-    #[serde(rename = "callData", default)]
+    #[serde(rename = "callData", default, skip_serializing_if = "Option::is_none")]
     pub call_data: Option<Bytes>,
 
     /// Call gas limit
     #[serde(
         rename = "callGasLimit",
-        default
+        default,
+        skip_serializing_if = "Option::is_none"
     )]
     pub call_gas_limit: Option<U256>,
 
@@ -76,7 +77,7 @@ pub struct UserOperationRequest {
 
     /// Target contract
     #[serde(skip_serializing)]
-    pub contract_target: Option<Address>,
+    pub target_address: Option<Address>,
 
     // Transaction's value
     #[serde(skip_serializing)]
@@ -164,8 +165,8 @@ impl UserOperationRequest {
     }
 
     #[must_use]
-    pub fn contract_target<T: Into<Address>>(mut self, contract_target: T) -> Self {
-        self.contract_target = Some(contract_target.into());
+    pub fn target_address<T: Into<Address>>(mut self, target_address: T) -> Self {
+        self.target_address = Some(target_address.into());
         self
     }
 

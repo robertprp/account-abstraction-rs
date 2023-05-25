@@ -75,6 +75,29 @@ where
     where
         A: BaseAccount<Inner = M>,
     {
+        let Some(target_address) = user_op.target_address else {
+            return Err(SmartAccountMiddlewareError::InvalidInputError("Target must be set".to_string()))
+        };
+
+        let tx_data = user_op
+            .tx_data
+            .clone()
+            .unwrap_or(user_op.call_data.clone().unwrap_or(Bytes::new()));
+
+        let (call_data, call_gas_limit) = self
+            .account
+            .encode_user_op_call_data_and_gas_limit(
+                target_address,
+                user_op.tx_value,
+                tx_data,
+                user_op.call_gas_limit,
+            )
+            .await
+            .map_err(SmartAccountMiddlewareError::AccountError)?;
+
+        user_op.call_data = Some(call_data);
+        user_op.call_gas_limit = Some(call_gas_limit);
+
         if user_op.nonce.is_none() {
             let nonce = self.account.get_nonce().await.unwrap_or(U256::from(0));
 
@@ -88,22 +111,6 @@ where
                     .await
                     .map_err(SmartAccountMiddlewareError::AccountError)?,
             );
-        }
-
-        if let (Some(target), Some(data)) = (user_op.contract_target, user_op.tx_data.clone()) {
-            let (call_data, call_gas_limit) = self
-                .account
-                .encode_user_op_call_data_and_gas_limit(
-                    target,
-                    user_op.tx_value,
-                    data,
-                    user_op.call_gas_limit,
-                )
-                .await
-                .map_err(SmartAccountMiddlewareError::AccountError)?;
-
-            user_op.call_data = Some(call_data);
-            user_op.call_gas_limit = Some(call_gas_limit);
         }
 
         if user_op.init_code.is_none() {
@@ -181,16 +188,21 @@ where
     where
         A: BaseAccount<Inner = M>,
     {
-        let (Some(target), Some(data)) = (user_op.contract_target, user_op.tx_data.clone()) else {
+        let Some(target) = user_op.target_address else {
             return Ok(U256::zero())
         };
+
+        let tx_data = user_op
+            .tx_data
+            .clone()
+            .unwrap_or(user_op.call_data.clone().unwrap_or(Bytes::new()));
 
         let (_, call_gas_limit) = self
             .account
             .encode_user_op_call_data_and_gas_limit(
                 target,
                 user_op.tx_value,
-                data,
+                tx_data,
                 user_op.call_gas_limit,
             )
             .await
@@ -266,6 +278,9 @@ pub enum SmartAccountMiddlewareError<M: Middleware> {
 
     #[error("provider error {0}")]
     ProviderError(ProviderError),
+
+    #[error("invalid input error {0}")]
+    InvalidInputError(String),
 }
 
 impl<M: Middleware> MiddlewareError for SmartAccountMiddlewareError<M> {
