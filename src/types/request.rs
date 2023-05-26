@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Serialize, Deserialize, PartialEq, Eq, Debug)]
 pub struct UserOperationRequest {
     /// Sender address
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none", default)]
     pub sender: Option<Address>,
 
     /// Nonce
@@ -91,6 +91,26 @@ pub struct UserOperationRequest {
 impl UserOperationRequest {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub fn with_defaults(self) -> Self {
+        Self {
+            sender: Some(self.sender.unwrap_or_else(|| Address::zero())),
+            nonce: Some(self.nonce.unwrap_or_else(|| U256::zero())),
+            init_code: Some(self.init_code.unwrap_or_else(|| Bytes::from(vec![0u8; 0]))),
+            call_data: Some(self.call_data.unwrap_or_else(|| Bytes::from(vec![0u8; 0]))),
+            call_gas_limit: Some(self.call_gas_limit.unwrap_or_else(|| U256::zero())),
+            verification_gas_limit: Some(self.verification_gas_limit.unwrap_or_else(|| U256::zero())),
+            pre_verification_gas: Some(self.pre_verification_gas.unwrap_or_else(|| U256::zero())),
+            max_fee_per_gas: Some(self.max_fee_per_gas.unwrap_or_else(|| U256::zero())),
+            max_priority_fee_per_gas: Some(self.max_priority_fee_per_gas.unwrap_or_else(|| U256::zero())),
+            paymaster_and_data: Some(self.paymaster_and_data.unwrap_or_else(|| Bytes::from(vec![0u8; 0]))),
+            // Dummy signature
+            signature: Some(self.signature.unwrap_or_else(|| "0xb6905c3cc524616247f41b6de20bced7d4437a6513a5cf1c90ab6a28415eb6993e1236443130bce47d1580ab289bcc8f32270acb4ae7e46a17fe158f473fd4991c".parse().unwrap())),
+            target_address: Some(self.target_address.unwrap_or_else(|| Address::zero())),
+            tx_value: Some(self.tx_value.unwrap_or_else(|| U256::zero())),
+            tx_data: Some(self.tx_data.unwrap_or_else(|| Bytes::from(vec![0u8; 0]))),
+        }
     }
 
     #[must_use]
