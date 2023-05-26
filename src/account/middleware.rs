@@ -4,7 +4,7 @@ use crate::{
     paymaster::{Paymaster, PaymasterError},
     types::{
         request::{UserOpHash, UserOperationRequest},
-        FromErr, UserOperation, UserOperationGasEstimate, UserOperationReceipt,
+        ExecuteCall, FromErr, UserOperation, UserOperationGasEstimate, UserOperationReceipt,
     },
 };
 
@@ -84,19 +84,18 @@ where
             .clone()
             .unwrap_or(user_op.call_data.clone().unwrap_or(Bytes::new()));
 
-        let (call_data, call_gas_limit) = self
+        let execute_call = ExecuteCall::new(
+            target_address,
+            user_op.tx_value.unwrap_or(U256::from(0)),
+            tx_data,
+        );
+        let call_data = self
             .account
-            .encode_user_op_call_data_and_gas_limit(
-                target_address,
-                user_op.tx_value,
-                tx_data,
-                user_op.call_gas_limit,
-            )
+            .encode_execute(execute_call)
             .await
             .map_err(SmartAccountMiddlewareError::AccountError)?;
 
-        user_op.call_data = Some(call_data);
-        user_op.call_gas_limit = Some(call_gas_limit);
+        user_op.call_data = Some(call_data.into());
 
         if user_op.nonce.is_none() {
             let nonce = self.account.get_nonce().await.unwrap_or(U256::from(0));
@@ -160,7 +159,29 @@ where
             user_op.paymaster_and_data = Some(Bytes::new());
         }
 
-        user_op.pre_verification_gas = Some(self.account.get_pre_verification_gas(user_op.clone()));
+        if user_op.call_gas_limit.is_none()
+            || user_op.verification_gas_limit.is_none()
+            || user_op.pre_verification_gas.is_none()
+        {
+            let gas_estimate = self
+                .estimate_user_operation_gas(&user_op.clone().with_defaults())
+                .await?;
+            user_op.call_gas_limit = Some(
+                user_op
+                    .call_gas_limit
+                    .unwrap_or(gas_estimate.call_gas_limit.into()),
+            );
+            user_op.pre_verification_gas = Some(
+                user_op
+                    .pre_verification_gas
+                    .unwrap_or(gas_estimate.pre_verification_gas.into()),
+            );
+            user_op.verification_gas_limit = Some(
+                user_op
+                    .verification_gas_limit
+                    .unwrap_or(gas_estimate.verification_gas.into()),
+            );
+        }
 
         Ok(())
     }
@@ -180,16 +201,14 @@ where
             .map_err(SmartAccountMiddlewareError::AccountError)
     }
 
-    pub async fn estimate_user_operation_gas<U: Into<UserOperationRequest> + Send + Sync>(
+    pub async fn estimate_user_operation_gas(
         &self,
-        user_op: U,
+        user_op: &UserOperationRequest,
     ) -> Result<UserOperationGasEstimate, SmartAccountMiddlewareError<M>>
     where
         A: BaseAccount<Inner = M>,
     {
-        let user_op = user_op.into();
-
-        let serialized_user_op = utils::serialize(&user_op);
+        let serialized_user_op = utils::serialize(user_op);
         let serialized_entry_point_address =
             utils::serialize(&self.account.get_entry_point_address());
 
