@@ -1,8 +1,12 @@
 use super::{AccountError, BaseAccount};
 
 use crate::contracts::{CreateAccountCall, SimpleAccountFactoryCalls};
-use crate::contracts::{EntryPoint, ExecuteCall, SimpleAccountCalls, UserOperation};
+use crate::contracts::{
+    EntryPoint, ExecuteBatchCall, ExecuteCall as SimpleAccountExecuteCall, SimpleAccountCalls,
+    UserOperation,
+};
 use crate::paymaster::{Paymaster, PaymasterError};
+use crate::types::ExecuteCall;
 
 use async_trait::async_trait;
 use ethers::abi::AbiEncode;
@@ -114,17 +118,29 @@ impl BaseAccount for SimpleAccount {
 
     async fn encode_execute(
         &self,
-        target: Address,
-        value: U256,
-        data: Bytes,
+        call: ExecuteCall,
     ) -> Result<Vec<u8>, AccountError<Self::Inner>> {
-        let call = SimpleAccountCalls::Execute(ExecuteCall {
-            dest: target,
-            value,
-            func: data,
+        let call = SimpleAccountCalls::Execute(SimpleAccountExecuteCall {
+            dest: call.target,
+            value: call.value,
+            func: call.data,
         });
 
         Ok(call.encode())
+    }
+
+    async fn encode_execute_batch(
+        &self,
+        calls: Vec<ExecuteCall>,
+    ) -> Result<Vec<u8>, AccountError<Self::Inner>> {
+        let targets: Vec<Address> = calls.iter().map(|call| call.target).collect();
+        let data: Vec<Bytes> = calls.iter().map(|call| call.data.clone()).collect();
+        let multi_call = SimpleAccountCalls::ExecuteBatch(ExecuteBatchCall {
+            dest: targets,
+            func: data,
+        });
+
+        Ok(multi_call.encode())
     }
 
     async fn sign_user_op_hash<S: Signer>(
@@ -167,7 +183,7 @@ mod tests {
 
     use crate::{
         account::{simple_account::SimpleAccount, BaseAccount, SmartAccountMiddleware},
-        types::UserOperationRequest,
+        types::{ExecuteCall, UserOpHash, UserOperationRequest},
     };
 
     const RPC_URL: &str = "https://eth-goerli.g.alchemy.com/v2/Lekp6yzHz5yAPLKPNvGpMKaqbGunnXHS"; //"https://eth-mainnet.g.alchemy.com/v2/lRcdJTfR_zjZSef3yutTGE6OIY9YFx1E";
@@ -242,7 +258,7 @@ mod tests {
                 .unwrap();
 
         let result: Bytes = account
-            .encode_execute(target_address, U256::from(100), call_data)
+            .encode_execute(ExecuteCall::new(target_address, U256::from(100), call_data))
             .await
             .unwrap()
             .into();
