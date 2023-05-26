@@ -1,6 +1,6 @@
 use crate::contracts::{EntryPoint, SenderAddressResult, UserOperation};
 use crate::paymaster::{Paymaster, PaymasterError};
-use crate::types::FromErr;
+use crate::types::{ExecuteCall, FromErr};
 use async_trait::async_trait;
 use ethers::signers::Signer;
 use ethers::{
@@ -95,12 +95,13 @@ pub trait BaseAccount: Sync + Send + Debug {
         Ok(self.is_deployed().await)
     }
 
-    async fn encode_execute(
+    async fn encode_execute(&self, call: ExecuteCall)
+        -> Result<Vec<u8>, AccountError<Self::Inner>>;
+
+    async fn encode_execute_batch(
         &self,
-        target: Address,
-        value: U256,
-        data: Bytes,
-    ) -> Result<Vec<u8>, AccountError<Self::Inner>>; // [u8; 32]?
+        calls: Vec<ExecuteCall>,
+    ) -> Result<Vec<u8>, AccountError<Self::Inner>>;
 
     async fn estimate_creation_gas(&self) -> Result<U256, AccountError<Self::Inner>> {
         let init_code = self.get_init_code().await?;
@@ -196,7 +197,9 @@ pub trait BaseAccount: Sync + Send + Debug {
         gas_limit: Option<U256>,
     ) -> Result<(Bytes, U256), AccountError<Self::Inner>> {
         let value = value.unwrap_or(U256::zero());
-        let call_data = self.encode_execute(target, value, data.into()).await?;
+        let call_data = self
+            .encode_execute(ExecuteCall::new(target, value, data.into()))
+            .await?;
 
         let call_gas_limit = match gas_limit {
             Some(limit) => limit,
