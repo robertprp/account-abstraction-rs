@@ -184,3 +184,19 @@ impl UserOperationRequest {
 }
 
 pub type UserOpHash = H256;
+
+pub struct ExecuteCall {
+    pub target: Address,
+    pub value: U256,
+    pub data: Bytes,
+}
+
+impl ExecuteCall {
+    pub fn new(target: Address, value: U256, data: Bytes) -> Self {
+        Self {
+            target,
+            value,
+            data,
+        }
+    }
+}
