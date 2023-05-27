@@ -1,8 +1,8 @@
 use ethers::types::{Address, Bytes, H256, U256};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 /// Parameters for sending a user operation
-#[derive(Clone, Default, Serialize, Deserialize, PartialEq, Eq, Debug)]
+#[derive(Clone, Default, Serialize, PartialEq, Eq, Debug)]
 pub struct UserOperationRequest {
     /// Sender address
     #[serde(skip_serializing_if = "Option::is_none", default)]
@@ -75,17 +75,8 @@ pub struct UserOperationRequest {
 
     /// Helper properties for encodeExecute
 
-    /// Target contract
     #[serde(skip_serializing)]
-    pub target_address: Option<Address>,
-
-    // Transaction's value
-    #[serde(skip_serializing)]
-    pub tx_value: Option<U256>,
-
-    // Transaction data
-    #[serde(skip_serializing)]
-    pub tx_data: Option<Bytes>,
+    pub call: Option<AccountCall>,
 }
 
 impl UserOperationRequest {
@@ -107,9 +98,7 @@ impl UserOperationRequest {
             paymaster_and_data: Some(self.paymaster_and_data.unwrap_or_else(|| Bytes::from(vec![0u8; 0]))),
             // Dummy signature
             signature: Some(self.signature.unwrap_or_else(|| "0xb6905c3cc524616247f41b6de20bced7d4437a6513a5cf1c90ab6a28415eb6993e1236443130bce47d1580ab289bcc8f32270acb4ae7e46a17fe158f473fd4991c".parse().unwrap())),
-            target_address: Some(self.target_address.unwrap_or_else(|| Address::zero())),
-            tx_value: Some(self.tx_value.unwrap_or_else(|| U256::zero())),
-            tx_data: Some(self.tx_data.unwrap_or_else(|| Bytes::from(vec![0u8; 0]))),
+            call: self.call
         }
     }
 
@@ -185,26 +174,42 @@ impl UserOperationRequest {
     }
 
     #[must_use]
-    pub fn target_address<T: Into<Address>>(mut self, target_address: T) -> Self {
-        self.target_address = Some(target_address.into());
+    pub fn call<T: Into<AccountCall>>(mut self, call: T) -> Self {
+        self.call = Some(call.into());
         self
     }
 
     #[must_use]
-    pub fn tx_value<T: Into<U256>>(mut self, tx_value: T) -> Self {
-        self.tx_value = Some(tx_value.into());
+    pub fn execute<T: Into<Address>, V: Into<U256>, D: Into<Bytes>>(
+        mut self,
+        target: T,
+        value: V,
+        data: D,
+    ) -> Self {
+        self.call = Some(AccountCall::Execute(ExecuteCall::new(
+            target.into(),
+            value.into(),
+            data.into(),
+        )));
         self
     }
 
     #[must_use]
-    pub fn tx_data<T: Into<Bytes>>(mut self, tx_data: T) -> Self {
-        self.tx_data = Some(tx_data.into());
+    pub fn execute_batch(mut self, calls: Vec<ExecuteCall>) -> Self {
+        self.call = Some(AccountCall::ExecuteBatch(calls));
         self
     }
 }
 
 pub type UserOpHash = H256;
 
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub enum AccountCall {
+    Execute(ExecuteCall),
+    ExecuteBatch(Vec<ExecuteCall>),
+}
+
+#[derive(Clone, Default, PartialEq, Eq, Debug)]
 pub struct ExecuteCall {
     pub target: Address,
     pub value: U256,
@@ -212,11 +217,15 @@ pub struct ExecuteCall {
 }
 
 impl ExecuteCall {
-    pub fn new(target: Address, value: U256, data: Bytes) -> Self {
+    pub fn new<T: Into<Address>, V: Into<U256>, B: Into<Bytes>>(
+        target: T,
+        value: V,
+        data: B,
+    ) -> Self {
         Self {
-            target,
-            value,
-            data,
+            target: target.into(),
+            value: value.into(),
+            data: data.into(),
         }
     }
 }
