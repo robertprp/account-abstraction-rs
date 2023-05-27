@@ -183,7 +183,7 @@ mod tests {
 
     use crate::{
         account::{simple_account::SimpleAccount, BaseAccount, SmartAccountMiddleware},
-        types::{ExecuteCall, UserOpHash, UserOperationRequest},
+        types::{AccountCall, ExecuteCall, UserOpHash, UserOperationRequest},
     };
 
     const RPC_URL: &str = "https://eth-goerli.g.alchemy.com/v2/Lekp6yzHz5yAPLKPNvGpMKaqbGunnXHS"; //"https://eth-mainnet.g.alchemy.com/v2/lRcdJTfR_zjZSef3yutTGE6OIY9YFx1E";
@@ -228,7 +228,7 @@ mod tests {
 
         let result = account.sign_user_op(user_op, &wallet).await.unwrap();
 
-        let expected_signature: Bytes = "0xf638e4980e8e2244d951c212caeadb31e4ec53629c1c743e2046393ecfa065da2cbaeb4460ee7ac6f7c5e9b52d94c6198dd03a50ff852f1e6cc118d603b8db631c".parse().unwrap();
+        let expected_signature: Bytes = "0xe24cd218d33046a7f0f9d3a296ebb0f89d4bc34149a4ee29b036f101ace9d2f85b86451955472e607feca50b51451887a742cee69f16e6a15a9354abce4ab50c1b".parse().unwrap();
 
         assert_eq!(result, expected_signature)
     }
