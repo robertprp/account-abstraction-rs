@@ -198,7 +198,7 @@ pub trait BaseAccount: Sync + Send + Debug {
     ) -> Result<(Bytes, U256), AccountError<Self::Inner>> {
         let value = value.unwrap_or(U256::zero());
         let call_data = self
-            .encode_execute(ExecuteCall::new(target, value, data.into()))
+            .encode_execute(ExecuteCall::new(target, value, data))
             .await?;
 
         let call_gas_limit = match gas_limit {

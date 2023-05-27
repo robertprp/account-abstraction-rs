@@ -4,7 +4,7 @@ use crate::{
     paymaster::{Paymaster, PaymasterError},
     types::{
         request::{UserOpHash, UserOperationRequest},
-        ExecuteCall, FromErr, UserOperation, UserOperationGasEstimate, UserOperationReceipt,
+        AccountCall, FromErr, UserOperation, UserOperationGasEstimate, UserOperationReceipt,
     },
 };
 
@@ -75,27 +75,30 @@ where
     where
         A: BaseAccount<Inner = M>,
     {
-        let Some(target_address) = user_op.target_address else {
-            return Err(SmartAccountMiddlewareError::InvalidInputError("Target must be set".to_string()))
-        };
+        if let Some(ref call) = user_op.call {
+            let call_data: Bytes = match call {
+                AccountCall::Execute(execute_call) => {
+                    let call_data = self
+                        .account
+                        .encode_execute(execute_call.clone())
+                        .await
+                        .map_err(SmartAccountMiddlewareError::AccountError)?;
 
-        let tx_data = user_op
-            .tx_data
-            .clone()
-            .unwrap_or(user_op.call_data.clone().unwrap_or(Bytes::new()));
+                    call_data.into()
+                }
+                AccountCall::ExecuteBatch(execute_calls) => {
+                    let call_data = self
+                        .account
+                        .encode_execute_batch(execute_calls.clone())
+                        .await
+                        .map_err(SmartAccountMiddlewareError::AccountError)?;
 
-        let execute_call = ExecuteCall::new(
-            target_address,
-            user_op.tx_value.unwrap_or(U256::from(0)),
-            tx_data,
-        );
-        let call_data = self
-            .account
-            .encode_execute(execute_call)
-            .await
-            .map_err(SmartAccountMiddlewareError::AccountError)?;
+                    call_data.into()
+                }
+            };
 
-        user_op.call_data = Some(call_data.into());
+            user_op.call_data = Some(call_data.into());
+        }
 
         if user_op.nonce.is_none() {
             let nonce = self.account.get_nonce().await.unwrap_or(U256::from(0));
