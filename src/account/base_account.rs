@@ -17,12 +17,6 @@ use super::utils;
 
 #[async_trait]
 pub trait BaseAccount: Sync + Send + Debug {
-    // type Error: Sync
-    //     + Send
-    //     + Error;
-    //     + FromErr<<Self::Inner as Middleware>::Error>
-    //     + FromErr<ProviderError>;
-
     type Paymaster: Paymaster;
     type Provider: JsonRpcClient;
     type Inner: Middleware<Provider = Self::Provider>;
@@ -44,7 +38,7 @@ pub trait BaseAccount: Sync + Send + Debug {
     fn get_paymaster(&self) -> Option<Self::Paymaster>;
 
     fn get_verification_gas_limit(&self) -> U256 {
-        U256::from(100000)
+        U256::from(110000)
     }
 
     fn get_pre_verification_gas<U: Into<UserOperation> + Send + Sync>(&self, user_op: U) -> U256 {
@@ -217,7 +211,7 @@ pub trait BaseAccount: Sync + Send + Debug {
                     .map_err(FromErr::from)?
             }
         };
-
+        
         Ok((call_data.into(), call_gas_limit))
     }
 
