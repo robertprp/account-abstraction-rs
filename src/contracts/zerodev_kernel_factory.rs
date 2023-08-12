@@ -1,4 +1,4 @@
-pub use zerodev_kernel_factory::*;
+pub use zero_dev_kernel_factory::*;
 /// This module was auto-generated with ethers-rs Abigen.
 /// More information at: <https://github.com/gakonst/ethers-rs>
 #[allow(
@@ -9,35 +9,41 @@ pub use zerodev_kernel_factory::*;
     dead_code,
     non_camel_case_types,
 )]
-pub mod zerodev_kernel_factory {
+pub mod zero_dev_kernel_factory {
     #[rustfmt::skip]
     const __ABI: &str = "[{\"inputs\":[{\"internalType\":\"contract IEntryPoint\",\"name\":\"_entryPoint\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"AccountCreated\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_index\",\"type\":\"uint256\"}],\"name\":\"createAccount\",\"outputs\":[{\"internalType\":\"contract EIP1967Proxy\",\"name\":\"proxy\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_index\",\"type\":\"uint256\"}],\"name\":\"getAccountAddress\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"kernelTemplate\",\"outputs\":[{\"internalType\":\"contract Kernel\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]";
     ///The parsed JSON ABI of the contract.
-    pub static KERNELFACTORY_ABI: ::ethers::contract::Lazy<::ethers::core::abi::Abi> = ::ethers::contract::Lazy::new(||
-    ::ethers::core::utils::__serde_json::from_str(__ABI).expect("ABI is always valid"));
-    pub struct KernelFactory<M>(::ethers::contract::Contract<M>);
-    impl<M> ::core::clone::Clone for KernelFactory<M> {
+    pub static ZERODEVKERNELFACTORY_ABI: ::ethers::contract::Lazy<
+        ::ethers::core::abi::Abi,
+    > = ::ethers::contract::Lazy::new(|| {
+        ::ethers::core::utils::__serde_json::from_str(__ABI)
+            .expect("ABI is always valid")
+    });
+    pub struct ZeroDevKernelFactory<M>(::ethers::contract::Contract<M>);
+    impl<M> ::core::clone::Clone for ZeroDevKernelFactory<M> {
         fn clone(&self) -> Self {
             Self(::core::clone::Clone::clone(&self.0))
         }
     }
-    impl<M> ::core::ops::Deref for KernelFactory<M> {
+    impl<M> ::core::ops::Deref for ZeroDevKernelFactory<M> {
         type Target = ::ethers::contract::Contract<M>;
         fn deref(&self) -> &Self::Target {
             &self.0
         }
     }
-    impl<M> ::core::ops::DerefMut for KernelFactory<M> {
+    impl<M> ::core::ops::DerefMut for ZeroDevKernelFactory<M> {
         fn deref_mut(&mut self) -> &mut Self::Target {
             &mut self.0
         }
     }
-    impl<M> ::core::fmt::Debug for KernelFactory<M> {
+    impl<M> ::core::fmt::Debug for ZeroDevKernelFactory<M> {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-            f.debug_tuple(stringify!(KernelFactory)).field(&self.address()).finish()
+            f.debug_tuple(stringify!(ZeroDevKernelFactory))
+                .field(&self.address())
+                .finish()
         }
     }
-    impl<M: ::ethers::providers::Middleware> KernelFactory<M> {
+    impl<M: ::ethers::providers::Middleware> ZeroDevKernelFactory<M> {
         /// Creates a new contract instance with the specified `ethers` client at
         /// `address`. The contract derefs to a `ethers::Contract` object.
         pub fn new<T: Into<::ethers::core::types::Address>>(
@@ -47,7 +53,7 @@ pub mod zerodev_kernel_factory {
             Self(
                 ::ethers::contract::Contract::new(
                     address.into(),
-                    KERNELFACTORY_ABI.clone(),
+                    ZERODEVKERNELFACTORY_ABI.clone(),
                     client,
                 ),
             )
@@ -111,7 +117,7 @@ pub mod zerodev_kernel_factory {
         }
     }
     impl<M: ::ethers::providers::Middleware> From<::ethers::contract::Contract<M>>
-    for KernelFactory<M> {
+    for ZeroDevKernelFactory<M> {
         fn from(contract: ::ethers::contract::Contract<M>) -> Self {
             Self::new(contract.address(), contract.client())
         }
@@ -181,12 +187,12 @@ pub mod zerodev_kernel_factory {
     pub struct KernelTemplateCall;
     ///Container type for all of the contract's call
     #[derive(Clone, ::ethers::contract::EthAbiType, Debug, PartialEq, Eq, Hash)]
-    pub enum KernelFactoryCalls {
+    pub enum ZeroDevKernelFactoryCalls {
         CreateAccount(CreateAccountCall),
         GetAccountAddress(GetAccountAddressCall),
         KernelTemplate(KernelTemplateCall),
     }
-    impl ::ethers::core::abi::AbiDecode for KernelFactoryCalls {
+    impl ::ethers::core::abi::AbiDecode for ZeroDevKernelFactoryCalls {
         fn decode(
             data: impl AsRef<[u8]>,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::AbiError> {
@@ -208,7 +214,7 @@ pub mod zerodev_kernel_factory {
             Err(::ethers::core::abi::Error::InvalidData.into())
         }
     }
-    impl ::ethers::core::abi::AbiEncode for KernelFactoryCalls {
+    impl ::ethers::core::abi::AbiEncode for ZeroDevKernelFactoryCalls {
         fn encode(self) -> Vec<u8> {
             match self {
                 Self::CreateAccount(element) => {
@@ -223,7 +229,7 @@ pub mod zerodev_kernel_factory {
             }
         }
     }
-    impl ::core::fmt::Display for KernelFactoryCalls {
+    impl ::core::fmt::Display for ZeroDevKernelFactoryCalls {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
             match self {
                 Self::CreateAccount(element) => ::core::fmt::Display::fmt(element, f),
@@ -232,17 +238,17 @@ pub mod zerodev_kernel_factory {
             }
         }
     }
-    impl ::core::convert::From<CreateAccountCall> for KernelFactoryCalls {
+    impl ::core::convert::From<CreateAccountCall> for ZeroDevKernelFactoryCalls {
         fn from(value: CreateAccountCall) -> Self {
             Self::CreateAccount(value)
         }
     }
-    impl ::core::convert::From<GetAccountAddressCall> for KernelFactoryCalls {
+    impl ::core::convert::From<GetAccountAddressCall> for ZeroDevKernelFactoryCalls {
         fn from(value: GetAccountAddressCall) -> Self {
             Self::GetAccountAddress(value)
         }
     }
-    impl ::core::convert::From<KernelTemplateCall> for KernelFactoryCalls {
+    impl ::core::convert::From<KernelTemplateCall> for ZeroDevKernelFactoryCalls {
         fn from(value: KernelTemplateCall) -> Self {
             Self::KernelTemplate(value)
         }
