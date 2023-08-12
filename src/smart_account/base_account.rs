@@ -211,7 +211,7 @@ pub trait BaseAccount: Sync + Send + Debug {
                     .map_err(FromErr::from)?
             }
         };
-        
+
         Ok((call_data.into(), call_gas_limit))
     }
 
@@ -328,4 +328,217 @@ impl<M: Middleware> FromErr<M::Error> for AccountError<M> {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use crate::contracts::CreateAccountCall;
+
+    use super::*;
+    use crate::contracts::{EntryPoint, SimpleAccountFactoryCalls};
+    use async_trait::async_trait;
+    use ethers::abi::AbiEncode;
+    use ethers::prelude::{Http, Provider, ProviderError};
+    use ethers::types::{Address, Bytes, H256, U256};
+    use std::sync::Arc;
+    use std::{assert_eq, println};
+
+    #[derive(Debug)]
+    struct MockBaseAccount {
+        inner: Arc<Provider<Http>>,
+    }
+
+    #[async_trait]
+    impl BaseAccount for MockBaseAccount {
+        type Paymaster = MockPaymaster;
+        type Provider = Http;
+        type Inner = Provider<Http>;
+
+        fn inner(&self) -> &Self::Inner {
+            &self.inner
+        }
+
+        async fn get_account_address(&self) -> Result<Address, AccountError<Self::Inner>> {
+            Ok("0x12fd82c9b1a44979838a19dfa5153bd093b0e75e"
+                .parse()
+                .unwrap())
+        }
+
+        fn get_rpc_url(&self) -> &str {
+            unimplemented!()
+        }
+
+        fn get_entry_point_address(&self) -> Address {
+            "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789" //"0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789"
+                .parse()
+                .unwrap()
+        }
+
+        fn get_entry_point(&self) -> EntryPoint<Self::Inner> {
+            let address: Address = self.get_entry_point_address();
+            EntryPoint::new(address, self.inner.clone())
+        }
+
+        fn get_paymaster(&self) -> Option<Self::Paymaster> {
+            unimplemented!()
+        }
+
+        async fn get_account_init_code(&self) -> Result<Bytes, AccountError<Self::Inner>> {
+            let factory_address: Address = "0x9406Cc6185a346906296840746125a0E44976454"
+                .parse()
+                .unwrap();
+
+            let owner: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
+                .parse()
+                .unwrap();
+
+            let index = U256::from(1);
+
+            let call =
+                SimpleAccountFactoryCalls::CreateAccount(CreateAccountCall { owner, salt: index });
+
+            println!("encoded call: {:?}", call.clone().encode_hex());
+
+            let mut result: Vec<u8> = Vec::new();
+
+            result.extend_from_slice(factory_address.as_bytes());
+            result.extend_from_slice(&call.encode());
+
+            let result_bytes = Bytes::from(result);
+
+            println!("encoded calldata: {:?}", result_bytes.clone().encode_hex());
+
+            Ok(result_bytes)
+        }
+
+        async fn get_nonce(&self) -> Result<U256, AccountError<Self::Inner>> {
+            unimplemented!() // You will need to provide an actual implementation.
+        }
+
+        async fn is_deployed(&self) -> bool {
+            false
+        }
+
+        async fn set_is_deployed(&self, _is_deployed: bool) {}
+
+        async fn encode_execute(
+            &self,
+            _call: ExecuteCall,
+        ) -> Result<Vec<u8>, AccountError<Self::Inner>> {
+            unimplemented!() // You will need to provide an actual implementation.
+        }
+
+        async fn encode_execute_batch(
+            &self,
+            _calls: Vec<ExecuteCall>,
+        ) -> Result<Vec<u8>, AccountError<Self::Inner>> {
+            unimplemented!() // You will need to provide an actual implementation.
+        }
+
+        async fn sign_user_op_hash<S: Signer>(
+            &self,
+            _user_op_hash: [u8; 32],
+            _signer: &S,
+        ) -> Result<Bytes, AccountError<Self::Inner>> {
+            unimplemented!() // You will need to provide an actual implementation.
+        }
+    }
+
+    impl MockBaseAccount {
+        async fn get_onchain_user_op_hash(
+            &self,
+            user_op: UserOperation,
+        ) -> Result<[u8; 32], AccountError<<MockBaseAccount as BaseAccount>::Inner>> {
+            let entry_point = self.get_entry_point();
+
+            entry_point
+                .get_user_op_hash(user_op.into())
+                .call()
+                .await
+                .map_err(|e| AccountError::ContractError(e))
+        }
+    }
+
+    #[derive(Debug)]
+    struct MockPaymaster;
+
+    #[async_trait]
+    impl Paymaster for MockPaymaster {
+        async fn get_paymaster_and_data(
+            &self,
+            _user_op: UserOperation,
+        ) -> Result<Bytes, PaymasterError> {
+            Ok(Bytes::new())
+        }
+    }
+
+    const RPC_URL: &str = "https://eth-mainnet.g.alchemy.com/v2/lRcdJTfR_zjZSef3yutTGE6OIY9YFx1E";
+
+    #[tokio::test]
+    async fn test_get_counterfactual_address() {
+        let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
+
+        let account = MockBaseAccount {
+            inner: Arc::new(provider),
+        };
+
+        let result = account.get_counterfactual_address().await;
+
+        println!("{:?}", result);
+    }
+
+    #[tokio::test]
+    async fn test_user_op_hash() {
+        let owner: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
+            .parse()
+            .unwrap();
+
+        let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
+
+        let account = MockBaseAccount {
+            inner: Arc::new(provider),
+        };
+println!("init code {:?}", account.get_account_init_code().await.unwrap());
+        let user_op = UserOperation {
+            sender: owner,
+            nonce: U256::from(1),
+            init_code: account.get_account_init_code().await.unwrap(),
+            call_data: Bytes::from(vec![]),
+            call_gas_limit: U256::from(0),
+            verification_gas_limit: U256::from(0),
+            pre_verification_gas: U256::from(0),
+            max_fee_per_gas: U256::from(0),
+            max_priority_fee_per_gas: U256::from(0),
+            paymaster_and_data: Bytes::from(vec![]),
+            signature: Bytes::from(vec![]),
+        };
+
+        let onchain_hash = account
+            .get_onchain_user_op_hash(user_op.clone())
+            .await
+            .unwrap();
+        let offchain_hash = account.get_user_op_hash(user_op.clone()).await.unwrap();
+
+        println!("onchain {:?}", H256::from(onchain_hash));
+        println!("offchain {:?}", H256::from(offchain_hash));
+
+        assert!(onchain_hash == offchain_hash)
+    }
+
+    #[tokio::test]
+    async fn test_estimate_creation_gas() {
+        let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
+
+        let account = MockBaseAccount {
+            inner: Arc::new(provider),
+        };
+
+        let creation_gas = account.estimate_creation_gas().await.unwrap();
+
+        assert_eq!(creation_gas, U256::from(291723))
+    }
+
+    impl FromErr<ProviderError> for ProviderError {
+        fn from(src: ProviderError) -> Self {
+            src
+        }
+    }
 }
