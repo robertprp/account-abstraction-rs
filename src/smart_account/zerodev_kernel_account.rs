@@ -20,6 +20,7 @@ use tokio::sync::RwLock;
 const ENTRY_POINT_ADDRESS: &str = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
 const FACTORY_ADDRESS: &str = "0x4E4946298614FC299B50c947289F4aD0572CB9ce";
 const DEFAULT_SESSION_KEY_PLUGIN: &str = "0x6E2631aF80bF7a9cEE83F590eE496bCc2E40626D";
+const MULTISEND_ADDR: &str = "0x8ae01fcf7c655655ff2c6ef907b8b4718ab4e17c";
 
 #[derive(Debug)]
 struct ZeroDevKernelAccount {
@@ -138,14 +139,16 @@ impl BaseAccount for ZeroDevKernelAccount {
         &self,
         calls: Vec<ExecuteCall>,
     ) -> Result<Vec<u8>, AccountError<Self::Inner>> {
-        let targets: Vec<Address> = calls.iter().map(|call| call.target).collect();
-        let data: Vec<Bytes> = calls.iter().map(|call| call.data.clone()).collect();
-        let multi_call = SimpleAccountCalls::ExecuteBatch(ExecuteBatchCall {
-            dest: targets,
-            func: data,
-        });
+        // TODO: Add multi send contract
+        unimplemented!()
+        // let targets: Vec<Address> = calls.iter().map(|call| call.target).collect();
+        // let data: Vec<Bytes> = calls.iter().map(|call| call.data.clone()).collect();
+        // let multi_call = zerodev_kernel_account::ZeroDevKernelAccountCalls::ExecuteBatch(zerodev_kernel_account::multi {
+        //     dest: targets,
+        //     func: data,
+        // });
 
-        Ok(multi_call.encode())
+        // Ok(multi_call.encode())
     }
 
     async fn sign_user_op_hash<S: Signer>(
