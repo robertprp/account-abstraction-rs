@@ -1,11 +1,7 @@
-
 use super::{AccountError, BaseAccount};
 
-use crate::contracts::{zerodev_kernel_factory, zerodev_kernel_account};
-use crate::contracts::{
-    EntryPoint, ExecuteBatchCall, SimpleAccountCalls,
-    UserOperation,
-};
+use crate::contracts::{zerodev_kernel_account, zerodev_kernel_factory};
+use crate::contracts::{EntryPoint, UserOperation};
 use crate::paymaster::{Paymaster, PaymasterError};
 use crate::types::ExecuteCall;
 
@@ -65,7 +61,6 @@ impl BaseAccount for ZeroDevKernelAccount {
     // TODO: Add
     // async approvePlugin(plugin: Contract, validUntil: BigNumber, validAfter: BigNumber, data: string): Promise<string>
 
-
     async fn get_account_address(&self) -> Result<Address, AccountError<Self::Inner>> {
         let Some(account_address) = *self.account_address.read().await else {
             let address = self.get_counterfactual_address().await?;
@@ -101,8 +96,9 @@ impl BaseAccount for ZeroDevKernelAccount {
         // TODO: Add optional index
         let index = U256::from(0);
 
-        let call =
-            zerodev_kernel_factory::ZeroDevKernelFactoryCalls::CreateAccount(zerodev_kernel_factory::CreateAccountCall { owner, index });
+        let call = zerodev_kernel_factory::ZeroDevKernelFactoryCalls::CreateAccount(
+            zerodev_kernel_factory::CreateAccountCall { owner, index },
+        );
 
         let mut result: Vec<u8> = Vec::new();
 
@@ -126,12 +122,14 @@ impl BaseAccount for ZeroDevKernelAccount {
         &self,
         call: ExecuteCall,
     ) -> Result<Vec<u8>, AccountError<Self::Inner>> {
-        let call = zerodev_kernel_account::ZeroDevKernelAccountCalls::Execute(zerodev_kernel_account::zero_dev_kernel_account::ExecuteCall {
-            to: call.target,
-            value: call.value,
-            data: call.data,
-            operation: u8::from(1)
-        });
+        let call = zerodev_kernel_account::ZeroDevKernelAccountCalls::Execute(
+            zerodev_kernel_account::zero_dev_kernel_account::ExecuteCall {
+                to: call.target,
+                value: call.value,
+                data: call.data,
+                operation: u8::from(1),
+            },
+        );
 
         Ok(call.encode())
     }
