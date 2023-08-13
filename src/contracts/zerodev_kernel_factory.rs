@@ -7,18 +7,16 @@ pub use zero_dev_kernel_factory::*;
     clippy::upper_case_acronyms,
     clippy::type_complexity,
     dead_code,
-    non_camel_case_types,
+    non_camel_case_types
 )]
 pub mod zero_dev_kernel_factory {
     #[rustfmt::skip]
     const __ABI: &str = "[{\"inputs\":[{\"internalType\":\"contract IEntryPoint\",\"name\":\"_entryPoint\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"AccountCreated\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_index\",\"type\":\"uint256\"}],\"name\":\"createAccount\",\"outputs\":[{\"internalType\":\"contract EIP1967Proxy\",\"name\":\"proxy\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_index\",\"type\":\"uint256\"}],\"name\":\"getAccountAddress\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"kernelTemplate\",\"outputs\":[{\"internalType\":\"contract Kernel\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]";
     ///The parsed JSON ABI of the contract.
-    pub static ZERODEVKERNELFACTORY_ABI: ::ethers::contract::Lazy<
-        ::ethers::core::abi::Abi,
-    > = ::ethers::contract::Lazy::new(|| {
-        ::ethers::core::utils::__serde_json::from_str(__ABI)
-            .expect("ABI is always valid")
-    });
+    pub static ZERODEVKERNELFACTORY_ABI: ::ethers::contract::Lazy<::ethers::core::abi::Abi> =
+        ::ethers::contract::Lazy::new(|| {
+            ::ethers::core::utils::__serde_json::from_str(__ABI).expect("ABI is always valid")
+        });
     pub struct ZeroDevKernelFactory<M>(::ethers::contract::Contract<M>);
     impl<M> ::core::clone::Clone for ZeroDevKernelFactory<M> {
         fn clone(&self) -> Self {
@@ -50,23 +48,18 @@ pub mod zero_dev_kernel_factory {
             address: T,
             client: ::std::sync::Arc<M>,
         ) -> Self {
-            Self(
-                ::ethers::contract::Contract::new(
-                    address.into(),
-                    ZERODEVKERNELFACTORY_ABI.clone(),
-                    client,
-                ),
-            )
+            Self(::ethers::contract::Contract::new(
+                address.into(),
+                ZERODEVKERNELFACTORY_ABI.clone(),
+                client,
+            ))
         }
         ///Calls the contract's `createAccount` (0x5fbfb9cf) function
         pub fn create_account(
             &self,
             owner: ::ethers::core::types::Address,
             index: ::ethers::core::types::U256,
-        ) -> ::ethers::contract::builders::ContractCall<
-            M,
-            ::ethers::core::types::Address,
-        > {
+        ) -> ::ethers::contract::builders::ContractCall<M, ::ethers::core::types::Address> {
             self.0
                 .method_hash([95, 191, 185, 207], (owner, index))
                 .expect("method not found (this should never happen)")
@@ -76,10 +69,7 @@ pub mod zero_dev_kernel_factory {
             &self,
             owner: ::ethers::core::types::Address,
             index: ::ethers::core::types::U256,
-        ) -> ::ethers::contract::builders::ContractCall<
-            M,
-            ::ethers::core::types::Address,
-        > {
+        ) -> ::ethers::contract::builders::ContractCall<M, ::ethers::core::types::Address> {
             self.0
                 .method_hash([13, 37, 61, 118], (owner, index))
                 .expect("method not found (this should never happen)")
@@ -87,10 +77,7 @@ pub mod zero_dev_kernel_factory {
         ///Calls the contract's `kernelTemplate` (0x037637aa) function
         pub fn kernel_template(
             &self,
-        ) -> ::ethers::contract::builders::ContractCall<
-            M,
-            ::ethers::core::types::Address,
-        > {
+        ) -> ::ethers::contract::builders::ContractCall<M, ::ethers::core::types::Address> {
             self.0
                 .method_hash([3, 118, 55, 170], ())
                 .expect("method not found (this should never happen)")
@@ -98,26 +85,22 @@ pub mod zero_dev_kernel_factory {
         ///Gets the contract's `AccountCreated` event
         pub fn account_created_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            AccountCreatedFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, AccountCreatedFilter>
+        {
             self.0.event()
         }
         /// Returns an `Event` builder for all the events of this contract.
         pub fn events(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            AccountCreatedFilter,
-        > {
-            self.0.event_with_filter(::core::default::Default::default())
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, AccountCreatedFilter>
+        {
+            self.0
+                .event_with_filter(::core::default::Default::default())
         }
     }
     impl<M: ::ethers::providers::Middleware> From<::ethers::contract::Contract<M>>
-    for ZeroDevKernelFactory<M> {
+        for ZeroDevKernelFactory<M>
+    {
         fn from(contract: ::ethers::contract::Contract<M>) -> Self {
             Self::new(contract.address(), contract.client())
         }
@@ -130,9 +113,12 @@ pub mod zero_dev_kernel_factory {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
-    #[ethevent(name = "AccountCreated", abi = "AccountCreated(address,address,uint256)")]
+    #[ethevent(
+        name = "AccountCreated",
+        abi = "AccountCreated(address,address,uint256)"
+    )]
     pub struct AccountCreatedFilter {
         #[ethevent(indexed)]
         pub account: ::ethers::core::types::Address,
@@ -149,7 +135,7 @@ pub mod zero_dev_kernel_factory {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "createAccount", abi = "createAccount(address,uint256)")]
     pub struct CreateAccountCall {
@@ -165,7 +151,7 @@ pub mod zero_dev_kernel_factory {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "getAccountAddress", abi = "getAccountAddress(address,uint256)")]
     pub struct GetAccountAddressCall {
@@ -181,7 +167,7 @@ pub mod zero_dev_kernel_factory {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "kernelTemplate", abi = "kernelTemplate()")]
     pub struct KernelTemplateCall;
@@ -197,18 +183,18 @@ pub mod zero_dev_kernel_factory {
             data: impl AsRef<[u8]>,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::AbiError> {
             let data = data.as_ref();
-            if let Ok(decoded)
-                = <CreateAccountCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <CreateAccountCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::CreateAccount(decoded));
             }
-            if let Ok(decoded)
-                = <GetAccountAddressCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <GetAccountAddressCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::GetAccountAddress(decoded));
             }
-            if let Ok(decoded)
-                = <KernelTemplateCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) =
+                <KernelTemplateCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::KernelTemplate(decoded));
             }
             Err(::ethers::core::abi::Error::InvalidData.into())
@@ -217,15 +203,9 @@ pub mod zero_dev_kernel_factory {
     impl ::ethers::core::abi::AbiEncode for ZeroDevKernelFactoryCalls {
         fn encode(self) -> Vec<u8> {
             match self {
-                Self::CreateAccount(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::GetAccountAddress(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::KernelTemplate(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::CreateAccount(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::GetAccountAddress(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::KernelTemplate(element) => ::ethers::core::abi::AbiEncode::encode(element),
             }
         }
     }
@@ -262,7 +242,7 @@ pub mod zero_dev_kernel_factory {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct CreateAccountReturn {
         pub proxy: ::ethers::core::types::Address,
@@ -276,7 +256,7 @@ pub mod zero_dev_kernel_factory {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct GetAccountAddressReturn(pub ::ethers::core::types::Address);
     ///Container type for all return fields from the `kernelTemplate` function with signature `kernelTemplate()` and selector `0x037637aa`
@@ -288,7 +268,7 @@ pub mod zero_dev_kernel_factory {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct KernelTemplateReturn(pub ::ethers::core::types::Address);
 }

@@ -7,18 +7,16 @@ pub use zero_dev_kernel_account::*;
     clippy::upper_case_acronyms,
     clippy::type_complexity,
     dead_code,
-    non_camel_case_types,
+    non_camel_case_types
 )]
 pub mod zero_dev_kernel_account {
     #[rustfmt::skip]
     const __ABI: &str = "[\n    {\n      \"inputs\": [\n        {\n          \"internalType\": \"contract IEntryPoint\",\n          \"name\": \"_entryPoint\",\n          \"type\": \"address\"\n        }\n      ],\n      \"stateMutability\": \"nonpayable\",\n      \"type\": \"constructor\"\n    },\n    {\n      \"inputs\": [],\n      \"name\": \"AlreadyInitialized\",\n      \"type\": \"error\"\n    },\n    {\n      \"inputs\": [],\n      \"name\": \"DisabledMode\",\n      \"type\": \"error\"\n    },\n    {\n      \"inputs\": [],\n      \"name\": \"NotAuthorizedCaller\",\n      \"type\": \"error\"\n    },\n    {\n      \"inputs\": [],\n      \"name\": \"NotEntryPoint\",\n      \"type\": \"error\"\n    },\n    {\n      \"anonymous\": false,\n      \"inputs\": [\n        {\n          \"indexed\": true,\n          \"internalType\": \"address\",\n          \"name\": \"oldValidator\",\n          \"type\": \"address\"\n        },\n        {\n          \"indexed\": true,\n          \"internalType\": \"address\",\n          \"name\": \"newValidator\",\n          \"type\": \"address\"\n        }\n      ],\n      \"name\": \"DefaultValidatorChanged\",\n      \"type\": \"event\"\n    },\n    {\n      \"anonymous\": false,\n      \"inputs\": [\n        {\n          \"indexed\": true,\n          \"internalType\": \"bytes4\",\n          \"name\": \"selector\",\n          \"type\": \"bytes4\"\n        },\n        {\n          \"indexed\": true,\n          \"internalType\": \"address\",\n          \"name\": \"executor\",\n          \"type\": \"address\"\n        },\n        {\n          \"indexed\": true,\n          \"internalType\": \"address\",\n          \"name\": \"validator\",\n          \"type\": \"address\"\n        }\n      ],\n      \"name\": \"ExecutionChanged\",\n      \"type\": \"event\"\n    },\n    {\n      \"anonymous\": false,\n      \"inputs\": [\n        {\n          \"indexed\": true,\n          \"internalType\": \"address\",\n          \"name\": \"newImplementation\",\n          \"type\": \"address\"\n        }\n      ],\n      \"name\": \"Upgraded\",\n      \"type\": \"event\"\n    },\n    {\n      \"stateMutability\": \"payable\",\n      \"type\": \"fallback\"\n    },\n    {\n      \"inputs\": [\n        {\n          \"internalType\": \"bytes4\",\n          \"name\": \"_disableFlag\",\n          \"type\": \"bytes4\"\n        }\n      ],\n      \"name\": \"disableMode\",\n      \"outputs\": [],\n      \"stateMutability\": \"payable\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [],\n      \"name\": \"eip712Domain\",\n      \"outputs\": [\n        {\n          \"internalType\": \"bytes1\",\n          \"name\": \"fields\",\n          \"type\": \"bytes1\"\n        },\n        {\n          \"internalType\": \"string\",\n          \"name\": \"name\",\n          \"type\": \"string\"\n        },\n        {\n          \"internalType\": \"string\",\n          \"name\": \"version\",\n          \"type\": \"string\"\n        },\n        {\n          \"internalType\": \"uint256\",\n          \"name\": \"chainId\",\n          \"type\": \"uint256\"\n        },\n        {\n          \"internalType\": \"address\",\n          \"name\": \"verifyingContract\",\n          \"type\": \"address\"\n        },\n        {\n          \"internalType\": \"bytes32\",\n          \"name\": \"salt\",\n          \"type\": \"bytes32\"\n        },\n        {\n          \"internalType\": \"uint256[]\",\n          \"name\": \"extensions\",\n          \"type\": \"uint256[]\"\n        }\n      ],\n      \"stateMutability\": \"view\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [],\n      \"name\": \"entryPoint\",\n      \"outputs\": [\n        {\n          \"internalType\": \"contract IEntryPoint\",\n          \"name\": \"\",\n          \"type\": \"address\"\n        }\n      ],\n      \"stateMutability\": \"view\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [\n        {\n          \"internalType\": \"address\",\n          \"name\": \"to\",\n          \"type\": \"address\"\n        },\n        {\n          \"internalType\": \"uint256\",\n          \"name\": \"value\",\n          \"type\": \"uint256\"\n        },\n        {\n          \"internalType\": \"bytes\",\n          \"name\": \"data\",\n          \"type\": \"bytes\"\n        },\n        {\n          \"internalType\": \"enum Operation\",\n          \"name\": \"operation\",\n          \"type\": \"uint8\"\n        }\n      ],\n      \"name\": \"execute\",\n      \"outputs\": [],\n      \"stateMutability\": \"payable\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [],\n      \"name\": \"getDefaultValidator\",\n      \"outputs\": [\n        {\n          \"internalType\": \"contract IKernelValidator\",\n          \"name\": \"validator\",\n          \"type\": \"address\"\n        }\n      ],\n      \"stateMutability\": \"view\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [],\n      \"name\": \"getDisabledMode\",\n      \"outputs\": [\n        {\n          \"internalType\": \"bytes4\",\n          \"name\": \"disabled\",\n          \"type\": \"bytes4\"\n        }\n      ],\n      \"stateMutability\": \"view\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [\n        {\n          \"internalType\": \"bytes4\",\n          \"name\": \"_selector\",\n          \"type\": \"bytes4\"\n        }\n      ],\n      \"name\": \"getExecution\",\n      \"outputs\": [\n        {\n          \"components\": [\n            {\n              \"internalType\": \"uint48\",\n              \"name\": \"validAfter\",\n              \"type\": \"uint48\"\n            },\n            {\n              \"internalType\": \"uint48\",\n              \"name\": \"validUntil\",\n              \"type\": \"uint48\"\n            },\n            {\n              \"internalType\": \"address\",\n              \"name\": \"executor\",\n              \"type\": \"address\"\n            },\n            {\n              \"internalType\": \"contract IKernelValidator\",\n              \"name\": \"validator\",\n              \"type\": \"address\"\n            }\n          ],\n          \"internalType\": \"struct ExecutionDetail\",\n          \"name\": \"\",\n          \"type\": \"tuple\"\n        }\n      ],\n      \"stateMutability\": \"view\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [],\n      \"name\": \"getLastDisabledTime\",\n      \"outputs\": [\n        {\n          \"internalType\": \"uint48\",\n          \"name\": \"\",\n          \"type\": \"uint48\"\n        }\n      ],\n      \"stateMutability\": \"view\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [\n        {\n          \"internalType\": \"uint192\",\n          \"name\": \"key\",\n          \"type\": \"uint192\"\n        }\n      ],\n      \"name\": \"getNonce\",\n      \"outputs\": [\n        {\n          \"internalType\": \"uint256\",\n          \"name\": \"\",\n          \"type\": \"uint256\"\n        }\n      ],\n      \"stateMutability\": \"view\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [],\n      \"name\": \"getNonce\",\n      \"outputs\": [\n        {\n          \"internalType\": \"uint256\",\n          \"name\": \"\",\n          \"type\": \"uint256\"\n        }\n      ],\n      \"stateMutability\": \"view\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [\n        {\n          \"internalType\": \"contract IKernelValidator\",\n          \"name\": \"_defaultValidator\",\n          \"type\": \"address\"\n        },\n        {\n          \"internalType\": \"bytes\",\n          \"name\": \"_data\",\n          \"type\": \"bytes\"\n        }\n      ],\n      \"name\": \"initialize\",\n      \"outputs\": [],\n      \"stateMutability\": \"payable\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [\n        {\n          \"internalType\": \"bytes32\",\n          \"name\": \"hash\",\n          \"type\": \"bytes32\"\n        },\n        {\n          \"internalType\": \"bytes\",\n          \"name\": \"signature\",\n          \"type\": \"bytes\"\n        }\n      ],\n      \"name\": \"isValidSignature\",\n      \"outputs\": [\n        {\n          \"internalType\": \"bytes4\",\n          \"name\": \"\",\n          \"type\": \"bytes4\"\n        }\n      ],\n      \"stateMutability\": \"view\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [],\n      \"name\": \"name\",\n      \"outputs\": [\n        {\n          \"internalType\": \"string\",\n          \"name\": \"\",\n          \"type\": \"string\"\n        }\n      ],\n      \"stateMutability\": \"view\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [\n        {\n          \"internalType\": \"address\",\n          \"name\": \"\",\n          \"type\": \"address\"\n        },\n        {\n          \"internalType\": \"address\",\n          \"name\": \"\",\n          \"type\": \"address\"\n        },\n        {\n          \"internalType\": \"uint256[]\",\n          \"name\": \"\",\n          \"type\": \"uint256[]\"\n        },\n        {\n          \"internalType\": \"uint256[]\",\n          \"name\": \"\",\n          \"type\": \"uint256[]\"\n        },\n        {\n          \"internalType\": \"bytes\",\n          \"name\": \"\",\n          \"type\": \"bytes\"\n        }\n      ],\n      \"name\": \"onERC1155BatchReceived\",\n      \"outputs\": [\n        {\n          \"internalType\": \"bytes4\",\n          \"name\": \"\",\n          \"type\": \"bytes4\"\n        }\n      ],\n      \"stateMutability\": \"pure\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [\n        {\n          \"internalType\": \"address\",\n          \"name\": \"\",\n          \"type\": \"address\"\n        },\n        {\n          \"internalType\": \"address\",\n          \"name\": \"\",\n          \"type\": \"address\"\n        },\n        {\n          \"internalType\": \"uint256\",\n          \"name\": \"\",\n          \"type\": \"uint256\"\n        },\n        {\n          \"internalType\": \"uint256\",\n          \"name\": \"\",\n          \"type\": \"uint256\"\n        },\n        {\n          \"internalType\": \"bytes\",\n          \"name\": \"\",\n          \"type\": \"bytes\"\n        }\n      ],\n      \"name\": \"onERC1155Received\",\n      \"outputs\": [\n        {\n          \"internalType\": \"bytes4\",\n          \"name\": \"\",\n          \"type\": \"bytes4\"\n        }\n      ],\n      \"stateMutability\": \"pure\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [\n        {\n          \"internalType\": \"address\",\n          \"name\": \"\",\n          \"type\": \"address\"\n        },\n        {\n          \"internalType\": \"address\",\n          \"name\": \"\",\n          \"type\": \"address\"\n        },\n        {\n          \"internalType\": \"uint256\",\n          \"name\": \"\",\n          \"type\": \"uint256\"\n        },\n        {\n          \"internalType\": \"bytes\",\n          \"name\": \"\",\n          \"type\": \"bytes\"\n        }\n      ],\n      \"name\": \"onERC721Received\",\n      \"outputs\": [\n        {\n          \"internalType\": \"bytes4\",\n          \"name\": \"\",\n          \"type\": \"bytes4\"\n        }\n      ],\n      \"stateMutability\": \"pure\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [\n        {\n          \"internalType\": \"contract IKernelValidator\",\n          \"name\": \"_defaultValidator\",\n          \"type\": \"address\"\n        },\n        {\n          \"internalType\": \"bytes\",\n          \"name\": \"_data\",\n          \"type\": \"bytes\"\n        }\n      ],\n      \"name\": \"setDefaultValidator\",\n      \"outputs\": [],\n      \"stateMutability\": \"payable\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [\n        {\n          \"internalType\": \"bytes4\",\n          \"name\": \"_selector\",\n          \"type\": \"bytes4\"\n        },\n        {\n          \"internalType\": \"address\",\n          \"name\": \"_executor\",\n          \"type\": \"address\"\n        },\n        {\n          \"internalType\": \"contract IKernelValidator\",\n          \"name\": \"_validator\",\n          \"type\": \"address\"\n        },\n        {\n          \"internalType\": \"uint48\",\n          \"name\": \"_validUntil\",\n          \"type\": \"uint48\"\n        },\n        {\n          \"internalType\": \"uint48\",\n          \"name\": \"_validAfter\",\n          \"type\": \"uint48\"\n        },\n        {\n          \"internalType\": \"bytes\",\n          \"name\": \"_enableData\",\n          \"type\": \"bytes\"\n        }\n      ],\n      \"name\": \"setExecution\",\n      \"outputs\": [],\n      \"stateMutability\": \"payable\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [\n        {\n          \"internalType\": \"address\",\n          \"name\": \"_newImplementation\",\n          \"type\": \"address\"\n        }\n      ],\n      \"name\": \"upgradeTo\",\n      \"outputs\": [],\n      \"stateMutability\": \"payable\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [\n        {\n          \"components\": [\n            {\n              \"internalType\": \"address\",\n              \"name\": \"sender\",\n              \"type\": \"address\"\n            },\n            {\n              \"internalType\": \"uint256\",\n              \"name\": \"nonce\",\n              \"type\": \"uint256\"\n            },\n            {\n              \"internalType\": \"bytes\",\n              \"name\": \"initCode\",\n              \"type\": \"bytes\"\n            },\n            {\n              \"internalType\": \"bytes\",\n              \"name\": \"callData\",\n              \"type\": \"bytes\"\n            },\n            {\n              \"internalType\": \"uint256\",\n              \"name\": \"callGasLimit\",\n              \"type\": \"uint256\"\n            },\n            {\n              \"internalType\": \"uint256\",\n              \"name\": \"verificationGasLimit\",\n              \"type\": \"uint256\"\n            },\n            {\n              \"internalType\": \"uint256\",\n              \"name\": \"preVerificationGas\",\n              \"type\": \"uint256\"\n            },\n            {\n              \"internalType\": \"uint256\",\n              \"name\": \"maxFeePerGas\",\n              \"type\": \"uint256\"\n            },\n            {\n              \"internalType\": \"uint256\",\n              \"name\": \"maxPriorityFeePerGas\",\n              \"type\": \"uint256\"\n            },\n            {\n              \"internalType\": \"bytes\",\n              \"name\": \"paymasterAndData\",\n              \"type\": \"bytes\"\n            },\n            {\n              \"internalType\": \"bytes\",\n              \"name\": \"signature\",\n              \"type\": \"bytes\"\n            }\n          ],\n          \"internalType\": \"struct UserOperation\",\n          \"name\": \"userOp\",\n          \"type\": \"tuple\"\n        },\n        {\n          \"internalType\": \"bytes32\",\n          \"name\": \"userOpHash\",\n          \"type\": \"bytes32\"\n        },\n        {\n          \"internalType\": \"uint256\",\n          \"name\": \"missingAccountFunds\",\n          \"type\": \"uint256\"\n        }\n      ],\n      \"name\": \"validateUserOp\",\n      \"outputs\": [\n        {\n          \"internalType\": \"uint256\",\n          \"name\": \"validationData\",\n          \"type\": \"uint256\"\n        }\n      ],\n      \"stateMutability\": \"payable\",\n      \"type\": \"function\"\n    },\n    {\n      \"inputs\": [],\n      \"name\": \"version\",\n      \"outputs\": [\n        {\n          \"internalType\": \"string\",\n          \"name\": \"\",\n          \"type\": \"string\"\n        }\n      ],\n      \"stateMutability\": \"view\",\n      \"type\": \"function\"\n    },\n    {\n      \"stateMutability\": \"payable\",\n      \"type\": \"receive\"\n    }\n  ]";
     ///The parsed JSON ABI of the contract.
-    pub static ZERODEVKERNELACCOUNT_ABI: ::ethers::contract::Lazy<
-        ::ethers::core::abi::Abi,
-    > = ::ethers::contract::Lazy::new(|| {
-        ::ethers::core::utils::__serde_json::from_str(__ABI)
-            .expect("ABI is always valid")
-    });
+    pub static ZERODEVKERNELACCOUNT_ABI: ::ethers::contract::Lazy<::ethers::core::abi::Abi> =
+        ::ethers::contract::Lazy::new(|| {
+            ::ethers::core::utils::__serde_json::from_str(__ABI).expect("ABI is always valid")
+        });
     pub struct ZeroDevKernelAccount<M>(::ethers::contract::Contract<M>);
     impl<M> ::core::clone::Clone for ZeroDevKernelAccount<M> {
         fn clone(&self) -> Self {
@@ -50,13 +48,11 @@ pub mod zero_dev_kernel_account {
             address: T,
             client: ::std::sync::Arc<M>,
         ) -> Self {
-            Self(
-                ::ethers::contract::Contract::new(
-                    address.into(),
-                    ZERODEVKERNELACCOUNT_ABI.clone(),
-                    client,
-                ),
-            )
+            Self(::ethers::contract::Contract::new(
+                address.into(),
+                ZERODEVKERNELACCOUNT_ABI.clone(),
+                client,
+            ))
         }
         ///Calls the contract's `disableMode` (0xd5416221) function
         pub fn disable_mode(
@@ -89,10 +85,7 @@ pub mod zero_dev_kernel_account {
         ///Calls the contract's `entryPoint` (0xb0d691fe) function
         pub fn entry_point(
             &self,
-        ) -> ::ethers::contract::builders::ContractCall<
-            M,
-            ::ethers::core::types::Address,
-        > {
+        ) -> ::ethers::contract::builders::ContractCall<M, ::ethers::core::types::Address> {
             self.0
                 .method_hash([176, 214, 145, 254], ())
                 .expect("method not found (this should never happen)")
@@ -112,18 +105,13 @@ pub mod zero_dev_kernel_account {
         ///Calls the contract's `getDefaultValidator` (0x0b3dc354) function
         pub fn get_default_validator(
             &self,
-        ) -> ::ethers::contract::builders::ContractCall<
-            M,
-            ::ethers::core::types::Address,
-        > {
+        ) -> ::ethers::contract::builders::ContractCall<M, ::ethers::core::types::Address> {
             self.0
                 .method_hash([11, 61, 195, 84], ())
                 .expect("method not found (this should never happen)")
         }
         ///Calls the contract's `getDisabledMode` (0x57b75047) function
-        pub fn get_disabled_mode(
-            &self,
-        ) -> ::ethers::contract::builders::ContractCall<M, [u8; 4]> {
+        pub fn get_disabled_mode(&self) -> ::ethers::contract::builders::ContractCall<M, [u8; 4]> {
             self.0
                 .method_hash([87, 183, 80, 71], ())
                 .expect("method not found (this should never happen)")
@@ -138,9 +126,7 @@ pub mod zero_dev_kernel_account {
                 .expect("method not found (this should never happen)")
         }
         ///Calls the contract's `getLastDisabledTime` (0x88e7fd06) function
-        pub fn get_last_disabled_time(
-            &self,
-        ) -> ::ethers::contract::builders::ContractCall<M, u64> {
+        pub fn get_last_disabled_time(&self) -> ::ethers::contract::builders::ContractCall<M, u64> {
             self.0
                 .method_hash([136, 231, 253, 6], ())
                 .expect("method not found (this should never happen)")
@@ -183,9 +169,7 @@ pub mod zero_dev_kernel_account {
                 .expect("method not found (this should never happen)")
         }
         ///Calls the contract's `name` (0x06fdde03) function
-        pub fn name(
-            &self,
-        ) -> ::ethers::contract::builders::ContractCall<M, ::std::string::String> {
+        pub fn name(&self) -> ::ethers::contract::builders::ContractCall<M, ::std::string::String> {
             self.0
                 .method_hash([6, 253, 222, 3], ())
                 .expect("method not found (this should never happen)")
@@ -306,36 +290,28 @@ pub mod zero_dev_kernel_account {
         ///Gets the contract's `ExecutionChanged` event
         pub fn execution_changed_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            ExecutionChangedFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, ExecutionChangedFilter>
+        {
             self.0.event()
         }
         ///Gets the contract's `Upgraded` event
         pub fn upgraded_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            UpgradedFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, UpgradedFilter> {
             self.0.event()
         }
         /// Returns an `Event` builder for all the events of this contract.
         pub fn events(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            ZeroDevKernelAccountEvents,
-        > {
-            self.0.event_with_filter(::core::default::Default::default())
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, ZeroDevKernelAccountEvents>
+        {
+            self.0
+                .event_with_filter(::core::default::Default::default())
         }
     }
     impl<M: ::ethers::providers::Middleware> From<::ethers::contract::Contract<M>>
-    for ZeroDevKernelAccount<M> {
+        for ZeroDevKernelAccount<M>
+    {
         fn from(contract: ::ethers::contract::Contract<M>) -> Self {
             Self::new(contract.address(), contract.client())
         }
@@ -349,7 +325,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[etherror(name = "AlreadyInitialized", abi = "AlreadyInitialized()")]
     pub struct AlreadyInitialized;
@@ -362,7 +338,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[etherror(name = "DisabledMode", abi = "DisabledMode()")]
     pub struct DisabledMode;
@@ -375,7 +351,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[etherror(name = "NotAuthorizedCaller", abi = "NotAuthorizedCaller()")]
     pub struct NotAuthorizedCaller;
@@ -388,7 +364,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[etherror(name = "NotEntryPoint", abi = "NotEntryPoint()")]
     pub struct NotEntryPoint;
@@ -408,26 +384,25 @@ pub mod zero_dev_kernel_account {
             data: impl AsRef<[u8]>,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::AbiError> {
             let data = data.as_ref();
-            if let Ok(decoded)
-                = <::std::string::String as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <::std::string::String as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::RevertString(decoded));
             }
-            if let Ok(decoded)
-                = <AlreadyInitialized as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) =
+                <AlreadyInitialized as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::AlreadyInitialized(decoded));
             }
-            if let Ok(decoded)
-                = <DisabledMode as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <DisabledMode as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::DisabledMode(decoded));
             }
-            if let Ok(decoded)
-                = <NotAuthorizedCaller as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) =
+                <NotAuthorizedCaller as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::NotAuthorizedCaller(decoded));
             }
-            if let Ok(decoded)
-                = <NotEntryPoint as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <NotEntryPoint as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::NotEntryPoint(decoded));
             }
             Err(::ethers::core::abi::Error::InvalidData.into())
@@ -439,15 +414,11 @@ pub mod zero_dev_kernel_account {
                 Self::AlreadyInitialized(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::DisabledMode(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::DisabledMode(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::NotAuthorizedCaller(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::NotEntryPoint(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::NotEntryPoint(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::RevertString(s) => ::ethers::core::abi::AbiEncode::encode(s),
             }
         }
@@ -457,17 +428,17 @@ pub mod zero_dev_kernel_account {
             match selector {
                 [0x08, 0xc3, 0x79, 0xa0] => true,
                 _ if selector
-                    == <AlreadyInitialized as ::ethers::contract::EthError>::selector() => {
+                    == <AlreadyInitialized as ::ethers::contract::EthError>::selector() =>
+                {
                     true
                 }
+                _ if selector == <DisabledMode as ::ethers::contract::EthError>::selector() => true,
                 _ if selector
-                    == <DisabledMode as ::ethers::contract::EthError>::selector() => true,
-                _ if selector
-                    == <NotAuthorizedCaller as ::ethers::contract::EthError>::selector() => {
+                    == <NotAuthorizedCaller as ::ethers::contract::EthError>::selector() =>
+                {
                     true
                 }
-                _ if selector
-                    == <NotEntryPoint as ::ethers::contract::EthError>::selector() => {
+                _ if selector == <NotEntryPoint as ::ethers::contract::EthError>::selector() => {
                     true
                 }
                 _ => false,
@@ -477,13 +448,9 @@ pub mod zero_dev_kernel_account {
     impl ::core::fmt::Display for ZeroDevKernelAccountErrors {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
             match self {
-                Self::AlreadyInitialized(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::AlreadyInitialized(element) => ::core::fmt::Display::fmt(element, f),
                 Self::DisabledMode(element) => ::core::fmt::Display::fmt(element, f),
-                Self::NotAuthorizedCaller(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::NotAuthorizedCaller(element) => ::core::fmt::Display::fmt(element, f),
                 Self::NotEntryPoint(element) => ::core::fmt::Display::fmt(element, f),
                 Self::RevertString(s) => ::core::fmt::Display::fmt(s, f),
             }
@@ -522,7 +489,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(
         name = "DefaultValidatorChanged",
@@ -542,7 +509,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(
         name = "ExecutionChanged",
@@ -564,7 +531,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(name = "Upgraded", abi = "Upgraded(address)")]
     pub struct UpgradedFilter {
@@ -583,9 +550,9 @@ pub mod zero_dev_kernel_account {
             log: &::ethers::core::abi::RawLog,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::Error> {
             if let Ok(decoded) = DefaultValidatorChangedFilter::decode_log(log) {
-                return Ok(
-                    ZeroDevKernelAccountEvents::DefaultValidatorChangedFilter(decoded),
-                );
+                return Ok(ZeroDevKernelAccountEvents::DefaultValidatorChangedFilter(
+                    decoded,
+                ));
             }
             if let Ok(decoded) = ExecutionChangedFilter::decode_log(log) {
                 return Ok(ZeroDevKernelAccountEvents::ExecutionChangedFilter(decoded));
@@ -602,15 +569,12 @@ pub mod zero_dev_kernel_account {
                 Self::DefaultValidatorChangedFilter(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
-                Self::ExecutionChangedFilter(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::ExecutionChangedFilter(element) => ::core::fmt::Display::fmt(element, f),
                 Self::UpgradedFilter(element) => ::core::fmt::Display::fmt(element, f),
             }
         }
     }
-    impl ::core::convert::From<DefaultValidatorChangedFilter>
-    for ZeroDevKernelAccountEvents {
+    impl ::core::convert::From<DefaultValidatorChangedFilter> for ZeroDevKernelAccountEvents {
         fn from(value: DefaultValidatorChangedFilter) -> Self {
             Self::DefaultValidatorChangedFilter(value)
         }
@@ -634,7 +598,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "disableMode", abi = "disableMode(bytes4)")]
     pub struct DisableModeCall {
@@ -649,7 +613,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "eip712Domain", abi = "eip712Domain()")]
     pub struct Eip712DomainCall;
@@ -662,7 +626,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "entryPoint", abi = "entryPoint()")]
     pub struct EntryPointCall;
@@ -675,7 +639,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "execute", abi = "execute(address,uint256,bytes,uint8)")]
     pub struct ExecuteCall {
@@ -693,7 +657,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "getDefaultValidator", abi = "getDefaultValidator()")]
     pub struct GetDefaultValidatorCall;
@@ -706,7 +670,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "getDisabledMode", abi = "getDisabledMode()")]
     pub struct GetDisabledModeCall;
@@ -719,7 +683,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "getExecution", abi = "getExecution(bytes4)")]
     pub struct GetExecutionCall {
@@ -734,7 +698,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "getLastDisabledTime", abi = "getLastDisabledTime()")]
     pub struct GetLastDisabledTimeCall;
@@ -747,7 +711,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "getNonce", abi = "getNonce(uint192)")]
     pub struct GetNonceWithKeyCall {
@@ -762,7 +726,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "getNonce", abi = "getNonce()")]
     pub struct GetNonceCall;
@@ -775,7 +739,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "initialize", abi = "initialize(address,bytes)")]
     pub struct InitializeCall {
@@ -791,7 +755,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "isValidSignature", abi = "isValidSignature(bytes32,bytes)")]
     pub struct IsValidSignatureCall {
@@ -807,7 +771,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "name", abi = "name()")]
     pub struct NameCall;
@@ -820,7 +784,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "onERC1155BatchReceived",
@@ -842,7 +806,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "onERC1155Received",
@@ -864,7 +828,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "onERC721Received",
@@ -885,9 +849,12 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
-    #[ethcall(name = "setDefaultValidator", abi = "setDefaultValidator(address,bytes)")]
+    #[ethcall(
+        name = "setDefaultValidator",
+        abi = "setDefaultValidator(address,bytes)"
+    )]
     pub struct SetDefaultValidatorCall {
         pub default_validator: ::ethers::core::types::Address,
         pub data: ::ethers::core::types::Bytes,
@@ -901,7 +868,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "setExecution",
@@ -924,7 +891,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "upgradeTo", abi = "upgradeTo(address)")]
     pub struct UpgradeToCall {
@@ -939,7 +906,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "validateUserOp",
@@ -959,7 +926,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "version", abi = "version()")]
     pub struct VersionCall;
@@ -993,102 +960,90 @@ pub mod zero_dev_kernel_account {
             data: impl AsRef<[u8]>,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::AbiError> {
             let data = data.as_ref();
-            if let Ok(decoded)
-                = <DisableModeCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <DisableModeCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::DisableMode(decoded));
             }
-            if let Ok(decoded)
-                = <Eip712DomainCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <Eip712DomainCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::Eip712Domain(decoded));
             }
-            if let Ok(decoded)
-                = <EntryPointCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <EntryPointCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::EntryPoint(decoded));
             }
-            if let Ok(decoded)
-                = <ExecuteCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <ExecuteCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::Execute(decoded));
             }
-            if let Ok(decoded)
-                = <GetDefaultValidatorCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <GetDefaultValidatorCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::GetDefaultValidator(decoded));
             }
-            if let Ok(decoded)
-                = <GetDisabledModeCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) =
+                <GetDisabledModeCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::GetDisabledMode(decoded));
             }
-            if let Ok(decoded)
-                = <GetExecutionCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <GetExecutionCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::GetExecution(decoded));
             }
-            if let Ok(decoded)
-                = <GetLastDisabledTimeCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <GetLastDisabledTimeCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::GetLastDisabledTime(decoded));
             }
-            if let Ok(decoded)
-                = <GetNonceWithKeyCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) =
+                <GetNonceWithKeyCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::GetNonceWithKey(decoded));
             }
-            if let Ok(decoded)
-                = <GetNonceCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <GetNonceCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::GetNonce(decoded));
             }
-            if let Ok(decoded)
-                = <InitializeCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <InitializeCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::Initialize(decoded));
             }
-            if let Ok(decoded)
-                = <IsValidSignatureCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <IsValidSignatureCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::IsValidSignature(decoded));
             }
-            if let Ok(decoded)
-                = <NameCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <NameCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::Name(decoded));
             }
-            if let Ok(decoded)
-                = <OnERC1155BatchReceivedCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <OnERC1155BatchReceivedCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::OnERC1155BatchReceived(decoded));
             }
-            if let Ok(decoded)
-                = <OnERC1155ReceivedCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <OnERC1155ReceivedCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::OnERC1155Received(decoded));
             }
-            if let Ok(decoded)
-                = <OnERC721ReceivedCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <OnERC721ReceivedCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::OnERC721Received(decoded));
             }
-            if let Ok(decoded)
-                = <SetDefaultValidatorCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <SetDefaultValidatorCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::SetDefaultValidator(decoded));
             }
-            if let Ok(decoded)
-                = <SetExecutionCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <SetExecutionCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::SetExecution(decoded));
             }
-            if let Ok(decoded)
-                = <UpgradeToCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <UpgradeToCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::UpgradeTo(decoded));
             }
-            if let Ok(decoded)
-                = <ValidateUserOpCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) =
+                <ValidateUserOpCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::ValidateUserOp(decoded));
             }
-            if let Ok(decoded)
-                = <VersionCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <VersionCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::Version(decoded));
             }
             Err(::ethers::core::abi::Error::InvalidData.into())
@@ -1097,62 +1052,34 @@ pub mod zero_dev_kernel_account {
     impl ::ethers::core::abi::AbiEncode for ZeroDevKernelAccountCalls {
         fn encode(self) -> Vec<u8> {
             match self {
-                Self::DisableMode(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::Eip712Domain(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::EntryPoint(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::DisableMode(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::Eip712Domain(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::EntryPoint(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::Execute(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::GetDefaultValidator(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::GetDisabledMode(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::GetExecution(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::GetDisabledMode(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::GetExecution(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::GetLastDisabledTime(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::GetNonceWithKey(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::GetNonce(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::Initialize(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::IsValidSignature(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::GetNonceWithKey(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::GetNonce(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::Initialize(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::IsValidSignature(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::Name(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::OnERC1155BatchReceived(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::OnERC1155Received(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::OnERC721Received(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::OnERC1155Received(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::OnERC721Received(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::SetDefaultValidator(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::SetExecution(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::UpgradeTo(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::ValidateUserOp(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::SetExecution(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::UpgradeTo(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::ValidateUserOp(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::Version(element) => ::ethers::core::abi::AbiEncode::encode(element),
             }
         }
@@ -1164,27 +1091,19 @@ pub mod zero_dev_kernel_account {
                 Self::Eip712Domain(element) => ::core::fmt::Display::fmt(element, f),
                 Self::EntryPoint(element) => ::core::fmt::Display::fmt(element, f),
                 Self::Execute(element) => ::core::fmt::Display::fmt(element, f),
-                Self::GetDefaultValidator(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::GetDefaultValidator(element) => ::core::fmt::Display::fmt(element, f),
                 Self::GetDisabledMode(element) => ::core::fmt::Display::fmt(element, f),
                 Self::GetExecution(element) => ::core::fmt::Display::fmt(element, f),
-                Self::GetLastDisabledTime(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::GetLastDisabledTime(element) => ::core::fmt::Display::fmt(element, f),
                 Self::GetNonceWithKey(element) => ::core::fmt::Display::fmt(element, f),
                 Self::GetNonce(element) => ::core::fmt::Display::fmt(element, f),
                 Self::Initialize(element) => ::core::fmt::Display::fmt(element, f),
                 Self::IsValidSignature(element) => ::core::fmt::Display::fmt(element, f),
                 Self::Name(element) => ::core::fmt::Display::fmt(element, f),
-                Self::OnERC1155BatchReceived(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::OnERC1155BatchReceived(element) => ::core::fmt::Display::fmt(element, f),
                 Self::OnERC1155Received(element) => ::core::fmt::Display::fmt(element, f),
                 Self::OnERC721Received(element) => ::core::fmt::Display::fmt(element, f),
-                Self::SetDefaultValidator(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::SetDefaultValidator(element) => ::core::fmt::Display::fmt(element, f),
                 Self::SetExecution(element) => ::core::fmt::Display::fmt(element, f),
                 Self::UpgradeTo(element) => ::core::fmt::Display::fmt(element, f),
                 Self::ValidateUserOp(element) => ::core::fmt::Display::fmt(element, f),
@@ -1257,8 +1176,7 @@ pub mod zero_dev_kernel_account {
             Self::Name(value)
         }
     }
-    impl ::core::convert::From<OnERC1155BatchReceivedCall>
-    for ZeroDevKernelAccountCalls {
+    impl ::core::convert::From<OnERC1155BatchReceivedCall> for ZeroDevKernelAccountCalls {
         fn from(value: OnERC1155BatchReceivedCall) -> Self {
             Self::OnERC1155BatchReceived(value)
         }
@@ -1307,7 +1225,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct Eip712DomainReturn {
         pub fields: [u8; 1],
@@ -1327,7 +1245,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct EntryPointReturn(pub ::ethers::core::types::Address);
     ///Container type for all return fields from the `getDefaultValidator` function with signature `getDefaultValidator()` and selector `0x0b3dc354`
@@ -1339,7 +1257,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct GetDefaultValidatorReturn {
         pub validator: ::ethers::core::types::Address,
@@ -1353,7 +1271,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct GetDisabledModeReturn {
         pub disabled: [u8; 4],
@@ -1367,7 +1285,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct GetExecutionReturn(pub ExecutionDetail);
     ///Container type for all return fields from the `getLastDisabledTime` function with signature `getLastDisabledTime()` and selector `0x88e7fd06`
@@ -1379,7 +1297,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct GetLastDisabledTimeReturn(pub u64);
     ///Container type for all return fields from the `getNonce` function with signature `getNonce(uint192)` and selector `0x3e1b0812`
@@ -1391,7 +1309,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct GetNonceWithKeyReturn(pub ::ethers::core::types::U256);
     ///Container type for all return fields from the `getNonce` function with signature `getNonce()` and selector `0xd087d288`
@@ -1403,7 +1321,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct GetNonceReturn(pub ::ethers::core::types::U256);
     ///Container type for all return fields from the `isValidSignature` function with signature `isValidSignature(bytes32,bytes)` and selector `0x1626ba7e`
@@ -1415,7 +1333,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct IsValidSignatureReturn(pub [u8; 4]);
     ///Container type for all return fields from the `name` function with signature `name()` and selector `0x06fdde03`
@@ -1427,7 +1345,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct NameReturn(pub ::std::string::String);
     ///Container type for all return fields from the `onERC1155BatchReceived` function with signature `onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)` and selector `0xbc197c81`
@@ -1439,7 +1357,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct OnERC1155BatchReceivedReturn(pub [u8; 4]);
     ///Container type for all return fields from the `onERC1155Received` function with signature `onERC1155Received(address,address,uint256,uint256,bytes)` and selector `0xf23a6e61`
@@ -1451,7 +1369,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct OnERC1155ReceivedReturn(pub [u8; 4]);
     ///Container type for all return fields from the `onERC721Received` function with signature `onERC721Received(address,address,uint256,bytes)` and selector `0x150b7a02`
@@ -1463,7 +1381,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct OnERC721ReceivedReturn(pub [u8; 4]);
     ///Container type for all return fields from the `validateUserOp` function with signature `validateUserOp((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,bytes,bytes),bytes32,uint256)` and selector `0x3a871cdd`
@@ -1475,7 +1393,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct ValidateUserOpReturn {
         pub validation_data: ::ethers::core::types::U256,
@@ -1489,7 +1407,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct VersionReturn(pub ::std::string::String);
     ///`ExecutionDetail(uint48,uint48,address,address)`
@@ -1501,7 +1419,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct ExecutionDetail {
         pub valid_after: u64,
@@ -1518,7 +1436,7 @@ pub mod zero_dev_kernel_account {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct UserOperation {
         pub sender: ::ethers::core::types::Address,
