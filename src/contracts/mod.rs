@@ -1,16 +1,23 @@
 use crate::types::request::UserOperationRequest;
 use ethers::types::{Address, Bytes, U256};
 
-mod entry_point;
+pub mod entry_point;
 pub use entry_point::{EntryPoint, EntryPointCalls, SenderAddressResult};
 
-mod simple_account_factory;
+pub mod simple_account_factory;
 pub use simple_account_factory::*;
 
-mod simple_account;
-pub use simple_account::{
-    ExecuteBatchCall, ExecuteCall, NonceCall, SimpleAccount, SimpleAccountCalls,
-};
+pub mod simple_account;
+pub use simple_account::*;
+
+pub mod zerodev_kernel_factory;
+pub use zerodev_kernel_factory::*;
+
+pub mod zerodev_kernel_account;
+pub use zerodev_kernel_account::*;
+
+pub mod zerodev_session_key_plugin;
+pub use zerodev_session_key_plugin::*;
 
 #[derive(
     Clone,

@@ -1,10 +1,7 @@
 use super::{AccountError, BaseAccount};
 
-use crate::contracts::{CreateAccountCall, SimpleAccountFactoryCalls};
-use crate::contracts::{
-    EntryPoint, ExecuteBatchCall, ExecuteCall as SimpleAccountExecuteCall, SimpleAccountCalls,
-    UserOperation,
-};
+use crate::contracts::{simple_account, simple_account_factory, SimpleAccountFactoryCalls};
+use crate::contracts::{EntryPoint, ExecuteBatchCall, SimpleAccountCalls, UserOperation};
 use crate::paymaster::{Paymaster, PaymasterError};
 use crate::types::ExecuteCall;
 
@@ -96,7 +93,10 @@ impl BaseAccount for SimpleAccount {
         let index = U256::from(0);
 
         let call =
-            SimpleAccountFactoryCalls::CreateAccount(CreateAccountCall { owner, salt: index });
+            SimpleAccountFactoryCalls::CreateAccount(simple_account_factory::CreateAccountCall {
+                owner,
+                salt: index,
+            });
 
         let mut result: Vec<u8> = Vec::new();
 
@@ -120,7 +120,7 @@ impl BaseAccount for SimpleAccount {
         &self,
         call: ExecuteCall,
     ) -> Result<Vec<u8>, AccountError<Self::Inner>> {
-        let call = SimpleAccountCalls::Execute(SimpleAccountExecuteCall {
+        let call = SimpleAccountCalls::Execute(simple_account::ExecuteCall {
             dest: call.target,
             value: call.value,
             func: call.data,
@@ -182,8 +182,9 @@ mod tests {
     use tokio::{sync::RwLock, time};
 
     use crate::{
+        contracts::UserOperation,
         smart_account::{simple_account::SimpleAccount, BaseAccount, SmartAccountMiddleware},
-        types::{AccountCall, ExecuteCall, UserOpHash, UserOperationRequest}, contracts::UserOperation,
+        types::{AccountCall, ExecuteCall, UserOpHash, UserOperationRequest},
     };
 
     const RPC_URL: &str = "https://eth-goerli.g.alchemy.com/v2/Lekp6yzHz5yAPLKPNvGpMKaqbGunnXHS"; //"https://eth-mainnet.g.alchemy.com/v2/lRcdJTfR_zjZSef3yutTGE6OIY9YFx1E";
@@ -274,7 +275,10 @@ mod tests {
             .unwrap();
 
         let account = make_simple_account();
-println!("init codezzzz {:?}", account.get_account_init_code().await.unwrap());
+        println!(
+            "init codezzzz {:?}",
+            account.get_account_init_code().await.unwrap()
+        );
         let user_op = UserOperation {
             sender: owner,
             nonce: U256::from(1),
@@ -308,7 +312,7 @@ println!("init codezzzz {:?}", account.get_account_init_code().await.unwrap());
                 .parse()
                 .unwrap();
 
-        let provider = Provider::<Http>::try_from(RPC_URL).unwrap();//.for_chain(Chain::mainnet);
+        let provider = Provider::<Http>::try_from(RPC_URL).unwrap(); //.for_chain(Chain::mainnet);
 
         let account = SimpleAccount::new(
             Arc::new(provider),
@@ -351,7 +355,6 @@ println!("init codezzzz {:?}", account.get_account_init_code().await.unwrap());
             .await;
 
         println!("{:?}", result);
-        
     }
 
     #[tokio::test]
@@ -580,7 +583,6 @@ println!("init codezzzz {:?}", account.get_account_init_code().await.unwrap());
             .unwrap()
     }
 }
-
 
 impl SimpleAccount {
     async fn get_onchain_user_op_hash(
