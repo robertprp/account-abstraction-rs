@@ -1,8 +1,9 @@
 use async_trait::async_trait;
 use ethers::{
+    abi::Address,
     providers::{JsonRpcClient, Provider, ProviderError},
     signers::Signer,
-    types::Bytes,
+    types::{BlockId, BlockNumber, Bytes, NameOrAddress},
     utils,
 };
 use std::error::Error;
@@ -114,6 +115,22 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddlewareNew for SmartAccoun
             .request("eth_supportedEntryPoints", ())
             .await
             .map_err(SmarAccountProviderError::ProviderError)
+    }
+}
+
+impl<P: JsonRpcClient, A: BaseAccount> SmartAccountProvider<P, A> {
+    async fn get_code<T: Into<Address> + Send + Sync>(
+        &self,
+        at: T,
+        block: Option<BlockId>,
+    ) -> Result<Bytes, ProviderError> {
+        let at = at.into();
+        let at = utils::serialize(&at);
+        let block = utils::serialize(&block.unwrap_or_else(|| BlockNumber::Latest.into()));
+        self.inner()
+            .provider()
+            .request("eth_getCode", [at, block])
+            .await
     }
 }
 
