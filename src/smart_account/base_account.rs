@@ -10,7 +10,7 @@ use ethers::{
 use std::fmt::Debug;
 use thiserror::Error;
 
-use super::{utils, EntryPointError, EntryPoint, SmartAccountMiddleware};
+use super::{utils, EntryPoint, EntryPointError, SmartAccountMiddleware};
 
 #[async_trait]
 pub trait BaseAccount: Sync + Send + Debug {
@@ -82,13 +82,9 @@ pub trait BaseAccount: Sync + Send + Debug {
         Ok(self.is_deployed().await)
     }
 
-    async fn encode_execute(&self, call: ExecuteCall)
-        -> Result<Vec<u8>, AccountError>;
+    async fn encode_execute(&self, call: ExecuteCall) -> Result<Vec<u8>, AccountError>;
 
-    async fn encode_execute_batch(
-        &self,
-        calls: Vec<ExecuteCall>,
-    ) -> Result<Vec<u8>, AccountError>;
+    async fn encode_execute_batch(&self, calls: Vec<ExecuteCall>) -> Result<Vec<u8>, AccountError>;
 
     async fn estimate_creation_gas(&self) -> Result<U256, AccountError> {
         let init_code = self.get_init_code().await?;

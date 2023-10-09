@@ -118,10 +118,7 @@ impl BaseAccount for SimpleAccount {
         *self.is_deployed.write().await = is_deployed;
     }
 
-    async fn encode_execute(
-        &self,
-        call: ExecuteCall,
-    ) -> Result<Vec<u8>, AccountError> {
+    async fn encode_execute(&self, call: ExecuteCall) -> Result<Vec<u8>, AccountError> {
         let call = SimpleAccountCalls::Execute(simple_account::ExecuteCall {
             dest: call.target,
             value: call.value,
@@ -131,10 +128,7 @@ impl BaseAccount for SimpleAccount {
         Ok(call.encode())
     }
 
-    async fn encode_execute_batch(
-        &self,
-        calls: Vec<ExecuteCall>,
-    ) -> Result<Vec<u8>, AccountError> {
+    async fn encode_execute_batch(&self, calls: Vec<ExecuteCall>) -> Result<Vec<u8>, AccountError> {
         let targets: Vec<Address> = calls.iter().map(|call| call.target).collect();
         let data: Vec<Bytes> = calls.iter().map(|call| call.data.clone()).collect();
         let multi_call = SimpleAccountCalls::ExecuteBatch(ExecuteBatchCall {

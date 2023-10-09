@@ -322,7 +322,7 @@ use async_trait::async_trait;
 use ethers::{
     providers::{JsonRpcClient, Provider},
     signers::Signer,
-    types::{transaction::eip2718::TypedTransaction, BlockId, Bytes, U256, Address}
+    types::{transaction::eip2718::TypedTransaction, Address, BlockId, Bytes, U256},
 };
 use std::error::Error;
 use std::fmt::Debug;
@@ -348,6 +348,18 @@ pub trait SmartAccountMiddleware: Sync + Send + Debug {
     /// The HTTP or Websocket provider.
     fn provider(&self) -> &Provider<Self::Provider> {
         self.inner().provider()
+    }
+
+    async fn send_user_operation<U: Into<UserOperationRequest> + Send + Sync, S: Signer>(
+        &self,
+        user_op: U,
+        // TODO: Passing in signer through method param for now. Consider separate signer middleware.
+        signer: &S,
+    ) -> Result<UserOpHash, Self::Error> {
+        self.inner()
+            .send_user_operation(user_op, signer)
+            .await
+            .map_err(FromErr::from)
     }
 
     async fn fill_user_operation(
@@ -428,8 +440,11 @@ pub trait SmartAccountMiddleware: Sync + Send + Debug {
         &self,
         at: T,
         block: Option<BlockId>,
-    ) -> Result<Bytes,  Self::Error> {
-        self.inner().get_code(at, block).await.map_err(FromErr::from)
+    ) -> Result<Bytes, Self::Error> {
+        self.inner()
+            .get_code(at, block)
+            .await
+            .map_err(FromErr::from)
     }
 }
 

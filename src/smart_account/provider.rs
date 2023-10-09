@@ -13,7 +13,7 @@ use crate::types::{
     UserOperationRequest,
 };
 
-use super::{BaseAccount, EntryPoint, SmartAccountMiddleware, AccountError};
+use super::{AccountError, BaseAccount, EntryPoint, SmartAccountMiddleware};
 use thiserror::Error;
 
 #[derive(Clone, Debug)]
@@ -176,7 +176,7 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
         &self,
         at: T,
         block: Option<BlockId>,
-    ) -> Result<Bytes,  SmartAccountProviderError> {
+    ) -> Result<Bytes, SmartAccountProviderError> {
         let at = at.into();
         let at = utils::serialize(&at);
         let block = utils::serialize(&block.unwrap_or_else(|| BlockNumber::Latest.into()));
