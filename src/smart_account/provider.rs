@@ -52,6 +52,34 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
         unreachable!("There is no inner provider here")
     }
 
+    async fn send_user_operation<U: Into<UserOperationRequest> + Send + Sync, S: Signer>(
+        &self,
+        user_op: U,
+        // TODO: Passing in signer through method param for now. Consider separate signer middleware.
+        signer: &S,
+    ) -> Result<UserOpHash, SmartAccountProviderError> {
+        let mut user_op: UserOperationRequest = user_op.into();
+        self.fill_user_operation(&mut user_op).await?;
+
+        if user_op.signature.is_none() {
+            let signature: Bytes = self.sign_user_operation(user_op.clone(), signer).await?;
+            user_op.signature = Some(signature)
+        }
+
+        let serialized_user_op = utils::serialize(&user_op);
+        let serialized_entry_point_address =
+            utils::serialize(&self.account.entry_point().get_address());
+
+        self.inner()
+            .provider()
+            .request(
+                "eth_sendUserOperation",
+                [serialized_user_op, serialized_entry_point_address],
+            )
+            .await
+            .map_err(SmartAccountProviderError::ProviderError)
+    }
+
     async fn sign_user_operation<S: Signer>(
         &self,
         user_op: UserOperationRequest,
