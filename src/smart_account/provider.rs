@@ -1,12 +1,11 @@
 use async_trait::async_trait;
 use ethers::{
     abi::Address,
-    providers::{JsonRpcClient, Provider, ProviderError},
+    providers::{JsonRpcClient, ProviderError},
     signers::Signer,
-    types::{BlockId, BlockNumber, Bytes, NameOrAddress},
+    types::{transaction::eip2718::TypedTransaction, BlockId, BlockNumber, Bytes, U256},
     utils,
 };
-use std::error::Error;
 use std::fmt::Debug;
 
 use crate::types::{
@@ -14,7 +13,7 @@ use crate::types::{
     UserOperationRequest,
 };
 
-use super::BaseAccount;
+use super::{BaseAccount, EntryPoint, SmartAccountMiddleware, AccountError};
 use thiserror::Error;
 
 #[derive(Clone, Debug)]
@@ -43,8 +42,8 @@ where
 }
 
 #[async_trait]
-impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddlewareNew for SmartAccountProvider<P, A> {
-    type Error = SmarAccountProviderError;
+impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountProvider<P, A> {
+    type Error = SmartAccountProviderError;
     type Provider = P;
     type Account = A;
     type Inner = Self;
@@ -53,25 +52,25 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddlewareNew for SmartAccoun
         unreachable!("There is no inner provider here")
     }
 
-    // async fn sign_user_operation<S: Signer>(
-    //     &self,
-    //     user_op: UserOperationRequest,
-    //     // TODO: Passing in signer through method param for now. Consider separate signer middleware.
-    //     signer: &S,
-    // ) -> Result<Bytes, SmarAccountProviderError> {
-    //     self.account
-    //         .sign_user_op(user_op, signer)
-    //         .await
-    //         .map_err(|e| SmarAccountProviderError::ProviderError)
-    // }
+    async fn sign_user_operation<S: Signer>(
+        &self,
+        user_op: UserOperationRequest,
+        // TODO: Passing in signer through method param for now.
+        signer: &S,
+    ) -> Result<Bytes, SmartAccountProviderError> {
+        self.account
+            .sign_user_op(user_op, signer)
+            .await
+            .map_err(SmartAccountProviderError::AccountError)
+    }
 
     async fn estimate_user_operation_gas(
         &self,
         user_op: &UserOperationRequest,
-    ) -> Result<UserOperationGasEstimate, SmarAccountProviderError> {
+    ) -> Result<UserOperationGasEstimate, SmartAccountProviderError> {
         let serialized_user_op = utils::serialize(user_op);
         let serialized_entry_point_address =
-            utils::serialize(&self.account.get_entry_point_address());
+            utils::serialize(&self.account.entry_point().get_address());
 
         self.inner()
             .provider()
@@ -80,50 +79,76 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddlewareNew for SmartAccoun
                 [serialized_user_op, serialized_entry_point_address],
             )
             .await
-            .map_err(SmarAccountProviderError::ProviderError)
+            .map_err(SmartAccountProviderError::ProviderError)
     }
 
     async fn get_user_operation<T: Send + Sync + Into<UserOpHash>>(
         &self,
         user_op_hash: T,
-    ) -> Result<Option<UserOperation>, SmarAccountProviderError> {
+    ) -> Result<Option<UserOperation>, SmartAccountProviderError> {
         let hash = user_op_hash.into();
 
         self.inner()
             .provider()
             .request("eth_getUserOperationByHash", [hash])
             .await
-            .map_err(SmarAccountProviderError::ProviderError)
+            .map_err(SmartAccountProviderError::ProviderError)
     }
 
     async fn get_user_operation_receipt<T: Send + Sync + Into<UserOpHash>>(
         &self,
         user_op_hash: T,
-    ) -> Result<Option<UserOperationReceipt>, SmarAccountProviderError> {
+    ) -> Result<Option<UserOperationReceipt>, SmartAccountProviderError> {
         let hash = user_op_hash.into();
 
         self.inner()
             .provider()
             .request("eth_getUserOperationReceipt", [hash])
             .await
-            .map_err(SmarAccountProviderError::ProviderError)
+            .map_err(SmartAccountProviderError::ProviderError)
     }
 
-    async fn get_supported_entry_points(&self) -> Result<Vec<String>, SmarAccountProviderError> {
+    async fn get_supported_entry_points(&self) -> Result<Vec<String>, SmartAccountProviderError> {
         self.inner()
             .provider()
             .request("eth_supportedEntryPoints", ())
             .await
-            .map_err(SmarAccountProviderError::ProviderError)
+            .map_err(SmartAccountProviderError::ProviderError)
     }
-}
 
-impl<P: JsonRpcClient, A: BaseAccount> SmartAccountProvider<P, A> {
+    async fn get_chainid(&self) -> Result<U256, SmartAccountProviderError> {
+        self.inner()
+            .provider()
+            .request("eth_chainId", ())
+            .await
+            .map_err(SmartAccountProviderError::ProviderError)
+    }
+
+    async fn estimate_gas(
+        &self,
+        tx: &TypedTransaction,
+        block: Option<BlockId>,
+    ) -> Result<U256, SmartAccountProviderError> {
+        let tx = utils::serialize(tx);
+        // Some nodes (e.g. old Optimism clients) don't support a block ID being passed as a param,
+        // so refrain from defaulting to BlockNumber::Latest.
+        let params = if let Some(block_id) = block {
+            vec![tx, utils::serialize(&block_id)]
+        } else {
+            vec![tx]
+        };
+        self.inner()
+            .provider()
+            .request("eth_estimateGas", params)
+            .await
+            .map_err(SmartAccountProviderError::ProviderError)
+    }
+
     async fn get_code<T: Into<Address> + Send + Sync>(
         &self,
         at: T,
         block: Option<BlockId>,
-    ) -> Result<Bytes, ProviderError> {
+    ) -> Result<Bytes,  SmartAccountProviderError> {
         let at = at.into();
         let at = utils::serialize(&at);
         let block = utils::serialize(&block.unwrap_or_else(|| BlockNumber::Latest.into()));
@@ -131,7 +156,10 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountProvider<P, A> {
             .provider()
             .request("eth_getCode", [at, block])
             .await
+            .map_err(SmartAccountProviderError::ProviderError)
     }
+
+    // TODO: Add paymaster methods
 }
 
 impl<P, A> AsRef<P> for SmartAccountProvider<P, A> {
@@ -140,115 +168,22 @@ impl<P, A> AsRef<P> for SmartAccountProvider<P, A> {
     }
 }
 
-impl FromErr<SmarAccountProviderError> for SmarAccountProviderError {
-    fn from(src: SmarAccountProviderError) -> Self {
+impl FromErr<SmartAccountProviderError> for SmartAccountProviderError {
+    fn from(src: SmartAccountProviderError) -> Self {
         src
     }
 }
 
 #[derive(Debug, Error)]
 /// An error thrown when making a call to the provider
-pub enum SmarAccountProviderError {
+pub enum SmartAccountProviderError {
     /// An internal error in the JSON RPC Client
     #[error(transparent)]
     JsonRpcClientError(#[from] Box<dyn std::error::Error + Send + Sync>),
 
-    #[error("provider error {0}")]
-    ProviderError(ProviderError),
-    // #[error("account error {0}")]
-    // AccountError(AccountError<M>),
-}
-
-#[async_trait]
-pub trait SmartAccountMiddlewareNew: Sync + Send + Debug {
-    type Error: Sync + Send + Error + FromErr<<Self::Inner as SmartAccountMiddlewareNew>::Error>;
-    type Provider: JsonRpcClient;
-    type Account: BaseAccount;
-    type Inner: SmartAccountMiddlewareNew<Provider = Self::Provider>;
-
-    /// The next middleware in the stack
-    fn inner(&self) -> &Self::Inner;
-
-    /// The HTTP or Websocket provider.
-    fn provider(&self) -> &Provider<Self::Provider> {
-        self.inner().provider()
-    }
-
-    async fn fill_user_operation(
-        &self,
-        user_op: &mut UserOperationRequest,
-    ) -> Result<(), Self::Error> {
-        self.inner()
-            .fill_user_operation(user_op)
-            .await
-            .map_err(FromErr::from)
-    }
-
-    async fn sign_user_operation<S: Signer>(
-        &self,
-        user_op: UserOperationRequest,
-        // TODO: Passing in signer through method param for now. Consider separate signer middleware.
-        signer: &S,
-    ) -> Result<Bytes, Self::Error> {
-        self.inner()
-            .sign_user_operation(user_op, signer)
-            .await
-            .map_err(FromErr::from)
-    }
-
-    async fn estimate_user_operation_gas(
-        &self,
-        user_op: &UserOperationRequest,
-    ) -> Result<UserOperationGasEstimate, Self::Error> {
-        self.inner()
-            .estimate_user_operation_gas(user_op)
-            .await
-            .map_err(FromErr::from)
-    }
-
-    async fn get_user_operation<T: Send + Sync + Into<UserOpHash>>(
-        &self,
-        user_op_hash: T,
-    ) -> Result<Option<UserOperation>, Self::Error> {
-        self.inner()
-            .get_user_operation(user_op_hash)
-            .await
-            .map_err(FromErr::from)
-    }
-
-    async fn get_user_operation_receipt<T: Send + Sync + Into<UserOpHash>>(
-        &self,
-        user_op_hash: T,
-    ) -> Result<Option<UserOperationReceipt>, Self::Error> {
-        self.inner()
-            .get_user_operation_receipt(user_op_hash)
-            .await
-            .map_err(FromErr::from)
-    }
-
-    async fn get_supported_entry_points(&self) -> Result<Vec<String>, Self::Error> {
-        self.inner()
-            .get_supported_entry_points()
-            .await
-            .map_err(FromErr::from)
-    }
-}
-
-#[derive(Error, Debug)]
-/// Thrown when an error happens at the smart account
-pub enum SmartAccountMiddlewareError<M: SmartAccountMiddlewareNew> {
-    /// Thrown when an internal middleware errors
     #[error(transparent)]
-    MiddlewareError(M::Error),
-    // #[error("account error {0}")]
-    // AccountError(AccountError<M>),
+    ProviderError(#[from] ProviderError),
 
-    // #[error("account error {0}")]
-    // PaymasterError(PaymasterError),
-
-    // #[error("provider error {0}")]
-    // ProviderError(ProviderError),
-
-    // #[error("invalid input error {0}")]
-    // InvalidInputError(String),
+    #[error(transparent)]
+    AccountError(#[from] AccountError),
 }
