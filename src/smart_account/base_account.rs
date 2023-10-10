@@ -2,7 +2,7 @@ use crate::contracts::UserOperation;
 use crate::paymaster::PaymasterError;
 use crate::types::ExecuteCall;
 use async_trait::async_trait;
-use ethers::providers::Middleware;
+use ethers::providers::{Middleware, ProviderError};
 use ethers::signers::Signer;
 use ethers::types::Chain;
 use ethers::{
@@ -77,7 +77,7 @@ pub trait BaseAccount: Sync + Send + Debug {
             .provider()
             .get_code(self.get_account_address().await?, None)
             .await
-            .map_err(|e| AccountError::SmartAccountMiddlewareError(e.to_string()))?;
+            .map_err(AccountError::ProviderError)?;
 
         if sender_address_code.len() > 2 {
             self.set_is_deployed(true).await;
@@ -109,7 +109,7 @@ pub trait BaseAccount: Sync + Send + Debug {
                 .provider()
                 .estimate_gas(&typed_tx, None)
                 .await
-                .map_err(|e| AccountError::SmartAccountMiddlewareError(e.to_string()))?;
+                .map_err(AccountError::ProviderError)?;
 
             Ok(gas_estimate)
         }
@@ -282,8 +282,11 @@ pub enum AccountError {
     #[error("contract error: {0}")]
     EntryPointError(EntryPointError),
 
-    #[error("middleware error: {0}")]
-    SmartAccountMiddlewareError(String),
+    // #[error("middleware error: {0}")]
+    // SmartAccountMiddlewareError(String),
+
+    #[error("provider error: {0}")]
+    ProviderError(ProviderError),
 
     #[error("nonce error")]
     NonceError,
