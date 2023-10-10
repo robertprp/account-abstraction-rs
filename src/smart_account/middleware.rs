@@ -323,7 +323,7 @@ use ethers::{
     providers::{JsonRpcClient, Provider},
     signers::Signer,
     types::{
-        transaction::eip2718::TypedTransaction, Address, Block, BlockId, BlockNumber, Bytes,
+        Block, BlockId, BlockNumber, Bytes,
         FeeHistory, TxHash, U256,
     },
 };
@@ -424,34 +424,12 @@ pub trait SmartAccountMiddleware: Sync + Send + Debug {
             .map_err(FromErr::from)
     }
 
-    async fn estimate_gas(
-        &self,
-        tx: &TypedTransaction,
-        block: Option<BlockId>,
-    ) -> Result<U256, Self::Error> {
-        self.inner()
-            .estimate_gas(tx, block)
-            .await
-            .map_err(FromErr::from)
-    }
-
     async fn estimate_eip1559_fees(
         &self,
         estimator: Option<fn(U256, Vec<Vec<U256>>) -> (U256, U256)>,
     ) -> Result<(U256, U256), Self::Error> {
         self.inner()
             .estimate_eip1559_fees(estimator)
-            .await
-            .map_err(FromErr::from)
-    }
-
-    async fn get_code<T: Into<Address> + Send + Sync>(
-        &self,
-        at: T,
-        block: Option<BlockId>,
-    ) -> Result<Bytes, Self::Error> {
-        self.inner()
-            .get_code(at, block)
             .await
             .map_err(FromErr::from)
     }

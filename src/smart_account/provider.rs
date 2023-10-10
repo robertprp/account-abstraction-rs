@@ -1,10 +1,9 @@
 use async_trait::async_trait;
 use ethers::{
-    abi::Address,
     providers::{JsonRpcClient, ProviderError},
     signers::Signer,
     types::{
-        transaction::eip2718::TypedTransaction, Block, BlockId, BlockNumber, Bytes, FeeHistory,
+        Block, BlockId, BlockNumber, Bytes, FeeHistory,
         TxHash, U256,
     },
     utils,
@@ -261,42 +260,6 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
         self.inner()
             .provider()
             .request("eth_supportedEntryPoints", ())
-            .await
-            .map_err(SmartAccountProviderError::ProviderError)
-    }
-
-
-    async fn estimate_gas(
-        &self,
-        tx: &TypedTransaction,
-        block: Option<BlockId>,
-    ) -> Result<U256, SmartAccountProviderError> {
-        let tx = utils::serialize(tx);
-        // Some nodes (e.g. old Optimism clients) don't support a block ID being passed as a param,
-        // so refrain from defaulting to BlockNumber::Latest.
-        let params = if let Some(block_id) = block {
-            vec![tx, utils::serialize(&block_id)]
-        } else {
-            vec![tx]
-        };
-        self.inner()
-            .provider()
-            .request("eth_estimateGas", params)
-            .await
-            .map_err(SmartAccountProviderError::ProviderError)
-    }
-
-    async fn get_code<T: Into<Address> + Send + Sync>(
-        &self,
-        at: T,
-        block: Option<BlockId>,
-    ) -> Result<Bytes, SmartAccountProviderError> {
-        let at = at.into();
-        let at = utils::serialize(&at);
-        let block = utils::serialize(&block.unwrap_or_else(|| BlockNumber::Latest.into()));
-        self.inner()
-            .provider()
-            .request("eth_getCode", [at, block])
             .await
             .map_err(SmartAccountProviderError::ProviderError)
     }
