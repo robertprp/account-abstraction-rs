@@ -282,9 +282,6 @@ pub enum AccountError {
     #[error("contract error: {0}")]
     EntryPointError(EntryPointError),
 
-    // #[error("middleware error: {0}")]
-    // SmartAccountMiddlewareError(String),
-
     #[error("provider error: {0}")]
     ProviderError(ProviderError),
 
@@ -301,7 +298,6 @@ pub enum AccountError {
 #[cfg(test)]
 mod tests {
     use crate::contracts::simple_account_factory::CreateAccountCall;
-    use crate::smart_account::SmartAccountProvider;
 
     use super::*;
     use crate::contracts::{EntryPoint as EthersEntryPoint, SimpleAccountFactoryCalls};
@@ -309,7 +305,6 @@ mod tests {
     use ethers::abi::AbiEncode;
     use ethers::prelude::{Http, Provider};
     use ethers::types::{Address, Bytes, H256, U256};
-    use url::Url;
     use std::sync::Arc;
     use std::{assert_eq, println};
 
@@ -383,10 +378,7 @@ mod tests {
 
         async fn set_is_deployed(&self, _is_deployed: bool) {}
 
-        async fn encode_execute(
-            &self,
-            _call: ExecuteCall,
-        ) -> Result<Vec<u8>, AccountError> {
+        async fn encode_execute(&self, _call: ExecuteCall) -> Result<Vec<u8>, AccountError> {
             unimplemented!() // You will need to provide an actual implementation.
         }
 
@@ -407,10 +399,7 @@ mod tests {
     }
 
     impl MockBaseAccount {
-        async fn get_onchain_user_op_hash(
-            &self,
-            user_op: UserOperation,
-        ) -> [u8; 32] {
+        async fn get_onchain_user_op_hash(&self, user_op: UserOperation) -> [u8; 32] {
             self.entry_point()
                 .get_user_op_hash(user_op.into())
                 .call()
@@ -439,7 +428,9 @@ mod tests {
     async fn test_get_counterfactual_address() {
         let account = make_mock_account();
         let counterfactual_address = account.get_counterfactual_address().await.unwrap();
-        let expected_address: Address = "0x2beb3c8a50ac9c67833e0748d69fd1d38d1193e2".parse().unwrap();
+        let expected_address: Address = "0x2beb3c8a50ac9c67833e0748d69fd1d38d1193e2"
+            .parse()
+            .unwrap();
 
         assert!(counterfactual_address == expected_address)
     }
@@ -449,7 +440,7 @@ mod tests {
         let owner: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
             .parse()
             .unwrap();
-        
+
         let account = make_mock_account();
         println!(
             "init code {:?}",
@@ -469,9 +460,7 @@ mod tests {
             signature: Bytes::from(vec![]),
         };
 
-        let onchain_hash = account
-            .get_onchain_user_op_hash(user_op.clone())
-            .await;
+        let onchain_hash = account.get_onchain_user_op_hash(user_op.clone()).await;
         let offchain_hash = account.get_user_op_hash(user_op.clone()).await.unwrap();
 
         println!("onchain {:?}", H256::from(onchain_hash));
@@ -491,23 +480,26 @@ mod tests {
     fn make_mock_account() -> MockBaseAccount {
         let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
         let entry_point_address: Address = ENTRY_POINT_ADDRESS.parse().unwrap();
-        let entry_point = Arc::new(EthersEntryPoint::new(entry_point_address, Arc::new(provider.clone())));
+        let entry_point = Arc::new(EthersEntryPoint::new(
+            entry_point_address,
+            Arc::new(provider.clone()),
+        ));
 
         let account = MockBaseAccount {
             inner: Arc::new(provider),
-            entry_point: entry_point,
+            entry_point,
             rpc_url: RPC_URL.to_string(),
         };
 
         account
     }
 
-    fn make_provider() -> SmartAccountProvider<Http, MockBaseAccount> {
-        let url: Url = RPC_URL.try_into().unwrap();
-        let http_provider = Http::new(url);
+    // fn make_provider() -> SmartAccountProvider<Http, MockBaseAccount> {
+    //     let url: Url = RPC_URL.try_into().unwrap();
+    //     let http_provider = Http::new(url);
 
-        let account_provider = SmartAccountProvider::new(http_provider, make_mock_account());
+    //     let account_provider = SmartAccountProvider::new(http_provider, make_mock_account());
 
-        account_provider
-    }
+    //     account_provider
+    // }
 }
