@@ -2,6 +2,7 @@ use crate::contracts::UserOperation;
 use crate::paymaster::PaymasterError;
 use crate::types::ExecuteCall;
 use async_trait::async_trait;
+use ethers::providers::Middleware;
 use ethers::signers::Signer;
 use ethers::types::Chain;
 use ethers::{
@@ -11,7 +12,7 @@ use ethers::{
 use std::fmt::Debug;
 use thiserror::Error;
 
-use super::{utils, EntryPoint, EntryPointError, SmartAccountMiddleware};
+use super::{utils, EntryPoint, EntryPointError};
 
 #[async_trait]
 pub trait BaseAccount: Sync + Send + Debug {
@@ -19,7 +20,7 @@ pub trait BaseAccount: Sync + Send + Debug {
     // type Paymaster: Paymaster;
     type EntryPoint: EntryPoint;
     type Provider: JsonRpcClient;
-    type Inner: SmartAccountMiddleware<Provider = Self::Provider>;
+    type Inner: Middleware<Provider = Self::Provider>;
 
     fn inner(&self) -> &Self::Inner;
 
@@ -73,7 +74,7 @@ pub trait BaseAccount: Sync + Send + Debug {
         }
 
         let sender_address_code = self
-            .inner()
+            .provider()
             .get_code(self.get_account_address().await?, None)
             .await
             .map_err(|e| AccountError::SmartAccountMiddlewareError(e.to_string()))?;
@@ -105,7 +106,7 @@ pub trait BaseAccount: Sync + Send + Debug {
                 .into();
 
             let gas_estimate = self
-                .inner()
+                .provider()
                 .estimate_gas(&typed_tx, None)
                 .await
                 .map_err(|e| AccountError::SmartAccountMiddlewareError(e.to_string()))?;
@@ -119,7 +120,6 @@ pub trait BaseAccount: Sync + Send + Debug {
         user_op: U,
     ) -> Result<[u8; 32], AccountError> {
         let chain_id: U256 = self.get_chain().into();
-
         let entry_point_address = self.entry_point().get_address();
 
         Ok(utils::get_user_op_hash(

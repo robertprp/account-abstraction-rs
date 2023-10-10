@@ -1,4 +1,4 @@
-use super::{AccountError, BaseAccount, SmartAccountProvider};
+use super::{AccountError, BaseAccount};
 
 use crate::contracts::{simple_account, simple_account_factory, SimpleAccountFactoryCalls};
 use crate::contracts::{
@@ -21,39 +21,36 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 
 // const ENTRY_POINT_ADDRESS: &str = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
-const SIMPLE_ACCOUNT_FACTORY_ADDRESS: &str = "0x9406Cc6185a346906296840746125a0E44976454";
+// const SIMPLE_ACCOUNT_FACTORY_ADDRESS: &str = "0x9406Cc6185a346906296840746125a0E44976454";
 
 #[derive(Debug)]
 struct SimpleAccount {
-    inner: Arc<SmartAccountProvider<Http, SimpleAccount>>,
+    inner: Arc<Provider<Http>>,
     owner: Address,
-    account_address: RwLock<Option<Address>>, // no locks needed?
-    is_deployed: RwLock<bool>, // no locks needed?
+    account_address: RwLock<Option<Address>>,
+    factory_address: Address,
+    is_deployed: RwLock<bool>,
     entry_point: Arc<EthersEntryPoint<Provider<Http>>>,
     chain: Chain,
 }
 
 impl SimpleAccount {
     fn new(
-        inner: Arc<SmartAccountProvider<Http, SimpleAccount>>,
+        inner: Arc<Provider<Http>>,
         owner: Address,
         account_address: RwLock<Option<Address>>,
+        factory_address: Address,
         entry_point_address: Address,
         is_deployed: RwLock<bool>,
-        rpc_url: String,
         chain: Chain,
     ) -> Self {
-        // TODO: Handle gracefully / try_from
-        let ethers_provider = Provider::<Http>::try_from(rpc_url).unwrap();
-        let entry_point = Arc::new(EthersEntryPoint::new(
-            entry_point_address,
-            Arc::new(ethers_provider.clone()),
-        ));
+        let entry_point = Arc::new(EthersEntryPoint::new(entry_point_address, inner.clone()));
 
         Self {
             inner,
             owner,
             account_address,
+            factory_address,
             is_deployed,
             entry_point,
             chain,
@@ -66,7 +63,7 @@ impl BaseAccount for SimpleAccount {
     // type Paymaster = EmptyPaymaster;
     type EntryPoint = EthersEntryPoint<Provider<Http>>;
     type Provider = Http;
-    type Inner = SmartAccountProvider<Http, SimpleAccount>;
+    type Inner = Provider<Http>;
 
     fn inner(&self) -> &Self::Inner {
         &self.inner
@@ -95,8 +92,7 @@ impl BaseAccount for SimpleAccount {
     // }
 
     async fn get_account_init_code(&self) -> Result<Bytes, AccountError> {
-        let factory_address: Address = SIMPLE_ACCOUNT_FACTORY_ADDRESS.parse().unwrap();
-
+        let factory_address: Address = self.factory_address;
         let owner: Address = self.owner;
 
         // TODO: Add optional index
