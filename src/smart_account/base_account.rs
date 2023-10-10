@@ -3,6 +3,7 @@ use crate::paymaster::PaymasterError;
 use crate::types::ExecuteCall;
 use async_trait::async_trait;
 use ethers::signers::Signer;
+use ethers::types::Chain;
 use ethers::{
     providers::{JsonRpcClient, Provider},
     types::{transaction::eip2718::TypedTransaction, Address, Bytes, TransactionRequest, U256},
@@ -27,6 +28,8 @@ pub trait BaseAccount: Sync + Send + Debug {
     }
 
     fn entry_point(&self) -> &Self::EntryPoint;
+
+    fn get_chain(&self) -> Chain;
 
     async fn get_account_address(&self) -> Result<Address, AccountError>;
 
@@ -115,11 +118,7 @@ pub trait BaseAccount: Sync + Send + Debug {
         &self,
         user_op: U,
     ) -> Result<[u8; 32], AccountError> {
-        let chain_id = self
-            .inner()
-            .get_chainid()
-            .await
-            .map_err(|e| AccountError::SmartAccountMiddlewareError(e.to_string()))?;
+        let chain_id: U256 = self.get_chain().into();
 
         let entry_point_address = self.entry_point().get_address();
 

@@ -445,10 +445,6 @@ pub trait SmartAccountMiddleware: Sync + Send + Debug {
             .map_err(FromErr::from)
     }
 
-    async fn get_chainid(&self) -> Result<U256, Self::Error> {
-        self.inner().get_chainid().await.map_err(FromErr::from)
-    }
-
     async fn get_code<T: Into<Address> + Send + Sync>(
         &self,
         at: T,

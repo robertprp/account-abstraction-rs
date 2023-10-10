@@ -265,13 +265,6 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
             .map_err(SmartAccountProviderError::ProviderError)
     }
 
-    async fn get_chainid(&self) -> Result<U256, SmartAccountProviderError> {
-        self.inner()
-            .provider()
-            .request("eth_chainId", ())
-            .await
-            .map_err(SmartAccountProviderError::ProviderError)
-    }
 
     async fn estimate_gas(
         &self,

@@ -11,6 +11,7 @@ use async_trait::async_trait;
 use ethers::abi::AbiEncode;
 use ethers::providers::Http;
 use ethers::signers::Signer;
+use ethers::types::Chain;
 use ethers::{
     providers::Provider,
     types::{Address, Bytes, U256},
@@ -26,9 +27,10 @@ const SIMPLE_ACCOUNT_FACTORY_ADDRESS: &str = "0x9406Cc6185a346906296840746125a0E
 struct SimpleAccount {
     inner: Arc<SmartAccountProvider<Http, SimpleAccount>>,
     owner: Address,
-    account_address: RwLock<Option<Address>>,
-    is_deployed: RwLock<bool>,
+    account_address: RwLock<Option<Address>>, // no locks needed?
+    is_deployed: RwLock<bool>, // no locks needed?
     entry_point: Arc<EthersEntryPoint<Provider<Http>>>,
+    chain: Chain,
 }
 
 impl SimpleAccount {
@@ -39,6 +41,7 @@ impl SimpleAccount {
         entry_point_address: Address,
         is_deployed: RwLock<bool>,
         rpc_url: String,
+        chain: Chain,
     ) -> Self {
         // TODO: Handle gracefully / try_from
         let ethers_provider = Provider::<Http>::try_from(rpc_url).unwrap();
@@ -53,6 +56,7 @@ impl SimpleAccount {
             account_address,
             is_deployed,
             entry_point,
+            chain,
         }
     }
 }
@@ -70,6 +74,10 @@ impl BaseAccount for SimpleAccount {
 
     fn entry_point(&self) -> &Self::EntryPoint {
         &self.entry_point
+    }
+
+    fn get_chain(&self) -> Chain {
+        self.chain
     }
 
     async fn get_account_address(&self) -> Result<Address, AccountError> {
