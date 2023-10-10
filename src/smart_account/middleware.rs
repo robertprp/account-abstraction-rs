@@ -322,7 +322,10 @@ use async_trait::async_trait;
 use ethers::{
     providers::{JsonRpcClient, Provider},
     signers::Signer,
-    types::{transaction::eip2718::TypedTransaction, Address, BlockId, Bytes, U256},
+    types::{
+        transaction::eip2718::TypedTransaction, Address, Block, BlockId, BlockNumber, Bytes,
+        FeeHistory, TxHash, U256,
+    },
 };
 use std::error::Error;
 use std::fmt::Debug;
@@ -432,6 +435,16 @@ pub trait SmartAccountMiddleware: Sync + Send + Debug {
             .map_err(FromErr::from)
     }
 
+    async fn estimate_eip1559_fees(
+        &self,
+        estimator: Option<fn(U256, Vec<Vec<U256>>) -> (U256, U256)>,
+    ) -> Result<(U256, U256), Self::Error> {
+        self.inner()
+            .estimate_eip1559_fees(estimator)
+            .await
+            .map_err(FromErr::from)
+    }
+
     async fn get_chainid(&self) -> Result<U256, Self::Error> {
         self.inner().get_chainid().await.map_err(FromErr::from)
     }
@@ -443,6 +456,28 @@ pub trait SmartAccountMiddleware: Sync + Send + Debug {
     ) -> Result<Bytes, Self::Error> {
         self.inner()
             .get_code(at, block)
+            .await
+            .map_err(FromErr::from)
+    }
+
+    async fn get_block<T: Into<BlockId> + Send + Sync>(
+        &self,
+        block_hash_or_number: T,
+    ) -> Result<Option<Block<TxHash>>, Self::Error> {
+        self.inner()
+            .get_block(block_hash_or_number)
+            .await
+            .map_err(FromErr::from)
+    }
+
+    async fn fee_history<T: Into<U256> + Send + Sync>(
+        &self,
+        block_count: T,
+        last_block: BlockNumber,
+        reward_percentiles: &[f64],
+    ) -> Result<FeeHistory, Self::Error> {
+        self.inner()
+            .fee_history(block_count, last_block, reward_percentiles)
             .await
             .map_err(FromErr::from)
     }
