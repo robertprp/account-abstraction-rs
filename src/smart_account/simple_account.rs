@@ -184,7 +184,7 @@ mod tests {
 
     use crate::{
         contracts::UserOperation,
-        smart_account::{simple_account::SimpleAccount, BaseAccount}, //, SmartAccountMiddleware},
+        smart_account::{simple_account::SimpleAccount, BaseAccount},
         types::{AccountCall, ExecuteCall, UserOpHash, UserOperationRequest},
     };
 
@@ -586,14 +586,14 @@ mod tests {
             .parse()
             .unwrap()
     }
-}
 
-impl SimpleAccount {
-    async fn get_onchain_user_op_hash(&self, user_op: UserOperation) -> [u8; 32] {
-        self.entry_point()
-            .get_user_op_hash(user_op.into())
-            .call()
-            .await
-            .unwrap()
+    impl SimpleAccount {
+        async fn get_onchain_user_op_hash(&self, user_op: UserOperation) -> [u8; 32] {
+            self.entry_point()
+                .get_user_op_hash(user_op.into())
+                .call()
+                .await
+                .unwrap()
+        }
     }
 }

@@ -322,10 +322,7 @@ use async_trait::async_trait;
 use ethers::{
     providers::{JsonRpcClient, Provider},
     signers::Signer,
-    types::{
-        Block, BlockId, BlockNumber, Bytes,
-        FeeHistory, TxHash, U256,
-    },
+    types::{Block, BlockId, BlockNumber, Bytes, FeeHistory, TxHash, U256},
 };
 use std::error::Error;
 use std::fmt::Debug;

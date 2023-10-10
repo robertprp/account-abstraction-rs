@@ -312,7 +312,6 @@ mod tests {
     struct MockBaseAccount {
         inner: Arc<Provider<Http>>,
         entry_point: Arc<EthersEntryPoint<Provider<Http>>>,
-        rpc_url: String,
     }
 
     #[async_trait]
@@ -488,7 +487,6 @@ mod tests {
         let account = MockBaseAccount {
             inner: Arc::new(provider),
             entry_point,
-            rpc_url: RPC_URL.to_string(),
         };
 
         account
