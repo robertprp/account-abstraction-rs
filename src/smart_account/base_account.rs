@@ -300,133 +300,124 @@ pub enum AccountError {
 
 #[cfg(test)]
 mod tests {
-    // use crate::contracts::simple_account_factory::CreateAccountCall;
-    // use crate::smart_account::SmartAccountProvider;
+    use crate::contracts::simple_account_factory::CreateAccountCall;
+    use crate::smart_account::SmartAccountProvider;
 
-    // use super::*;
-    // use crate::contracts::{EntryPoint, SimpleAccountFactoryCalls};
-    // use async_trait::async_trait;
-    // use ethers::abi::AbiEncode;
-    // use ethers::prelude::{Http, Provider, ProviderError};
-    // use ethers::types::{Address, Bytes, H256, U256};
-    // use std::sync::Arc;
-    // use std::{assert_eq, println};
+    use super::*;
+    use crate::contracts::{EntryPoint as EthersEntryPoint, SimpleAccountFactoryCalls};
+    use async_trait::async_trait;
+    use ethers::abi::AbiEncode;
+    use ethers::prelude::{Http, Provider};
+    use ethers::types::{Address, Bytes, H256, U256};
+    use url::Url;
+    use std::sync::Arc;
+    use std::{assert_eq, println};
 
-    // #[derive(Debug)]
-    // struct MockBaseAccount {
-    //     inner: Arc<SmartAccountProvider<Http, MockBaseAccount>>,
-    // }
+    #[derive(Debug)]
+    struct MockBaseAccount {
+        inner: Arc<Provider<Http>>,
+        entry_point: Arc<EthersEntryPoint<Provider<Http>>>,
+        rpc_url: String,
+    }
 
-    // #[async_trait]
-    // impl BaseAccount for MockBaseAccount {
-    //     // type Paymaster = MockPaymaster;
-    //     type Provider = Http;
-    //     type Inner = SmartAccountProvider<Http, MockBaseAccount>;
+    #[async_trait]
+    impl BaseAccount for MockBaseAccount {
+        // type Paymaster = MockPaymaster;
+        type EntryPoint = EthersEntryPoint<Provider<Http>>;
+        type Provider = Http;
+        type Inner = Provider<Http>;
 
-    //     fn inner(&self) -> &Self::Inner {
-    //         &self.inner
-    //     }
+        fn inner(&self) -> &Self::Inner {
+            &self.inner
+        }
 
-    //     async fn get_account_address(&self) -> Result<Address, AccountError> {
-    //         Ok("0x12fd82c9b1a44979838a19dfa5153bd093b0e75e"
-    //             .parse()
-    //             .unwrap())
-    //     }
+        fn get_chain(&self) -> Chain {
+            Chain::Mainnet
+        }
 
-    //     // fn get_rpc_url(&self) -> &str {
-    //     //     unimplemented!()
-    //     // }
+        async fn get_account_address(&self) -> Result<Address, AccountError> {
+            Ok("0x12fd82c9b1a44979838a19dfa5153bd093b0e75e"
+                .parse()
+                .unwrap())
+        }
 
-    //     fn get_entry_point_address(&self) -> Address {
-    //         "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789" //"0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789"
-    //             .parse()
-    //             .unwrap()
-    //     }
+        fn entry_point(&self) -> &Self::EntryPoint {
+            &self.entry_point
+        }
 
-    //     fn get_entry_point(&self) -> EntryPoint<Self::Inner> {
-    //         let address: Address = self.get_entry_point_address();
-    //         EntryPoint::new(address, self.inner.clone())
-    //     }
+        async fn get_account_init_code(&self) -> Result<Bytes, AccountError> {
+            let factory_address: Address = "0x9406Cc6185a346906296840746125a0E44976454"
+                .parse()
+                .unwrap();
 
-    //     // fn get_paymaster(&self) -> Option<Self::Paymaster> {
-    //     //     unimplemented!()
-    //     // }
+            let owner: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
+                .parse()
+                .unwrap();
 
-    //     async fn get_account_init_code(&self) -> Result<Bytes, AccountError> {
-    //         let factory_address: Address = "0x9406Cc6185a346906296840746125a0E44976454"
-    //             .parse()
-    //             .unwrap();
+            let index = U256::from(1);
 
-    //         let owner: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
-    //             .parse()
-    //             .unwrap();
+            let call =
+                SimpleAccountFactoryCalls::CreateAccount(CreateAccountCall { owner, salt: index });
 
-    //         let index = U256::from(1);
+            println!("encoded call: {:?}", call.clone().encode_hex());
 
-    //         let call =
-    //             SimpleAccountFactoryCalls::CreateAccount(CreateAccountCall { owner, salt: index });
+            let mut result: Vec<u8> = Vec::new();
 
-    //         println!("encoded call: {:?}", call.clone().encode_hex());
+            result.extend_from_slice(factory_address.as_bytes());
+            result.extend_from_slice(&call.encode());
 
-    //         let mut result: Vec<u8> = Vec::new();
+            let result_bytes = Bytes::from(result);
 
-    //         result.extend_from_slice(factory_address.as_bytes());
-    //         result.extend_from_slice(&call.encode());
+            println!("encoded calldata: {:?}", result_bytes.clone().encode_hex());
 
-    //         let result_bytes = Bytes::from(result);
+            Ok(result_bytes)
+        }
 
-    //         println!("encoded calldata: {:?}", result_bytes.clone().encode_hex());
+        async fn get_nonce(&self) -> Result<U256, AccountError> {
+            unimplemented!() // You will need to provide an actual implementation.
+        }
 
-    //         Ok(result_bytes)
-    //     }
+        async fn is_deployed(&self) -> bool {
+            false
+        }
 
-    //     async fn get_nonce(&self) -> Result<U256, AccountError> {
-    //         unimplemented!() // You will need to provide an actual implementation.
-    //     }
+        async fn set_is_deployed(&self, _is_deployed: bool) {}
 
-    //     async fn is_deployed(&self) -> bool {
-    //         false
-    //     }
+        async fn encode_execute(
+            &self,
+            _call: ExecuteCall,
+        ) -> Result<Vec<u8>, AccountError> {
+            unimplemented!() // You will need to provide an actual implementation.
+        }
 
-    //     async fn set_is_deployed(&self, _is_deployed: bool) {}
+        async fn encode_execute_batch(
+            &self,
+            _calls: Vec<ExecuteCall>,
+        ) -> Result<Vec<u8>, AccountError> {
+            unimplemented!() // You will need to provide an actual implementation.
+        }
 
-    //     async fn encode_execute(
-    //         &self,
-    //         _call: ExecuteCall,
-    //     ) -> Result<Vec<u8>, AccountError> {
-    //         unimplemented!() // You will need to provide an actual implementation.
-    //     }
+        async fn sign_user_op_hash<S: Signer>(
+            &self,
+            _user_op_hash: [u8; 32],
+            _signer: &S,
+        ) -> Result<Bytes, AccountError> {
+            unimplemented!() // You will need to provide an actual implementation.
+        }
+    }
 
-    //     async fn encode_execute_batch(
-    //         &self,
-    //         _calls: Vec<ExecuteCall>,
-    //     ) -> Result<Vec<u8>, AccountError> {
-    //         unimplemented!() // You will need to provide an actual implementation.
-    //     }
-
-    //     async fn sign_user_op_hash<S: Signer>(
-    //         &self,
-    //         _user_op_hash: [u8; 32],
-    //         _signer: &S,
-    //     ) -> Result<Bytes, AccountError> {
-    //         unimplemented!() // You will need to provide an actual implementation.
-    //     }
-    // }
-
-    // impl MockBaseAccount {
-    //     async fn get_onchain_user_op_hash(
-    //         &self,
-    //         user_op: UserOperation,
-    //     ) -> Result<[u8; 32], AccountError<<MockBaseAccount as BaseAccount>::Inner>> {
-    //         let entry_point = self.get_entry_point();
-
-    //         entry_point
-    //             .get_user_op_hash(user_op.into())
-    //             .call()
-    //             .await
-    //             .map_err(|e| AccountError::ContractError(e))
-    //     }
-    // }
+    impl MockBaseAccount {
+        async fn get_onchain_user_op_hash(
+            &self,
+            user_op: UserOperation,
+        ) -> [u8; 32] {
+            self.entry_point()
+                .get_user_op_hash(user_op.into())
+                .call()
+                .await
+                .unwrap()
+        }
+    }
 
     // #[derive(Debug)]
     // struct MockPaymaster;
@@ -441,78 +432,82 @@ mod tests {
     //     }
     // }
 
-    // const RPC_URL: &str = "https://eth-mainnet.g.alchemy.com/v2/lRcdJTfR_zjZSef3yutTGE6OIY9YFx1E";
+    const ENTRY_POINT_ADDRESS: &str = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
+    const RPC_URL: &str = "https://eth-mainnet.g.alchemy.com/v2/lRcdJTfR_zjZSef3yutTGE6OIY9YFx1E";
 
-    // #[tokio::test]
-    // async fn test_get_counterfactual_address() {
-    //     let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
+    #[tokio::test]
+    async fn test_get_counterfactual_address() {
+        let account = make_mock_account();
+        let counterfactual_address = account.get_counterfactual_address().await.unwrap();
+        let expected_address: Address = "0x2beb3c8a50ac9c67833e0748d69fd1d38d1193e2".parse().unwrap();
 
-    //     let account = MockBaseAccount {
-    //         inner: Arc::new(provider),
-    //     };
+        assert!(counterfactual_address == expected_address)
+    }
 
-    //     let result = account.get_counterfactual_address().await;
+    #[tokio::test]
+    async fn test_user_op_hash() {
+        let owner: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
+            .parse()
+            .unwrap();
+        
+        let account = make_mock_account();
+        println!(
+            "init code {:?}",
+            account.get_account_init_code().await.unwrap()
+        );
+        let user_op = UserOperation {
+            sender: owner,
+            nonce: U256::from(1),
+            init_code: account.get_account_init_code().await.unwrap(),
+            call_data: Bytes::from(vec![]),
+            call_gas_limit: U256::from(0),
+            verification_gas_limit: U256::from(0),
+            pre_verification_gas: U256::from(0),
+            max_fee_per_gas: U256::from(0),
+            max_priority_fee_per_gas: U256::from(0),
+            paymaster_and_data: Bytes::from(vec![]),
+            signature: Bytes::from(vec![]),
+        };
 
-    //     println!("{:?}", result);
-    // }
+        let onchain_hash = account
+            .get_onchain_user_op_hash(user_op.clone())
+            .await;
+        let offchain_hash = account.get_user_op_hash(user_op.clone()).await.unwrap();
 
-    // #[tokio::test]
-    // async fn test_user_op_hash() {
-    //     let owner: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
-    //         .parse()
-    //         .unwrap();
+        println!("onchain {:?}", H256::from(onchain_hash));
+        println!("offchain {:?}", H256::from(offchain_hash));
 
-    //     let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
+        assert!(onchain_hash == offchain_hash)
+    }
 
-    //     let account = MockBaseAccount {
-    //         inner: Arc::new(provider),
-    //     };
-    //     println!(
-    //         "init code {:?}",
-    //         account.get_account_init_code().await.unwrap()
-    //     );
-    //     let user_op = UserOperation {
-    //         sender: owner,
-    //         nonce: U256::from(1),
-    //         init_code: account.get_account_init_code().await.unwrap(),
-    //         call_data: Bytes::from(vec![]),
-    //         call_gas_limit: U256::from(0),
-    //         verification_gas_limit: U256::from(0),
-    //         pre_verification_gas: U256::from(0),
-    //         max_fee_per_gas: U256::from(0),
-    //         max_priority_fee_per_gas: U256::from(0),
-    //         paymaster_and_data: Bytes::from(vec![]),
-    //         signature: Bytes::from(vec![]),
-    //     };
+    #[tokio::test]
+    async fn test_estimate_creation_gas() {
+        let account = make_mock_account();
+        let creation_gas = account.estimate_creation_gas().await.unwrap();
 
-    //     let onchain_hash = account
-    //         .get_onchain_user_op_hash(user_op.clone())
-    //         .await
-    //         .unwrap();
-    //     let offchain_hash = account.get_user_op_hash(user_op.clone()).await.unwrap();
+        assert_eq!(creation_gas, U256::from(291723))
+    }
 
-    //     println!("onchain {:?}", H256::from(onchain_hash));
-    //     println!("offchain {:?}", H256::from(offchain_hash));
+    fn make_mock_account() -> MockBaseAccount {
+        let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
+        let entry_point_address: Address = ENTRY_POINT_ADDRESS.parse().unwrap();
+        let entry_point = Arc::new(EthersEntryPoint::new(entry_point_address, Arc::new(provider.clone())));
 
-    //     assert!(onchain_hash == offchain_hash)
-    // }
+        let account = MockBaseAccount {
+            inner: Arc::new(provider),
+            entry_point: entry_point,
+            rpc_url: RPC_URL.to_string(),
+        };
 
-    // #[tokio::test]
-    // async fn test_estimate_creation_gas() {
-    //     let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
+        account
+    }
 
-    //     let account = MockBaseAccount {
-    //         inner: Arc::new(provider),
-    //     };
+    fn make_provider() -> SmartAccountProvider<Http, MockBaseAccount> {
+        let url: Url = RPC_URL.try_into().unwrap();
+        let http_provider = Http::new(url);
 
-    //     let creation_gas = account.estimate_creation_gas().await.unwrap();
+        let account_provider = SmartAccountProvider::new(http_provider, make_mock_account());
 
-    //     assert_eq!(creation_gas, U256::from(291723))
-    // }
-
-    // impl FromErr<ProviderError> for ProviderError {
-    //     fn from(src: ProviderError) -> Self {
-    //         src
-    //     }
-    // }
+        account_provider
+    }
 }
