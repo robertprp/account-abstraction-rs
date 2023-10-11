@@ -1,4 +1,6 @@
-use ethers::types::{Address, Bytes, TransactionReceipt, H256, U256};
+use ethers::types::{
+    serde_helpers::deserialize_stringified_u64, Address, Bytes, TransactionReceipt, H256, U256,
+};
 use serde::{Deserialize, Serialize};
 
 /// Details of a signed user operation
@@ -130,14 +132,17 @@ pub struct UserOperationLog {
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Default)]
 pub struct UserOperationGasEstimate {
     /// Pre-verification gas
+    #[serde(deserialize_with = "deserialize_stringified_u64")]
     #[serde(rename = "preVerificationGas")]
     pub pre_verification_gas: u64,
 
     /// Verification gas
-    #[serde(rename = "verificationGas")]
-    pub verification_gas: u64,
+    #[serde(deserialize_with = "deserialize_stringified_u64")]
+    #[serde(rename = "verificationGasLimit")]
+    pub verification_gas_limit: u64,
 
     /// Call gas limit
+    #[serde(deserialize_with = "deserialize_stringified_u64")]
     #[serde(rename = "callGasLimit")]
     pub call_gas_limit: u64,
 }

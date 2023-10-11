@@ -32,7 +32,7 @@ pub fn get_user_op_hash(
         chain_id,
     };
     let input_bytes: Bytes = keccak256(hash_input.clone().encode()).into();
-    println!("has_input {:?}",  input_bytes);
+    println!("has_input {:?}", input_bytes);
     keccak256(hash_input.encode())
 }
 
