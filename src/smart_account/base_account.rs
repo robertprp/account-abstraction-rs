@@ -193,7 +193,6 @@ pub enum AccountError {
 #[cfg(test)]
 mod tests {
     use crate::contracts::simple_account_factory::CreateAccountCall;
-    use crate::types::UserOperationRequest;
 
     use super::*;
     use crate::contracts::{EntryPoint as EthersEntryPoint, SimpleAccountFactoryCalls};
@@ -387,13 +386,4 @@ mod tests {
 
         account
     }
-
-    // fn make_provider() -> SmartAccountProvider<Http, MockBaseAccount> {
-    //     let url: Url = RPC_URL.try_into().unwrap();
-    //     let http_provider = Http::new(url);
-
-    //     let account_provider = SmartAccountProvider::new(http_provider, make_mock_account());
-
-    //     account_provider
-    // }
 }
