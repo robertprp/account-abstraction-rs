@@ -1,4 +1,4 @@
-use super::{AccountError, BaseAccount};
+use super::{AccountError, BaseAccount, SmartAccountSigner};
 
 use crate::contracts::{simple_account, simple_account_factory, SimpleAccountFactoryCalls};
 use crate::contracts::{
@@ -10,7 +10,6 @@ use crate::types::ExecuteCall;
 use async_trait::async_trait;
 use ethers::abi::AbiEncode;
 use ethers::providers::Http;
-use ethers::signers::Signer;
 use ethers::types::Chain;
 use ethers::{
     providers::Provider,
@@ -143,16 +142,12 @@ impl BaseAccount for SimpleAccount {
         Ok(multi_call.encode())
     }
 
-    async fn sign_user_op_hash<S: Signer>(
+    async fn sign_user_op_hash<S: SmartAccountSigner>(
         &self,
         user_op_hash: [u8; 32],
         signer: &S,
     ) -> Result<Bytes, AccountError> {
-        let Ok(signed_hash) = signer.sign_message(&user_op_hash).await else {
-            return Err(AccountError::SignerError);
-        };
-
-        Ok(signed_hash.to_vec().into())
+        signer.sign_message(&user_op_hash).await.map_err(|_| AccountError::SignerError)
     }
 }
 

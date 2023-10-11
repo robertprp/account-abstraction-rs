@@ -1,7 +1,6 @@
 use async_trait::async_trait;
 use ethers::{
     providers::{JsonRpcClient, ProviderError},
-    signers::Signer,
     types::{Block, BlockId, BlockNumber, Bytes, FeeHistory, TxHash, U256},
     utils,
 };
@@ -12,7 +11,7 @@ use crate::types::{
     UserOperationReceipt, UserOperationRequest,
 };
 
-use super::{AccountError, BaseAccount, EntryPoint, SmartAccountMiddleware};
+use super::{AccountError, BaseAccount, EntryPoint, SmartAccountMiddleware, SmartAccountSigner};
 use thiserror::Error;
 
 #[derive(Clone, Debug)]
@@ -51,7 +50,7 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
         unreachable!("There is no inner provider here")
     }
 
-    async fn send_user_operation<U: Into<UserOperationRequest> + Send + Sync, S: Signer>(
+    async fn send_user_operation<U: Into<UserOperationRequest> + Send + Sync, S: SmartAccountSigner>(
         &self,
         user_op: U,
         // TODO: Passing in signer through method param for now. Consider separate signer middleware.
@@ -197,7 +196,7 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
         Ok(())
     }
 
-    async fn sign_user_operation<S: Signer>(
+    async fn sign_user_operation<S: SmartAccountSigner>(
         &self,
         user_op: UserOperationRequest,
         // TODO: Passing in signer through method param for now.

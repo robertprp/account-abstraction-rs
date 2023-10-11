@@ -10,6 +10,9 @@ pub use utils::*;
 mod middleware;
 pub use middleware::*;
 
+mod signer;
+pub use signer::*;
+
 mod provider;
 pub use provider::*;
 

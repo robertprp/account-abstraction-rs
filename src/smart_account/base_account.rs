@@ -3,7 +3,6 @@ use crate::paymaster::PaymasterError;
 use crate::types::ExecuteCall;
 use async_trait::async_trait;
 use ethers::providers::{Middleware, ProviderError};
-use ethers::signers::Signer;
 use ethers::types::Chain;
 use ethers::{
     providers::{JsonRpcClient, Provider},
@@ -12,7 +11,7 @@ use ethers::{
 use std::fmt::Debug;
 use thiserror::Error;
 
-use super::{utils, EntryPoint, EntryPointError};
+use super::{utils, EntryPoint, EntryPointError, SmartAccountSigner};
 
 #[async_trait]
 pub trait BaseAccount: Sync + Send + Debug {
@@ -139,14 +138,14 @@ pub trait BaseAccount: Sync + Send + Debug {
     }
 
     // TODO: `Signer` produces an ECDSA signature. Will need to add our own Signer type
-    async fn sign_user_op_hash<S: Signer>(
+    async fn sign_user_op_hash<S: SmartAccountSigner>(
         &self,
         user_op_hash: [u8; 32],
         signer: &S,
     ) -> Result<Bytes, AccountError>;
 
     // TODO: `Signer` produces an ECDSA signature. Will need to add our own Signer type
-    async fn sign_user_op<U: Into<UserOperation> + Send + Sync, S: Signer>(
+    async fn sign_user_op<U: Into<UserOperation> + Send + Sync, S: SmartAccountSigner>(
         &self,
         user_op: U,
         signer: &S,
@@ -194,6 +193,7 @@ pub enum AccountError {
 #[cfg(test)]
 mod tests {
     use crate::contracts::simple_account_factory::CreateAccountCall;
+    use crate::types::UserOperationRequest;
 
     use super::*;
     use crate::contracts::{EntryPoint as EthersEntryPoint, SimpleAccountFactoryCalls};
@@ -284,7 +284,7 @@ mod tests {
             unimplemented!() // You will need to provide an actual implementation.
         }
 
-        async fn sign_user_op_hash<S: Signer>(
+        async fn sign_user_op_hash<S: SmartAccountSigner>(
             &self,
             _user_op_hash: [u8; 32],
             _signer: &S,

@@ -321,7 +321,6 @@
 use async_trait::async_trait;
 use ethers::{
     providers::{JsonRpcClient, Provider},
-    signers::Signer,
     types::{Block, BlockId, BlockNumber, Bytes, FeeHistory, TxHash, U256},
 };
 use std::error::Error;
@@ -332,7 +331,7 @@ use crate::types::{
     UserOperationRequest,
 };
 
-use super::BaseAccount;
+use super::{BaseAccount, SmartAccountSigner};
 use thiserror::Error;
 
 #[async_trait]
@@ -350,7 +349,7 @@ pub trait SmartAccountMiddleware: Sync + Send + Debug {
         self.inner().provider()
     }
 
-    async fn send_user_operation<U: Into<UserOperationRequest> + Send + Sync, S: Signer>(
+    async fn send_user_operation<U: Into<UserOperationRequest> + Send + Sync, S: SmartAccountSigner>(
         &self,
         user_op: U,
         // TODO: Passing in signer through method param for now. Consider separate signer middleware.
@@ -372,7 +371,7 @@ pub trait SmartAccountMiddleware: Sync + Send + Debug {
             .map_err(FromErr::from)
     }
 
-    async fn sign_user_operation<S: Signer>(
+    async fn sign_user_operation<S: SmartAccountSigner>(
         &self,
         user_op: UserOperationRequest,
         // TODO: Passing in signer through method param for now. Consider separate signer middleware.
