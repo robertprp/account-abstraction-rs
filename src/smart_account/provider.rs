@@ -30,13 +30,9 @@ where
         Self { inner, account }
     }
 
-    // fn inner(&self) -> &Self::Inner {
-    //     unreachable!("There is no inner provider here")
-    // }
-
-    // fn provider(&self) -> &SmartAccountProvider<Self::Provider> {
-    //     self
-    // }
+    fn provider(&self) -> &P {
+        &self.inner
+    }
 }
 
 #[async_trait]
@@ -47,7 +43,7 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
     type Inner = Self;
 
     fn inner(&self) -> &Self::Inner {
-        unreachable!("There is no inner provider here")
+        self
     }
 
     async fn send_user_operation<U: Into<UserOperationRequest> + Send + Sync, S: SmartAccountSigner>(
@@ -75,7 +71,7 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
                 [serialized_user_op, serialized_entry_point_address],
             )
             .await
-            .map_err(SmartAccountProviderError::ProviderError)
+            .map_err(|e| SmartAccountProviderError::ProviderError(e.into()))
     }
 
     async fn fill_user_operation(
@@ -223,7 +219,7 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
                 [serialized_user_op, serialized_entry_point_address],
             )
             .await
-            .map_err(SmartAccountProviderError::ProviderError)
+            .map_err(|e| SmartAccountProviderError::ProviderError(e.into()))
     }
 
     async fn get_user_operation<T: Send + Sync + Into<UserOpHash>>(
@@ -236,7 +232,7 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
             .provider()
             .request("eth_getUserOperationByHash", [hash])
             .await
-            .map_err(SmartAccountProviderError::ProviderError)
+            .map_err(|e| SmartAccountProviderError::ProviderError(e.into()))
     }
 
     async fn get_user_operation_receipt<T: Send + Sync + Into<UserOpHash>>(
@@ -249,7 +245,7 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
             .provider()
             .request("eth_getUserOperationReceipt", [hash])
             .await
-            .map_err(SmartAccountProviderError::ProviderError)
+            .map_err(|e| SmartAccountProviderError::ProviderError(e.into()))
     }
 
     async fn get_supported_entry_points(&self) -> Result<Vec<String>, SmartAccountProviderError> {
@@ -257,7 +253,7 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
             .provider()
             .request("eth_supportedEntryPoints", ())
             .await
-            .map_err(SmartAccountProviderError::ProviderError)
+            .map_err(|e| SmartAccountProviderError::ProviderError(e.into()))
     }
 
     async fn estimate_eip1559_fees(
@@ -302,14 +298,16 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
                 self.inner()
                     .provider()
                     .request("eth_getBlockByHash", [hash, include_txs])
-                    .await?
+                    .await
+                    .map_err(|e| SmartAccountProviderError::ProviderError(e.into()))?
             }
             BlockId::Number(num) => {
                 let num = utils::serialize(&num);
                 self.inner()
                     .provider()
                     .request("eth_getBlockByNumber", [num, include_txs])
-                    .await?
+                    .await
+                    .map_err(|e| SmartAccountProviderError::ProviderError(e.into()))?
             }
         })
     }
@@ -358,12 +356,12 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
                 if fallback.is_err() {
                     // if the older fallback also resulted in an error, we return the error from the
                     // initial attempt
-                    return err.map_err(SmartAccountProviderError::ProviderError);
+                    return err.map_err(|e| SmartAccountProviderError::ProviderError(e.into()));
                 }
                 fallback
             }
         }
-        .map_err(SmartAccountProviderError::ProviderError)
+        .map_err(|e| SmartAccountProviderError::ProviderError(e.into()))
     }
 
     // TODO: Add paymaster methods
