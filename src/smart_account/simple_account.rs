@@ -4,7 +4,6 @@ use crate::contracts::{simple_account, simple_account_factory, SimpleAccountFact
 use crate::contracts::{
     EntryPoint as EthersEntryPoint, ExecuteBatchCall, SimpleAccountCalls, UserOperation,
 };
-use crate::paymaster::{Paymaster, PaymasterError};
 use crate::types::ExecuteCall;
 
 use async_trait::async_trait;
@@ -148,20 +147,6 @@ impl BaseAccount for SimpleAccount {
         signer: &S,
     ) -> Result<Bytes, AccountError> {
         signer.sign_message(&user_op_hash).await.map_err(|_| AccountError::SignerError)
-    }
-}
-
-#[derive(Debug)]
-struct EmptyPaymaster;
-
-#[async_trait]
-impl Paymaster for EmptyPaymaster {
-    // TODO: Move to SA provider / middleware
-    async fn get_paymaster_and_data(
-        &self,
-        _user_op: UserOperation,
-    ) -> Result<Bytes, PaymasterError> {
-        Ok(Bytes::new())
     }
 }
 

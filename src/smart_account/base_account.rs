@@ -1,5 +1,4 @@
 use crate::contracts::UserOperation;
-use crate::paymaster::PaymasterError;
 use crate::types::ExecuteCall;
 use async_trait::async_trait;
 use ethers::providers::{Middleware, ProviderError};
@@ -182,9 +181,6 @@ pub enum AccountError {
 
     #[error("nonce error")]
     NonceError,
-
-    #[error("paymaster error: {0}")]
-    PaymasterError(PaymasterError),
 
     #[error("signer error")]
     SignerError,

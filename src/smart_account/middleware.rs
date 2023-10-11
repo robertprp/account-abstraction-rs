@@ -420,6 +420,14 @@ pub trait SmartAccountMiddleware: Sync + Send + Debug {
             .map_err(FromErr::from)
     }
 
+    async fn get_paymaster_and_data(&self, user_op: UserOperation)
+        -> Result<Bytes, Self::Error> {
+        self.inner()
+            .get_paymaster_and_data(user_op)
+            .await
+            .map_err(FromErr::from)
+    }
+
     async fn estimate_eip1559_fees(
         &self,
         estimator: Option<fn(U256, Vec<Vec<U256>>) -> (U256, U256)>,
