@@ -26,6 +26,7 @@ where
     P: JsonRpcClient,
     A: BaseAccount,
 {
+    // TODO: Add try_from that only accepts url plus account
     pub fn new(inner: P, account: A) -> Self {
         Self { inner, account }
     }
@@ -156,21 +157,15 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
                 Some(self.account.get_verification_gas_limit().add(init_gas));
         }
 
-        // TODO: Update
-        // if let Some(paymaster_api) = self.account.get_paymaster() {
-        //     let pre_verification_gas = self.account.get_pre_verification_gas(user_op.clone());
+        if let Ok(paymaster_and_data) = self.get_paymaster_and_data(user_op.clone()).await {
+            let pre_verification_gas = self.account.get_pre_verification_gas(user_op.clone());
 
-        //     user_op.pre_verification_gas = Some(pre_verification_gas);
+            user_op.pre_verification_gas = Some(pre_verification_gas);
 
-        //     let paymaster_and_data = paymaster_api
-        //         .get_paymaster_and_data(user_op.clone().into())
-        //         .await
-        //         .map_err(SmartAccountMiddlewareError::PaymasterError)?;
-
-        //     user_op.paymaster_and_data = Some(paymaster_and_data);
-        // } else {
+            user_op.paymaster_and_data = Some(paymaster_and_data);
+        } else {
             user_op.paymaster_and_data = Some(Bytes::new());
-        // }
+        }
 
         if user_op.call_gas_limit.is_none()
             || user_op.verification_gas_limit.is_none()
@@ -262,6 +257,15 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
             .await
             .map_err(|e| SmartAccountProviderError::ProviderError(e.into()))
     }
+
+    async fn get_paymaster_and_data<U: Into<UserOperationRequest> + Send + Sync>(
+        &self,
+        _user_op: U,
+    ) -> Result<Bytes, SmartAccountProviderError> {
+        Err(SmartAccountProviderError::CustomError(
+            "No paymaster data defined".to_string(),
+        ))
+    }
 }
 
 impl<P, A> AsRef<P> for SmartAccountProvider<P, A> {
@@ -288,4 +292,7 @@ pub enum SmartAccountProviderError {
 
     #[error(transparent)]
     AccountError(#[from] AccountError),
+
+    #[error("error: {0}")]
+    CustomError(String),
 }

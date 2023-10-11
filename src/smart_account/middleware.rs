@@ -321,7 +321,7 @@
 use async_trait::async_trait;
 use ethers::{
     providers::{JsonRpcClient, Provider},
-    types::{Block, BlockId, BlockNumber, Bytes, FeeHistory, TxHash, U256},
+    types::Bytes,
 };
 use std::error::Error;
 use std::fmt::Debug;
@@ -423,41 +423,12 @@ pub trait SmartAccountMiddleware: Sync + Send + Debug {
             .map_err(FromErr::from)
     }
 
-    async fn get_paymaster_and_data(&self, user_op: UserOperation) -> Result<Bytes, Self::Error> {
-        self.inner()
-            .get_paymaster_and_data(user_op)
-            .await
-            .map_err(FromErr::from)
-    }
-
-    async fn estimate_eip1559_fees(
+    async fn get_paymaster_and_data<U: Into<UserOperationRequest> + Send + Sync>(
         &self,
-        estimator: Option<fn(U256, Vec<Vec<U256>>) -> (U256, U256)>,
-    ) -> Result<(U256, U256), Self::Error> {
+        user_op: U,
+    ) -> Result<Bytes, Self::Error> {
         self.inner()
-            .estimate_eip1559_fees(estimator)
-            .await
-            .map_err(FromErr::from)
-    }
-
-    async fn get_block<T: Into<BlockId> + Send + Sync>(
-        &self,
-        block_hash_or_number: T,
-    ) -> Result<Option<Block<TxHash>>, Self::Error> {
-        self.inner()
-            .get_block(block_hash_or_number)
-            .await
-            .map_err(FromErr::from)
-    }
-
-    async fn fee_history<T: Into<U256> + Send + Sync>(
-        &self,
-        block_count: T,
-        last_block: BlockNumber,
-        reward_percentiles: &[f64],
-    ) -> Result<FeeHistory, Self::Error> {
-        self.inner()
-            .fee_history(block_count, last_block, reward_percentiles)
+            .get_paymaster_and_data(user_op.into())
             .await
             .map_err(FromErr::from)
     }
