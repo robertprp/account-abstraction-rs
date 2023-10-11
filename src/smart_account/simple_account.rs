@@ -1,9 +1,7 @@
 use super::{AccountError, BaseAccount, SmartAccountSigner};
 
 use crate::contracts::{simple_account, simple_account_factory, SimpleAccountFactoryCalls};
-use crate::contracts::{
-    EntryPoint as EthersEntryPoint, ExecuteBatchCall, SimpleAccountCalls, UserOperation,
-};
+use crate::contracts::{EntryPoint as EthersEntryPoint, ExecuteBatchCall, SimpleAccountCalls};
 use crate::types::ExecuteCall;
 
 use async_trait::async_trait;
@@ -158,10 +156,10 @@ mod tests {
     use std::{sync::Arc, time::Duration};
 
     use ethers::{
-        prelude::{k256::ecdsa::SigningKey, rand},
+        prelude::k256::ecdsa::SigningKey,
         providers::{Http, Provider},
         signers::{LocalWallet, Signer, Wallet},
-        types::{Address, Bytes, Chain, H256, U256},
+        types::{Address, Bytes, Chain, U256},
     };
     use tokio::{sync::RwLock, time};
     use url::Url;
@@ -172,7 +170,7 @@ mod tests {
             simple_account::SimpleAccount, BaseAccount, SmartAccountMiddleware,
             SmartAccountProvider,
         },
-        types::{AccountCall, ExecuteCall, UserOpHash, UserOperationRequest},
+        types::{AccountCall, ExecuteCall, UserOperationRequest},
     };
 
     const RPC_URL: &str = "https://eth-goerli.g.alchemy.com/v2/Lekp6yzHz5yAPLKPNvGpMKaqbGunnXHS"; //"https://eth-mainnet.g.alchemy.com/v2/lRcdJTfR_zjZSef3yutTGE6OIY9YFx1E";
