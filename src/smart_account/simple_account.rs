@@ -176,10 +176,11 @@ mod tests {
         types::{Address, Bytes, Chain, H256, U256},
     };
     use tokio::{sync::RwLock, time};
+    use url::Url;
 
     use crate::{
         contracts::UserOperation,
-        smart_account::{simple_account::SimpleAccount, BaseAccount},
+        smart_account::{simple_account::SimpleAccount, BaseAccount, SmartAccountProvider, SmartAccountMiddleware},
         types::{AccountCall, ExecuteCall, UserOpHash, UserOperationRequest},
     };
 
@@ -273,10 +274,7 @@ mod tests {
             .unwrap();
 
         let account = make_simple_account();
-        println!(
-            "init codezzzz {:?}",
-            account.get_account_init_code().await.unwrap()
-        );
+        
         let user_op = UserOperation {
             sender: owner,
             nonce: U256::from(1),
@@ -294,152 +292,136 @@ mod tests {
         let onchain_hash = account.get_onchain_user_op_hash(user_op.clone()).await;
         let offchain_hash = account.get_user_op_hash(user_op.clone()).await.unwrap();
 
-        println!("onchain {:?}", H256::from(onchain_hash));
-        println!("offchain {:?}", H256::from(offchain_hash));
-
         assert!(onchain_hash == offchain_hash)
     }
 
-    // #[tokio::test]
-    // async fn test_estimate_user_op() {
-    //     let wallet: LocalWallet =
-    //         "82aba1f2ce3d1a0f6eca0ade8877077b7fc6fd06fb0af48ab4a53650bde69979"
-    //             .parse()
-    //             .unwrap();
+    #[tokio::test]
+    async fn test_estimate_user_op() {
+        let wallet: LocalWallet =
+            "82aba1f2ce3d1a0f6eca0ade8877077b7fc6fd06fb0af48ab4a53650bde69979"
+                .parse()
+                .unwrap();
 
-    //     let provider = Provider::<Http>::try_from(RPC_URL).unwrap(); //.for_chain(Chain::mainnet);
+        let account_address: Address = "0x8898886f1adacdb475a8c6778d8c3a011e2c54a6"
+            .parse()
+            .unwrap();
+        let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
+        let factory_address: Address = SIMPLE_ACCOUNT_FACTORY_ADDRESS.parse().unwrap();
+        let entry_point_address: Address = ENTRY_POINT_ADDRESS.parse().unwrap();
 
-    //     let account = SimpleAccount::new(
-    //         Arc::new(provider),
-    //         wallet.address(),
-    //         RwLock::new(Some(
-    //             "0x8898886f1adacdb475a8c6778d8c3a011e2c54a6"
-    //                 .parse()
-    //                 .unwrap(),
-    //         )),
-    //         RwLock::new(true),
-    //         RPC_URL.to_string(),
-    //     );
+        println!("account address {:?}", account_address);
+        let account = SimpleAccount::new(
+            Arc::new(provider),
+            wallet.address(),
+            RwLock::new(Some(account_address)),
+            factory_address,
+            entry_point_address,
+            RwLock::new(false),
+            Chain::Goerli,
+        );
 
-    //     let nonce = account.get_nonce().await.unwrap();
+        let nonce = account.get_nonce().await.unwrap();
 
-    //     println!("nonce {:?}", nonce);
-    //     let middleware = SmartAccountMiddleware::new(Provider::<Http>::try_from("https://api.stackup.sh/v1/node/2e0bd6d2d67c8003121fb3ac53c3cd866dc2ce425f68f817d6e9b723fe3cfd5f").unwrap(), account);
+        let provider = make_provider(account);
 
-    //     let to_address: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
-    //         .parse()
-    //         .unwrap();
+        let to_address: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
+            .parse()
+            .unwrap();
 
-    //     let sender: Address = "0x8898886f1adacdb475a8c6778d8c3a011e2c54a6"
-    //         .parse()
-    //         .unwrap();
+        let sender: Address = "0x8898886f1adacdb475a8c6778d8c3a011e2c54a6"
+            .parse()
+            .unwrap();
 
-    //     let req = UserOperationRequest::new()
-    //         .call(AccountCall::Execute(ExecuteCall::new(
-    //             to_address,
-    //             100,
-    //             Bytes::new(),
-    //         )))
-    //         .sender(sender)
-    //         .max_fee_per_gas(100)
-    //         .max_priority_fee_per_gas(10)
-    //         .nonce(nonce);
+        let req = UserOperationRequest::new()
+            .call(AccountCall::Execute(ExecuteCall::new(
+                to_address,
+                100,
+                Bytes::new(),
+            )))
+            .sender(sender)
+            .max_fee_per_gas(100)
+            .max_priority_fee_per_gas(10)
+            .nonce(nonce);
 
-    //     let result = middleware
-    //         .estimate_user_operation_gas(&req.with_defaults())
-    //         .await;
+        let result = provider
+            .estimate_user_operation_gas(&req.with_defaults())
+            // .estimate_user_operation_gas(&req.with_defaults())
+            .await;
 
-    //     println!("{:?}", result);
-    // }
+        println!("{:?}", result);
+    }
 
-    // #[tokio::test]
-    // async fn test_stuff() {
-    //     let wallet: LocalWallet =
-    //         "82aba1f2ce3d1a0f6eca0ade8877077b7fc6fd06fb0af48ab4a53650bde69979"
-    //             .parse()
-    //             .unwrap();
+    #[tokio::test]
+    async fn test_send_transaction() {
+        let wallet: LocalWallet =
+        "82aba1f2ce3d1a0f6eca0ade8877077b7fc6fd06fb0af48ab4a53650bde69979"
+            .parse()
+            .unwrap();
+        
+        let account_address: Address = "0x8898886f1adacdb475a8c6778d8c3a011e2c54a6"
+            .parse()
+            .unwrap();
+        let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
+        let factory_address: Address = SIMPLE_ACCOUNT_FACTORY_ADDRESS.parse().unwrap();
+        let entry_point_address: Address = ENTRY_POINT_ADDRESS.parse().unwrap();
 
-    //     // let wallet = LocalWallet::new(&mut rand::thread_rng());
+        println!("account address {:?}", account_address);
+        let account = SimpleAccount::new(
+            Arc::new(provider),
+            wallet.address(),
+            RwLock::new(Some(account_address)),
+            factory_address,
+            entry_point_address,
+            RwLock::new(false),
+            Chain::Goerli,
+        );
 
-    //     // Bytes(0x82aba1f2ce3d1a0f6eca0ade8877077b7fc6fd06fb0af48ab4a53650bde69979)
-    //     // 0xa666d9ebcc3feecf8e09c050c9c2379df1e5b333
+        let provider = make_provider(account);
 
-    //     // SA 0x8898886f1adacdb475a8c6778d8c3a011e2c54a6
-    //     println!("{:?}", wallet.address());
+        let to_address: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
+            .parse()
+            .unwrap();
 
-    //     let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
+        let req = UserOperationRequest::new().call(AccountCall::Execute(ExecuteCall::new(
+            to_address,
+            100,
+            Bytes::new(),
+        )));
+        
+        let result = provider.send_user_operation(req, &wallet).await;
 
-    //     let account = SimpleAccount::new(
-    //         Arc::new(provider),
-    //         wallet.address(),
-    //         RwLock::new(Some(
-    //             "0x8898886f1adacdb475a8c6778d8c3a011e2c54a6"
-    //                 .parse()
-    //                 .unwrap(),
-    //         )),
-    //         RwLock::new(true),
-    //         RPC_URL.to_string(),
-    //     );
+        let user_op_hash = result.unwrap();
 
-    //     // let contract_address = account.get_counterfactual_address().await.unwrap();
+        let mut interval = time::interval(Duration::from_secs(10));
+        let mut attempts = 0;
+        let max_attempts = 20;
 
-    //     // println!("{:?}", contract_address);
+        println!("user op hash {:?}", user_op_hash);
 
-    //     let middleware = SmartAccountMiddleware::new(Provider::<Http>::try_from("https://api.stackup.sh/v1/node/2e0bd6d2d67c8003121fb3ac53c3cd866dc2ce425f68f817d6e9b723fe3cfd5f").unwrap(), account);
+        loop {
+            interval.tick().await;
+            attempts += 1;
 
-    //     let to_address: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
-    //         .parse()
-    //         .unwrap();
-
-    //     let req = UserOperationRequest::new().call(AccountCall::Execute(ExecuteCall::new(
-    //         to_address,
-    //         100,
-    //         Bytes::new(),
-    //     )));
-    //     // .target_address(to_address)
-    //     // .tx_value(100);
-    //     // .tx_data(Bytes::new());
-    //     // .call_gas_limit(40000);
-    //     // let result = middleware.send_user_operation(req, &wallet).await;
-
-    //     println!("request {:?}", req);
-
-    //     // // fix : Err(ProviderError(JsonRpcClientError(JsonRpcError(JsonRpcError { code: -32602, message: "callGasLimit: below expected gas of 33100", data: Some(String("callGasLimit: below expected gas of 33100")) }))))
-
-    //     // println!("send result {:?}", result);
-
-    //     // let user_op_hash = result.unwrap();
-
-    //     // let mut interval = time::interval(Duration::from_secs(10));
-    //     // let mut attempts = 0;
-    //     // let max_attempts = 20;
-
-    //     // loop {
-    //     //     interval.tick().await;
-    //     //     attempts += 1;
-
-    //     //     match middleware
-    //     //         .get_user_operation_receipt(user_op_hash.clone())
-    //     //         // .get_user_operation(user_op_hash)
-    //     //         .await
-    //     //     {
-    //     //         Ok(receipt) => {
-    //     //             println!("Received receipt: {:?}", receipt);
-    //     //             break;
-    //     //         }
-    //     //         Err(e) => {
-    //     //             println!("Failed to get user operation receipt: {:?}", e);
-    //     //             if attempts >= max_attempts {
-    //     //                 println!("Exceeded max attempts, stopping retries");
-    //     //                 break;
-    //     //             }
-    //     //         }
-    //     //     }
-    //     // }
-    //     // let receipt = middleware.get_user_operation_receipt(result.unwrap()).await;
-    //     //0x6303715bf1ecc999f96baf320896de93ff7951e908506e6ed68ac46190c09746
-    //     // println!("receipt {:?}", receipt);
-    // }
+            match provider
+                .get_user_operation_receipt(user_op_hash.clone())
+                .await
+            {
+                Ok(receipt) => {
+                    if let Some(receipt) = receipt {
+                        println!("Received receipt: {:?}", receipt);
+                        break;
+                    }
+                }
+                Err(e) => {
+                    println!("Failed to get user operation receipt: {:?}", e);
+                    if attempts >= max_attempts {
+                        println!("Exceeded max attempts, stopping retries");
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
     // #[tokio::test]
     // async fn test_new_wallet() {
@@ -574,6 +556,15 @@ mod tests {
             RwLock::new(false),
             Chain::Goerli,
         )
+    }
+
+    fn make_provider(account: SimpleAccount) -> SmartAccountProvider<Http, SimpleAccount> {
+        let url: Url = RPC_URL.try_into().unwrap();
+        let http_provider = Http::new(url);
+
+        let account_provider = SmartAccountProvider::new(http_provider, account);
+
+        account_provider
     }
 
     fn make_wallet() -> Wallet<SigningKey> {
