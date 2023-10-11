@@ -349,7 +349,10 @@ pub trait SmartAccountMiddleware: Sync + Send + Debug {
         self.inner().provider()
     }
 
-    async fn send_user_operation<U: Into<UserOperationRequest> + Send + Sync, S: SmartAccountSigner>(
+    async fn send_user_operation<
+        U: Into<UserOperationRequest> + Send + Sync,
+        S: SmartAccountSigner,
+    >(
         &self,
         user_op: U,
         // TODO: Passing in signer through method param for now. Consider separate signer middleware.
@@ -420,8 +423,7 @@ pub trait SmartAccountMiddleware: Sync + Send + Debug {
             .map_err(FromErr::from)
     }
 
-    async fn get_paymaster_and_data(&self, user_op: UserOperation)
-        -> Result<Bytes, Self::Error> {
+    async fn get_paymaster_and_data(&self, user_op: UserOperation) -> Result<Bytes, Self::Error> {
         self.inner()
             .get_paymaster_and_data(user_op)
             .await

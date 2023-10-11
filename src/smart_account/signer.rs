@@ -2,7 +2,8 @@ use async_trait::async_trait;
 use ethers::{
     core::k256::ecdsa::SigningKey,
     signers::{Wallet, WalletError},
-    types::Bytes, utils::hash_message,
+    types::Bytes,
+    utils::hash_message,
 };
 use std::error::Error;
 

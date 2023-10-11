@@ -1,4 +1,6 @@
-use ethers::types::{Address, Bytes, TransactionReceipt, H256, U256, serde_helpers::deserialize_stringified_u64};
+use ethers::types::{
+    serde_helpers::deserialize_stringified_u64, Address, Bytes, TransactionReceipt, H256, U256,
+};
 use serde::{Deserialize, Serialize};
 
 /// Details of a signed user operation

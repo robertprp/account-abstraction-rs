@@ -146,7 +146,10 @@ impl BaseAccount for SimpleAccount {
         user_op_hash: [u8; 32],
         signer: &S,
     ) -> Result<Bytes, AccountError> {
-        signer.sign_message(&user_op_hash).await.map_err(|_| AccountError::SignerError)
+        signer
+            .sign_message(&user_op_hash)
+            .await
+            .map_err(|_| AccountError::SignerError)
     }
 }
 
@@ -165,7 +168,10 @@ mod tests {
 
     use crate::{
         contracts::UserOperation,
-        smart_account::{simple_account::SimpleAccount, BaseAccount, SmartAccountProvider, SmartAccountMiddleware},
+        smart_account::{
+            simple_account::SimpleAccount, BaseAccount, SmartAccountMiddleware,
+            SmartAccountProvider,
+        },
         types::{AccountCall, ExecuteCall, UserOpHash, UserOperationRequest},
     };
 
@@ -259,7 +265,7 @@ mod tests {
             .unwrap();
 
         let account = make_simple_account();
-        
+
         let user_op = UserOperation {
             sender: owner,
             nonce: U256::from(1),
@@ -338,10 +344,10 @@ mod tests {
     #[tokio::test]
     async fn test_send_transaction() {
         let wallet: LocalWallet =
-        "82aba1f2ce3d1a0f6eca0ade8877077b7fc6fd06fb0af48ab4a53650bde69979"
-            .parse()
-            .unwrap();
-        
+            "82aba1f2ce3d1a0f6eca0ade8877077b7fc6fd06fb0af48ab4a53650bde69979"
+                .parse()
+                .unwrap();
+
         let account_address: Address = "0x8898886f1adacdb475a8c6778d8c3a011e2c54a6"
             .parse()
             .unwrap();
@@ -371,7 +377,7 @@ mod tests {
             100,
             Bytes::new(),
         )));
-        
+
         let result = provider.send_user_operation(req, &wallet).await;
 
         let user_op_hash = result.unwrap();

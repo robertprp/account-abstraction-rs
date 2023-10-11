@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use ethers::{
-    providers::{JsonRpcClient, ProviderError, Middleware},
-    types::{Block, BlockId, BlockNumber, Bytes, FeeHistory, TxHash, U256},
+    providers::{JsonRpcClient, Middleware, ProviderError},
+    types::{Bytes, U256},
     utils,
 };
 use std::{fmt::Debug, ops::Add};
@@ -46,7 +46,10 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
         self
     }
 
-    async fn send_user_operation<U: Into<UserOperationRequest> + Send + Sync, S: SmartAccountSigner>(
+    async fn send_user_operation<
+        U: Into<UserOperationRequest> + Send + Sync,
+        S: SmartAccountSigner,
+    >(
         &self,
         user_op: U,
         // TODO: Passing in signer through method param for now. Consider separate signer middleware.
@@ -127,8 +130,12 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
         }
 
         if user_op.max_fee_per_gas.is_none() || user_op.max_priority_fee_per_gas.is_none() {
-            let (max_fee_per_gas, max_priority_fee_per_gas) =
-                self.account.inner().provider().estimate_eip1559_fees(None).await?;
+            let (max_fee_per_gas, max_priority_fee_per_gas) = self
+                .account
+                .inner()
+                .provider()
+                .estimate_eip1559_fees(None)
+                .await?;
 
             if user_op.max_priority_fee_per_gas.is_none() {
                 user_op.max_priority_fee_per_gas = Some(max_priority_fee_per_gas);
