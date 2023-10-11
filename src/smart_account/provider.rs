@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use ethers::{
-    providers::{JsonRpcClient, ProviderError},
+    providers::{JsonRpcClient, ProviderError, Middleware},
     types::{Block, BlockId, BlockNumber, Bytes, FeeHistory, TxHash, U256},
     utils,
 };
@@ -128,7 +128,7 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
 
         if user_op.max_fee_per_gas.is_none() || user_op.max_priority_fee_per_gas.is_none() {
             let (max_fee_per_gas, max_priority_fee_per_gas) =
-                self.estimate_eip1559_fees(None).await?;
+                self.account.inner().provider().estimate_eip1559_fees(None).await?;
 
             if user_op.max_priority_fee_per_gas.is_none() {
                 user_op.max_priority_fee_per_gas = Some(max_priority_fee_per_gas);
@@ -162,7 +162,7 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
 
         //     user_op.paymaster_and_data = Some(paymaster_and_data);
         // } else {
-        //     user_op.paymaster_and_data = Some(Bytes::new());
+            user_op.paymaster_and_data = Some(Bytes::new());
         // }
 
         if user_op.call_gas_limit.is_none()
@@ -255,116 +255,6 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
             .await
             .map_err(|e| SmartAccountProviderError::ProviderError(e.into()))
     }
-
-    async fn estimate_eip1559_fees(
-        &self,
-        estimator: Option<fn(U256, Vec<Vec<U256>>) -> (U256, U256)>,
-    ) -> Result<(U256, U256), SmartAccountProviderError> {
-        let base_fee_per_gas = self
-            .get_block(BlockNumber::Latest)
-            .await?
-            .ok_or_else(|| ProviderError::CustomError("Latest block not found".into()))?
-            .base_fee_per_gas
-            .ok_or_else(|| ProviderError::CustomError("EIP-1559 not activated".into()))?;
-
-        let fee_history = self
-            .fee_history(
-                utils::EIP1559_FEE_ESTIMATION_PAST_BLOCKS,
-                BlockNumber::Latest,
-                &[utils::EIP1559_FEE_ESTIMATION_REWARD_PERCENTILE],
-            )
-            .await?;
-
-        // use the provided fee estimator function, or fallback to the default implementation.
-        let (max_fee_per_gas, max_priority_fee_per_gas) = if let Some(es) = estimator {
-            es(base_fee_per_gas, fee_history.reward)
-        } else {
-            utils::eip1559_default_estimator(base_fee_per_gas, fee_history.reward)
-        };
-
-        Ok((max_fee_per_gas, max_priority_fee_per_gas))
-    }
-
-    async fn get_block<T: Into<BlockId> + Send + Sync>(
-        &self,
-        block_hash_or_number: T,
-    ) -> Result<Option<Block<TxHash>>, SmartAccountProviderError> {
-        let include_txs = utils::serialize(&false);
-        let id: BlockId = block_hash_or_number.into();
-
-        Ok(match id {
-            BlockId::Hash(hash) => {
-                let hash = utils::serialize(&hash);
-                self.inner()
-                    .provider()
-                    .request("eth_getBlockByHash", [hash, include_txs])
-                    .await
-                    .map_err(|e| SmartAccountProviderError::ProviderError(e.into()))?
-            }
-            BlockId::Number(num) => {
-                let num = utils::serialize(&num);
-                self.inner()
-                    .provider()
-                    .request("eth_getBlockByNumber", [num, include_txs])
-                    .await
-                    .map_err(|e| SmartAccountProviderError::ProviderError(e.into()))?
-            }
-        })
-    }
-
-    async fn fee_history<T: Into<U256> + Send + Sync>(
-        &self,
-        block_count: T,
-        last_block: BlockNumber,
-        reward_percentiles: &[f64],
-    ) -> Result<FeeHistory, SmartAccountProviderError> {
-        let block_count = block_count.into();
-        let last_block = utils::serialize(&last_block);
-        let reward_percentiles = utils::serialize(&reward_percentiles);
-
-        // The blockCount param is expected to be an unsigned integer up to geth v1.10.6.
-        // Geth v1.10.7 onwards, this has been updated to a hex encoded form. Failure to
-        // decode the param from client side would fallback to the old API spec.
-        match self
-            .inner()
-            .provider()
-            .request::<_, FeeHistory>(
-                "eth_feeHistory",
-                [
-                    utils::serialize(&block_count),
-                    last_block.clone(),
-                    reward_percentiles.clone(),
-                ],
-            )
-            .await
-        {
-            success @ Ok(_) => success,
-            err @ Err(_) => {
-                let fallback = self
-                    .inner()
-                    .provider()
-                    .request::<_, FeeHistory>(
-                        "eth_feeHistory",
-                        [
-                            utils::serialize(&block_count.as_u64()),
-                            last_block,
-                            reward_percentiles,
-                        ],
-                    )
-                    .await;
-
-                if fallback.is_err() {
-                    // if the older fallback also resulted in an error, we return the error from the
-                    // initial attempt
-                    return err.map_err(|e| SmartAccountProviderError::ProviderError(e.into()));
-                }
-                fallback
-            }
-        }
-        .map_err(|e| SmartAccountProviderError::ProviderError(e.into()))
-    }
-
-    // TODO: Add paymaster methods
 }
 
 impl<P, A> AsRef<P> for SmartAccountProvider<P, A> {

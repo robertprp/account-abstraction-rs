@@ -330,7 +330,6 @@ mod tests {
 
         let result = provider
             .estimate_user_operation_gas(&req.with_defaults())
-            // .estimate_user_operation_gas(&req.with_defaults())
             .await;
 
         println!("{:?}", result);
