@@ -83,10 +83,6 @@ impl BaseAccount for SimpleAccount {
         Ok(account_address)
     }
 
-    // fn get_paymaster(&self) -> Option<Self::Paymaster> {
-    //     None
-    // }
-
     async fn get_account_init_code(&self) -> Result<Bytes, AccountError> {
         let factory_address: Address = self.factory_address;
         let owner: Address = self.owner;

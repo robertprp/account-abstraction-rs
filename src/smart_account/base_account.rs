@@ -298,19 +298,6 @@ mod tests {
         }
     }
 
-    // #[derive(Debug)]
-    // struct MockPaymaster;
-
-    // #[async_trait]
-    // impl Paymaster for MockPaymaster {
-    //     async fn get_paymaster_and_data(
-    //         &self,
-    //         _user_op: UserOperation,
-    //     ) -> Result<Bytes, PaymasterError> {
-    //         Ok(Bytes::new())
-    //     }
-    // }
-
     const ENTRY_POINT_ADDRESS: &str = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
     const RPC_URL: &str = "https://eth-mainnet.g.alchemy.com/v2/lRcdJTfR_zjZSef3yutTGE6OIY9YFx1E";
 
