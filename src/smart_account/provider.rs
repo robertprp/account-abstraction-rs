@@ -185,7 +185,7 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
             user_op.verification_gas_limit = Some(
                 user_op
                     .verification_gas_limit
-                    .unwrap_or(gas_estimate.verification_gas.into()),
+                    .unwrap_or(gas_estimate.verification_gas_limit.into()),
             );
         }
 
