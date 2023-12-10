@@ -14,8 +14,6 @@ use super::{utils, EntryPoint, EntryPointError, SmartAccountSigner};
 
 #[async_trait]
 pub trait BaseAccount: Sync + Send + Debug {
-    // TODO: move paymaster handling to middleware
-    // type Paymaster: Paymaster;
     type EntryPoint: EntryPoint;
     type Provider: JsonRpcClient;
     type Inner: Middleware<Provider = Self::Provider>;
@@ -31,8 +29,6 @@ pub trait BaseAccount: Sync + Send + Debug {
     fn get_chain(&self) -> Chain;
 
     async fn get_account_address(&self) -> Result<Address, AccountError>;
-
-    // fn get_paymaster(&self) -> Option<Self::Paymaster>;
 
     fn get_verification_gas_limit(&self) -> U256 {
         U256::from(110000)
@@ -136,7 +132,7 @@ pub trait BaseAccount: Sync + Send + Debug {
             .map_err(AccountError::EntryPointError)
     }
 
-    // TODO: `Signer` produces an ECDSA signature. Will need to add our own Signer type
+    // TODO: `Signer` produces an ECDSA signature. Will need to add our own Signer type // should be fine now
     async fn sign_user_op_hash<S: SmartAccountSigner>(
         &self,
         user_op_hash: [u8; 32],
@@ -207,7 +203,6 @@ mod tests {
 
     #[async_trait]
     impl BaseAccount for MockBaseAccount {
-        // type Paymaster = MockPaymaster;
         type EntryPoint = EthersEntryPoint<Provider<Http>>;
         type Provider = Http;
         type Inner = Provider<Http>;

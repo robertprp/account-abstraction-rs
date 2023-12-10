@@ -56,7 +56,7 @@ impl SimpleAccount {
 
 #[async_trait]
 impl BaseAccount for SimpleAccount {
-    // type Paymaster = EmptyPaymaster;
+    
     type EntryPoint = EthersEntryPoint<Provider<Http>>;
     type Provider = Http;
     type Inner = Provider<Http>;
