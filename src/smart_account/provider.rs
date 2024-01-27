@@ -85,7 +85,7 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
         if let Some(ref call) = user_op.call {
             let call_data: Bytes = match call {
                 AccountCall::Execute(execute_call) => {
-                    let call_data = self
+                    let call_data: Vec<u8> = self
                         .account
                         .encode_execute(execute_call.clone())
                         .await
@@ -94,7 +94,7 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
                     call_data.into()
                 }
                 AccountCall::ExecuteBatch(execute_calls) => {
-                    let call_data = self
+                    let call_data: Vec<u8> = self
                         .account
                         .encode_execute_batch(execute_calls.clone())
                         .await
@@ -108,7 +108,7 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
         }
 
         if user_op.nonce.is_none() {
-            let nonce = self.account.get_nonce().await.unwrap_or(U256::from(0));
+            let nonce: U256 = self.account.get_nonce().await.unwrap_or(U256::from(0));
             user_op.set_nonce(nonce);
         }
 
@@ -148,7 +148,7 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
         }
 
         if user_op.pre_verification_gas.is_none() {
-            let init_gas = self
+            let init_gas: U256 = self
                 .account
                 .estimate_creation_gas()
                 .await

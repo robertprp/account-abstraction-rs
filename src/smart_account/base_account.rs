@@ -41,7 +41,7 @@ pub trait BaseAccount: Sync + Send + Debug {
     async fn get_nonce(&self) -> Result<U256, AccountError> {
         // TODO: Use cache trait to cache nonce, address, etc. Can also initialize
 
-        let account_address = self.get_account_address().await?;
+        let account_address: Address = self.get_account_address().await?;
 
         self.entry_point()
             .get_nonce(account_address)
@@ -67,7 +67,7 @@ pub trait BaseAccount: Sync + Send + Debug {
             return Ok(self.is_deployed().await);
         }
 
-        let sender_address_code = self
+        let sender_address_code: Bytes = self
             .provider()
             .get_code(self.get_account_address().await?, None)
             .await
@@ -85,7 +85,7 @@ pub trait BaseAccount: Sync + Send + Debug {
     async fn encode_execute_batch(&self, calls: Vec<ExecuteCall>) -> Result<Vec<u8>, AccountError>;
 
     async fn estimate_creation_gas(&self) -> Result<U256, AccountError> {
-        let init_code = self.get_init_code().await?;
+        let init_code: Bytes = self.get_init_code().await?;
 
         if init_code.is_empty() {
             Ok(U256::zero())
@@ -99,7 +99,7 @@ pub trait BaseAccount: Sync + Send + Debug {
                 .data(deployer_call_data.to_vec())
                 .into();
 
-            let gas_estimate = self
+            let gas_estimate: U256 = self
                 .provider()
                 .estimate_gas(&typed_tx, None)
                 .await
@@ -114,7 +114,7 @@ pub trait BaseAccount: Sync + Send + Debug {
         user_op: U,
     ) -> Result<[u8; 32], AccountError> {
         let chain_id: U256 = self.get_chain().into();
-        let entry_point_address = self.entry_point().get_address();
+        let entry_point_address: Address = self.entry_point().get_address();
 
         Ok(utils::get_user_op_hash(
             user_op.into(),
@@ -124,7 +124,7 @@ pub trait BaseAccount: Sync + Send + Debug {
     }
 
     async fn get_counterfactual_address(&self) -> Result<Address, AccountError> {
-        let init_code = self.get_account_init_code().await?;
+        let init_code: Bytes = self.get_account_init_code().await?;
 
         self.entry_point()
             .get_sender_address(init_code)
