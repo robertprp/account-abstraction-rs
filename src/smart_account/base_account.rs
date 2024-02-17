@@ -80,6 +80,7 @@ pub trait BaseAccount: Sync + Send + Debug {
         Ok(self.is_deployed().await)
     }
 
+    // TODO Doesn't need to be async
     async fn encode_execute(&self, call: ExecuteCall) -> Result<Vec<u8>, AccountError>;
 
     async fn encode_execute_batch(&self, calls: Vec<ExecuteCall>) -> Result<Vec<u8>, AccountError>;
@@ -165,6 +166,9 @@ pub struct TransactionDetailsForUserOp {
 pub enum AccountError {
     #[error("decode error: {0}")]
     DecodeError(String),
+
+    #[error("encode error: {0}")]
+    EncodeError(String),
 
     #[error("revert error: {0}")]
     RevertError(String),
