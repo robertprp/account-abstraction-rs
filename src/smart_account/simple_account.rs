@@ -56,7 +56,6 @@ impl SimpleAccount {
 
 #[async_trait]
 impl BaseAccount for SimpleAccount {
-    
     type EntryPoint = EthersEntryPoint<Provider<Http>>;
     type Provider = Http;
     type Inner = Provider<Http>;
@@ -75,7 +74,7 @@ impl BaseAccount for SimpleAccount {
 
     async fn get_account_address(&self) -> Result<Address, AccountError> {
         let Some(account_address) = *self.account_address.read().await else {
-            let address = self.get_counterfactual_address().await?;
+            let address: Address = self.get_counterfactual_address().await?;
             *self.account_address.write().await = Some(address);
             return Ok(address)
         };
@@ -254,6 +253,34 @@ mod tests {
 
     #[tokio::test]
     async fn test_user_op_hash() {
+        let account: SimpleAccount = make_simple_account();
+
+        let user_op = UserOperation {
+            sender: Address::zero(),
+            nonce: U256::from(0),
+            init_code: Bytes::from(vec![]),
+            call_data: Bytes::from(vec![]),
+            call_gas_limit: U256::from(0),
+            verification_gas_limit: U256::from(0),
+            pre_verification_gas: U256::from(0),
+            max_fee_per_gas: U256::from(0),
+            max_priority_fee_per_gas: U256::from(0),
+            paymaster_and_data: Bytes::from(vec![]),
+            signature: Bytes::from(vec![]),
+        };
+
+        let result: [u8; 32] = account.get_user_op_hash(user_op).await.unwrap();
+
+        let expected_result: [u8; 32] = [
+            133, 41, 35, 170, 101, 119, 97, 163, 97, 233, 30, 51, 120, 77, 163, 47, 199, 123, 148,
+            96, 162, 191, 15, 241, 96, 138, 206, 27, 4, 83, 75, 151,
+        ];
+
+        assert_eq!(result, expected_result)
+    }
+
+    #[tokio::test]
+    async fn test_user_op_hash_equals_onchain_hash() {
         let owner: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
             .parse()
             .unwrap();
