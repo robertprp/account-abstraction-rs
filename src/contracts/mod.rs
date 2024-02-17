@@ -10,6 +10,15 @@ pub use simple_account_factory::*;
 pub mod simple_account;
 pub use simple_account::*;
 
+pub mod safe_signer_launch_pad;
+pub use safe_signer_launch_pad::*;
+
+pub mod safe_add_module_lib;
+pub use safe_add_module_lib::*;
+
+pub mod safe_proxy_factory;
+pub use safe_proxy_factory::*;
+
 #[derive(
     Clone,
     ::ethers::contract::EthAbiType,
