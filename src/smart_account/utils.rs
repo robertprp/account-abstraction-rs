@@ -24,13 +24,11 @@ pub fn get_user_op_hash(
     chain_id: U256,
 ) -> [u8; 32] {
     let user_op_hash = hash_user_op(user_op);
-    let user_op_hash_bytes: Bytes = user_op_hash.into();
     let hash_input = UserOperationHashInput {
         user_op_hash,
         entry_point_address,
         chain_id,
     };
-    let input_bytes: Bytes = keccak256(hash_input.clone().encode()).into();
     keccak256(hash_input.encode())
 }
 
