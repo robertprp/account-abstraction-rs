@@ -116,16 +116,23 @@ pub struct UserOperationLog {
     address: Address,
     topics: Vec<String>,
     data: String,
+
     #[serde(rename = "blockNumber", default)]
     pub block_number: U256,
+    
     #[serde(rename = "transactionHash", default)]
     pub transaction_hash: H256,
+    
     #[serde(rename = "transactionIndex", default)]
     pub transaction_index: String,
+    
     #[serde(rename = "blockHash", default)]
     pub block_hash: H256,
+    
     #[serde(rename = "logIndex", default)]
+    
     pub log_index: String,
+    
     removed: bool,
 }
 
