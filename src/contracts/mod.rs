@@ -22,6 +22,9 @@ pub use safe_proxy_factory::*;
 pub mod safe_l2;
 pub use safe_l2::*;
 
+pub mod safe_4337_module;
+pub use safe_4337_module::*;
+
 #[derive(
     Clone,
     ::ethers::contract::EthAbiType,
