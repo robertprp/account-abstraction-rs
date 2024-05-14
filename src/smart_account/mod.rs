@@ -7,6 +7,9 @@ pub use simple_account::*;
 mod safe_account;
 pub use safe_account::*;
 
+mod safe_standard_account;
+pub use safe_standard_account::*;
+
 mod utils;
 pub use utils::*;
 
