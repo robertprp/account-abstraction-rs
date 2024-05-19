@@ -1,10 +1,11 @@
 use super::{AccountError, BaseAccount, SmartAccountSigner};
 
-use crate::contracts::safe_proxy_factory::{SafeProxyFactory, SafeProxyFactoryCalls};
+use crate::contracts::safe_proxy_factory::SafeProxyFactoryCalls;
+use crate::contracts::EntryPoint as EthersEntryPoint;
 use crate::contracts::{
-    self, safe_proxy_factory, EnableModulesCall, ExecuteUserOpCall, Safe4337ModuleCalls, SafeAddModuleLib, SafeL2Calls
+    self, safe_proxy_factory, EnableModulesCall, ExecuteUserOpCall, Safe4337Module,
+    Safe4337ModuleCalls, SafeL2Calls, UserOperation,
 };
-use crate::contracts::{EntryPoint as EthersEntryPoint};
 use crate::types::ExecuteCall;
 
 use async_trait::async_trait;
@@ -22,31 +23,26 @@ use tokio::sync::RwLock;
 // const ENTRY_POINT_ADDRESS: &str = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
 // const SIMPLE_ACCOUNT_FACTORY_ADDRESS: &str = "0x9406Cc6185a346906296840746125a0E44976454";
 
-const RPC_URL: &str = "https://base-sepolia.g.alchemy.com/v2/HvnvemJhpDTfxwhfcGGnXHuo_dtgZVN6";//"https://eth-goerli.g.alchemy.com/v2/Lekp6yzHz5yAPLKPNvGpMKaqbGunnXHS"; //"https://eth-mainnet.g.alchemy.com/v2/lRcdJTfR_zjZSef3yutTGE6OIY9YFx1E";
+const RPC_URL: &str = "https://base-sepolia.g.alchemy.com/v2/HvnvemJhpDTfxwhfcGGnXHuo_dtgZVN6"; //"https://eth-goerli.g.alchemy.com/v2/Lekp6yzHz5yAPLKPNvGpMKaqbGunnXHS"; //"https://eth-mainnet.g.alchemy.com/v2/lRcdJTfR_zjZSef3yutTGE6OIY9YFx1E";
 
-const SAFE_4337_MODULE_ADDRESS: &str = "0xa581c4A4DB7175302464fF3C06380BC3270b4037"; // 
-const ADD_MODULES_LIB_ADDRESS: &str = "0x8EcD4ec46D4D2a6B64fE960B3D64e8B94B2234eb"; //
-const SAFE_PROXY_FACTORY_ADDRESS: &str = "0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67"; //
-const SAFE_SINGLETON_ADDRESS: &str = "0x29fcB43b46531BcA003ddC8FCB67FFE91900C762"; //
+const SAFE_4337_MODULE_ADDRESS: &str = "0xa581c4A4DB7175302464fF3C06380BC3270b4037";
+const ADD_MODULES_LIB_ADDRESS: &str = "0x8EcD4ec46D4D2a6B64fE960B3D64e8B94B2234eb";
+const SAFE_PROXY_FACTORY_ADDRESS: &str = "0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67";
+const SAFE_SINGLETON_ADDRESS: &str = "0x29fcB43b46531BcA003ddC8FCB67FFE91900C762";
 const ENTRYPOINT_ADDRESS: &str = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
 const FALLBACK_HANDLER_ADDRESS: &str = "0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99";
-
-const SafeProxyBytecode: &str = "0x608060405234801561001057600080fd5b506040516101e63803806101e68339818101604052602081101561003357600080fd5b8101908080519060200190929190505050600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1614156100ca576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260228152602001806101c46022913960400191505060405180910390fd5b806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505060ab806101196000396000f3fe608060405273ffffffffffffffffffffffffffffffffffffffff600054167fa619486e0000000000000000000000000000000000000000000000000000000060003514156050578060005260206000f35b3660008037600080366000845af43d6000803e60008114156070573d6000fd5b3d6000f3fea264697066735822122003d1488ee65e08fa41e58e888a9865554c535f2c77126a82cb4c0f917f31441364736f6c63430007060033496e76616c69642073696e676c65746f6e20616464726573732070726f7669646564";
-
-// keccak256(toUtf8Bytes('Safe Account Abstraction'))
-const PREDETERMINED_SALT_NONCE: &str =
-  "0xb1073742015cbcf5a3a4d9d1ae33ecf619439710b89475f92e2abd2117e90f90";
-
 
 #[derive(Debug)]
 struct SafeStandardAccount {
     inner: Arc<Provider<Http>>,
     owners: Vec<Address>,
     threshold: U256,
+    // TODO: Remove RwLock
     account_address: RwLock<Option<Address>>,
     factory_address: Address,
     is_deployed: RwLock<bool>,
     entry_point: Arc<EthersEntryPoint<Provider<Http>>>,
+    safe_4337_module: Arc<Safe4337Module<Provider<Http>>>,
     chain: Chain,
 }
 
@@ -58,10 +54,13 @@ impl SafeStandardAccount {
         account_address: RwLock<Option<Address>>,
         factory_address: Address,
         entry_point_address: Address,
+        safe_4337_module_address: Address,
         is_deployed: RwLock<bool>,
         chain: Chain,
     ) -> Self {
         let entry_point = Arc::new(EthersEntryPoint::new(entry_point_address, inner.clone()));
+        let safe_4337_module =
+            Arc::new(Safe4337Module::new(safe_4337_module_address, inner.clone()));
 
         Self {
             inner,
@@ -71,6 +70,7 @@ impl SafeStandardAccount {
             factory_address,
             is_deployed,
             entry_point,
+            safe_4337_module,
             chain,
         }
     }
@@ -99,7 +99,7 @@ impl BaseAccount for SafeStandardAccount {
             let address: Address = self.get_counterfactual_address().await?;
             println!("Counterfactual address: {:x}", address);
             *self.account_address.write().await = Some(address);
-            return Ok(address)
+            return Ok(address);
         };
 
         Ok(account_address)
@@ -116,9 +116,9 @@ impl BaseAccount for SafeStandardAccount {
             modules: vec![safe_4337_module_address],
         };
         let encoded_enable_modules_call: Bytes = enable_modules_call.encode().into();
-        
+
         // Should be same as 4337 module address.
-        let fallback_handler_address: Address = safe_4337_module_address;//FALLBACK_HANDLER_ADDRESS.parse().unwrap();
+        let fallback_handler_address: Address = safe_4337_module_address;
         let setup_call_params = contracts::safe_l2::SetupCall {
             owners: self.owners.clone(),
             threshold: self.threshold,
@@ -127,8 +127,9 @@ impl BaseAccount for SafeStandardAccount {
             fallback_handler: fallback_handler_address,
             payment_token: Address::zero(),
             payment: U256::zero(),
-            payment_receiver: Address::zero()
+            payment_receiver: Address::zero(),
         };
+
         let setup_call = SafeL2Calls::Setup(setup_call_params);
 
         let singleton_address: Address = SAFE_SINGLETON_ADDRESS.parse().unwrap();
@@ -137,7 +138,8 @@ impl BaseAccount for SafeStandardAccount {
             initializer: setup_call.encode().into(),
             salt_nonce: index, //PREDETERMINED_SALT_NONCE,
         };
-        let create_proxy_with_nonce_call = SafeProxyFactoryCalls::CreateProxyWithNonce(create_proxy_with_nonce_call_params);
+        let create_proxy_with_nonce_call =
+            SafeProxyFactoryCalls::CreateProxyWithNonce(create_proxy_with_nonce_call_params);
 
         let safe_proxy_factory_address: Address = SAFE_PROXY_FACTORY_ADDRESS.parse().unwrap();
 
@@ -147,7 +149,7 @@ impl BaseAccount for SafeStandardAccount {
         result.extend_from_slice(&create_proxy_with_nonce_call.encode());
 
         let result_bytes = Bytes::from(result);
-        
+
         Ok(result_bytes)
     }
 
@@ -160,7 +162,7 @@ impl BaseAccount for SafeStandardAccount {
     }
 
     async fn encode_execute(&self, call: ExecuteCall) -> Result<Vec<u8>, AccountError> {
-        let call = Safe4337ModuleCalls::ExecuteUserOp(ExecuteUserOpCall{
+        let call = Safe4337ModuleCalls::ExecuteUserOp(ExecuteUserOpCall {
             to: call.target,
             value: call.value,
             data: call.data,
@@ -177,8 +179,15 @@ impl BaseAccount for SafeStandardAccount {
         //       transactions.map((tx) => ({ ...tx, operation: tx.operation ?? OperationType.Call }))
         //     )
         //   ])
-        
+
         unimplemented!();
+    }
+
+    async fn get_user_op_hash<U: Into<UserOperation> + Send + Sync>(
+        &self,
+        user_op: U,
+    ) -> Result<[u8; 32], AccountError> {
+        unimplemented!()
     }
 
     async fn sign_user_op_hash<S: SmartAccountSigner>(
@@ -186,13 +195,73 @@ impl BaseAccount for SafeStandardAccount {
         user_op_hash: [u8; 32],
         signer: &S,
     ) -> Result<Bytes, AccountError> {
+        // unimplemented!()
         signer
             .sign_message(&user_op_hash)
             .await
             .map_err(|_| AccountError::SignerError)
     }
+
+    async fn sign_user_op<U: Into<UserOperation> + Send + Sync, S: SmartAccountSigner>(
+        &self,
+        user_op: U,
+        signer: &S,
+    ) -> Result<Bytes, AccountError> {
+        let safe_user_op_hash = self.get_safe_user_op_hash(user_op).await?;
+        let signature = signer
+            .sign_hash_data(safe_user_op_hash.into())
+            .map_err(|_| AccountError::SignerError)?;
+
+        let packed_signature: Bytes = self.encode_signatures(0, 0, &signature.to_vec()).into();
+
+        Ok(packed_signature)
+    }
 }
 
+impl SafeStandardAccount {
+    async fn get_safe_user_op_hash<U: Into<UserOperation> + Send + Sync>(
+        &self,
+        user_op: U,
+    ) -> Result<[u8; 32], AccountError> {
+        let user_op: UserOperation = user_op.into();
+        // Empty signature since get_operation_hash doesn't care about it.
+        let packed_signature = self.encode_signatures(0, 0, &Bytes::new().to_vec());
+
+        let safe_4337_module_user_op = contracts::safe_4337_module::UserOperation {
+            sender: user_op.sender,
+            nonce: user_op.nonce,
+            init_code: user_op.init_code,
+            call_data: user_op.call_data,
+            call_gas_limit: user_op.call_gas_limit,
+            verification_gas_limit: user_op.verification_gas_limit,
+            pre_verification_gas: user_op.pre_verification_gas,
+            max_fee_per_gas: user_op.max_fee_per_gas,
+            max_priority_fee_per_gas: user_op.max_priority_fee_per_gas,
+            paymaster_and_data: user_op.paymaster_and_data,
+            signature: packed_signature.into(),
+        };
+
+        let user_op_hash = self
+            .safe_4337_module
+            .get_operation_hash(safe_4337_module_user_op)
+            .call()
+            .await
+            .map_err(|_| AccountError::SignerError)?;
+
+        Ok(user_op_hash)
+    }
+
+    fn encode_signatures(&self, valid_until: u64, valid_after: u64, signatures: &[u8]) -> Vec<u8> {
+        let mut buffer = Vec::new();
+
+        buffer.extend_from_slice(&valid_until.to_le_bytes()[..6]);
+        buffer.extend_from_slice(&valid_after.to_le_bytes()[..6]);
+
+        buffer.extend_from_slice(signatures);
+
+        buffer
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -202,7 +271,10 @@ mod tests {
     use tokio::time;
     use url::Url;
 
-    use crate::{smart_account::{SmartAccountMiddleware, SmartAccountProvider}, types::{AccountCall, UserOperationRequest}};
+    use crate::{
+        smart_account::{SmartAccountMiddleware, SmartAccountProvider},
+        types::{AccountCall, UserOperationRequest},
+    };
 
     use super::*;
 
@@ -214,21 +286,21 @@ mod tests {
             "82aba1f2ce3d1a0f6eca0ade8877077b7fc6fd06fb0af48ab4a53650bde69979"
                 .parse()
                 .unwrap();
-
-        // let account_address: Address = "0x8898886f1adacdb475a8c6778d8c3a011e2c54a6"
-        //     .parse()
-        //     .unwrap();
+        let account_address: Address = "0xEb312892f9ACADe523C838f738ed1649398257E5"
+            .parse()
+            .unwrap();
         let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
 
         let account = SafeStandardAccount::new(
-            Arc::new(provider), 
-            vec![wallet.address()], 
-            U256::one(), 
-            RwLock::new(None), //RwLock::new(Some(account_address)), 
-            factory_address, 
-            entry_point_address, 
-            RwLock::new(false), 
-            Chain::BaseSepolia
+            Arc::new(provider),
+            vec![wallet.address()],
+            U256::one(),
+            RwLock::new(Some(account_address)),
+            factory_address,
+            entry_point_address,
+            SAFE_4337_MODULE_ADDRESS.parse().unwrap(),
+            RwLock::new(true),
+            Chain::BaseSepolia,
         );
 
         let safe_address = account.get_account_address().await.unwrap();
@@ -249,20 +321,21 @@ mod tests {
                 .parse()
                 .unwrap();
 
-        // let account_address: Address = "0x8898886f1adacdb475a8c6778d8c3a011e2c54a6"
-        //     .parse()
-        //     .unwrap();
+        let account_address: Address = "0xEb312892f9ACADe523C838f738ed1649398257E5"
+            .parse()
+            .unwrap();
         let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
 
         let account = SafeStandardAccount::new(
-            Arc::new(provider), 
-            vec![wallet.address()], 
-            U256::one(), 
-            RwLock::new(None), //RwLock::new(Some(account_address)), 
-            factory_address, 
-            entry_point_address, 
-            RwLock::new(false), 
-            Chain::BaseSepolia
+            Arc::new(provider),
+            vec![wallet.address()],
+            U256::one(),
+            RwLock::new(Some(account_address)),
+            factory_address,
+            entry_point_address,
+            SAFE_4337_MODULE_ADDRESS.parse().unwrap(),
+            RwLock::new(true),
+            Chain::BaseSepolia,
         );
 
         let provider = make_provider(account);
@@ -284,8 +357,6 @@ mod tests {
         let mut interval = time::interval(Duration::from_secs(10));
         let mut attempts = 0;
         let max_attempts = 20;
-
-        println!("user op hash {:?}", user_op_hash);
 
         loop {
             interval.tick().await;
@@ -312,7 +383,9 @@ mod tests {
         }
     }
 
-    fn make_provider(account: SafeStandardAccount) -> SmartAccountProvider<Http, SafeStandardAccount> {
+    fn make_provider(
+        account: SafeStandardAccount,
+    ) -> SmartAccountProvider<Http, SafeStandardAccount> {
         let url: Url = RPC_URL.try_into().unwrap();
         let http_provider = Http::new(url);
 
