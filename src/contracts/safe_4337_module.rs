@@ -7,14 +7,16 @@ pub use safe_4337_module::*;
     clippy::upper_case_acronyms,
     clippy::type_complexity,
     dead_code,
-    non_camel_case_types,
+    non_camel_case_types
 )]
 pub mod safe_4337_module {
     #[rustfmt::skip]
     const __ABI: &str = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"entryPoint\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"SUPPORTED_ENTRYPOINT\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"domainSeparator\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"contract Safe\",\"name\":\"safe\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"message\",\"type\":\"bytes\"}],\"name\":\"encodeMessageDataForSafe\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"},{\"internalType\":\"uint8\",\"name\":\"operation\",\"type\":\"uint8\"}],\"name\":\"executeUserOp\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"},{\"internalType\":\"uint8\",\"name\":\"operation\",\"type\":\"uint8\"}],\"name\":\"executeUserOpWithErrorString\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"message\",\"type\":\"bytes\"}],\"name\":\"getMessageHash\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"contract Safe\",\"name\":\"safe\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"message\",\"type\":\"bytes\"}],\"name\":\"getMessageHashForSafe\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getModules\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"initCode\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"callData\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"callGasLimit\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"verificationGasLimit\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"preVerificationGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxPriorityFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"paymasterAndData\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"internalType\":\"struct UserOperation\",\"name\":\"userOp\",\"type\":\"tuple\"}],\"name\":\"getOperationHash\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"operationHash\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_dataHash\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"_signature\",\"type\":\"bytes\"}],\"name\":\"isValidSignature\",\"outputs\":[{\"internalType\":\"bytes4\",\"name\":\"\",\"type\":\"bytes4\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"_data\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"_signature\",\"type\":\"bytes\"}],\"name\":\"isValidSignature\",\"outputs\":[{\"internalType\":\"bytes4\",\"name\":\"\",\"type\":\"bytes4\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"uint256[]\",\"name\":\"\",\"type\":\"uint256[]\"},{\"internalType\":\"uint256[]\",\"name\":\"\",\"type\":\"uint256[]\"},{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"name\":\"onERC1155BatchReceived\",\"outputs\":[{\"internalType\":\"bytes4\",\"name\":\"\",\"type\":\"bytes4\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"name\":\"onERC1155Received\",\"outputs\":[{\"internalType\":\"bytes4\",\"name\":\"\",\"type\":\"bytes4\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"name\":\"onERC721Received\",\"outputs\":[{\"internalType\":\"bytes4\",\"name\":\"\",\"type\":\"bytes4\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"targetContract\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"calldataPayload\",\"type\":\"bytes\"}],\"name\":\"simulate\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"response\",\"type\":\"bytes\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"interfaceId\",\"type\":\"bytes4\"}],\"name\":\"supportsInterface\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"name\":\"tokensReceived\",\"outputs\":[],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"initCode\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"callData\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"callGasLimit\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"verificationGasLimit\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"preVerificationGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxPriorityFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"paymasterAndData\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"internalType\":\"struct UserOperation\",\"name\":\"userOp\",\"type\":\"tuple\"},{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"missingAccountFunds\",\"type\":\"uint256\"}],\"name\":\"validateUserOp\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"validationData\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]";
     ///The parsed JSON ABI of the contract.
-    pub static SAFE4337MODULE_ABI: ::ethers::contract::Lazy<::ethers::core::abi::Abi> = ::ethers::contract::Lazy::new(||
-    ::ethers::core::utils::__serde_json::from_str(__ABI).expect("ABI is always valid"));
+    pub static SAFE4337MODULE_ABI: ::ethers::contract::Lazy<::ethers::core::abi::Abi> =
+        ::ethers::contract::Lazy::new(|| {
+            ::ethers::core::utils::__serde_json::from_str(__ABI).expect("ABI is always valid")
+        });
     pub struct Safe4337Module<M>(::ethers::contract::Contract<M>);
     impl<M> ::core::clone::Clone for Safe4337Module<M> {
         fn clone(&self) -> Self {
@@ -34,7 +36,9 @@ pub mod safe_4337_module {
     }
     impl<M> ::core::fmt::Debug for Safe4337Module<M> {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-            f.debug_tuple(stringify!(Safe4337Module)).field(&self.address()).finish()
+            f.debug_tuple(stringify!(Safe4337Module))
+                .field(&self.address())
+                .finish()
         }
     }
     impl<M: ::ethers::providers::Middleware> Safe4337Module<M> {
@@ -44,29 +48,22 @@ pub mod safe_4337_module {
             address: T,
             client: ::std::sync::Arc<M>,
         ) -> Self {
-            Self(
-                ::ethers::contract::Contract::new(
-                    address.into(),
-                    SAFE4337MODULE_ABI.clone(),
-                    client,
-                ),
-            )
+            Self(::ethers::contract::Contract::new(
+                address.into(),
+                SAFE4337MODULE_ABI.clone(),
+                client,
+            ))
         }
         ///Calls the contract's `SUPPORTED_ENTRYPOINT` (0x137e051e) function
         pub fn supported_entrypoint(
             &self,
-        ) -> ::ethers::contract::builders::ContractCall<
-            M,
-            ::ethers::core::types::Address,
-        > {
+        ) -> ::ethers::contract::builders::ContractCall<M, ::ethers::core::types::Address> {
             self.0
                 .method_hash([19, 126, 5, 30], ())
                 .expect("method not found (this should never happen)")
         }
         ///Calls the contract's `domainSeparator` (0xf698da25) function
-        pub fn domain_separator(
-            &self,
-        ) -> ::ethers::contract::builders::ContractCall<M, [u8; 32]> {
+        pub fn domain_separator(&self) -> ::ethers::contract::builders::ContractCall<M, [u8; 32]> {
             self.0
                 .method_hash([246, 152, 218, 37], ())
                 .expect("method not found (this should never happen)")
@@ -76,10 +73,7 @@ pub mod safe_4337_module {
             &self,
             safe: ::ethers::core::types::Address,
             message: ::ethers::core::types::Bytes,
-        ) -> ::ethers::contract::builders::ContractCall<
-            M,
-            ::ethers::core::types::Bytes,
-        > {
+        ) -> ::ethers::contract::builders::ContractCall<M, ::ethers::core::types::Bytes> {
             self.0
                 .method_hash([35, 3, 22, 64], (safe, message))
                 .expect("method not found (this should never happen)")
@@ -210,10 +204,7 @@ pub mod safe_4337_module {
             &self,
             target_contract: ::ethers::core::types::Address,
             calldata_payload: ::ethers::core::types::Bytes,
-        ) -> ::ethers::contract::builders::ContractCall<
-            M,
-            ::ethers::core::types::Bytes,
-        > {
+        ) -> ::ethers::contract::builders::ContractCall<M, ::ethers::core::types::Bytes> {
             self.0
                 .method_hash([189, 97, 149, 29], (target_contract, calldata_payload))
                 .expect("method not found (this should never happen)")
@@ -254,7 +245,8 @@ pub mod safe_4337_module {
         }
     }
     impl<M: ::ethers::providers::Middleware> From<::ethers::contract::Contract<M>>
-    for Safe4337Module<M> {
+        for Safe4337Module<M>
+    {
         fn from(contract: ::ethers::contract::Contract<M>) -> Self {
             Self::new(contract.address(), contract.client())
         }
@@ -268,7 +260,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "SUPPORTED_ENTRYPOINT", abi = "SUPPORTED_ENTRYPOINT()")]
     pub struct SupportedEntrypointCall;
@@ -281,7 +273,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "domainSeparator", abi = "domainSeparator()")]
     pub struct DomainSeparatorCall;
@@ -294,7 +286,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "encodeMessageDataForSafe",
@@ -313,7 +305,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "executeUserOp",
@@ -334,7 +326,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "executeUserOpWithErrorString",
@@ -355,7 +347,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "getMessageHash", abi = "getMessageHash(bytes)")]
     pub struct GetMessageHashCall {
@@ -370,7 +362,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "getMessageHashForSafe",
@@ -389,7 +381,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "getModules", abi = "getModules()")]
     pub struct GetModulesCall;
@@ -402,7 +394,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "getOperationHash",
@@ -420,7 +412,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "isValidSignature", abi = "isValidSignature(bytes32,bytes)")]
     pub struct IsValidSignatureCall {
@@ -436,7 +428,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "isValidSignature", abi = "isValidSignature(bytes,bytes)")]
     pub struct IsValidSignatureWithDataCall {
@@ -452,7 +444,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "onERC1155BatchReceived",
@@ -474,7 +466,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "onERC1155Received",
@@ -496,7 +488,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "onERC721Received",
@@ -517,7 +509,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "simulate", abi = "simulate(address,bytes)")]
     pub struct SimulateCall {
@@ -533,7 +525,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "supportsInterface", abi = "supportsInterface(bytes4)")]
     pub struct SupportsInterfaceCall {
@@ -548,7 +540,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "tokensReceived",
@@ -571,7 +563,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "validateUserOp",
@@ -609,98 +601,89 @@ pub mod safe_4337_module {
             data: impl AsRef<[u8]>,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::AbiError> {
             let data = data.as_ref();
-            if let Ok(decoded)
-                = <SupportedEntrypointCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <SupportedEntrypointCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::SupportedEntrypoint(decoded));
             }
-            if let Ok(decoded)
-                = <DomainSeparatorCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) =
+                <DomainSeparatorCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::DomainSeparator(decoded));
             }
-            if let Ok(decoded)
-                = <EncodeMessageDataForSafeCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <EncodeMessageDataForSafeCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::EncodeMessageDataForSafe(decoded));
             }
-            if let Ok(decoded)
-                = <ExecuteUserOpCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <ExecuteUserOpCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::ExecuteUserOp(decoded));
             }
-            if let Ok(decoded)
-                = <ExecuteUserOpWithErrorStringCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <ExecuteUserOpWithErrorStringCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::ExecuteUserOpWithErrorString(decoded));
             }
-            if let Ok(decoded)
-                = <GetMessageHashCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) =
+                <GetMessageHashCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::GetMessageHash(decoded));
             }
-            if let Ok(decoded)
-                = <GetMessageHashForSafeCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <GetMessageHashForSafeCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::GetMessageHashForSafe(decoded));
             }
-            if let Ok(decoded)
-                = <GetModulesCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <GetModulesCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::GetModules(decoded));
             }
-            if let Ok(decoded)
-                = <GetOperationHashCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <GetOperationHashCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::GetOperationHash(decoded));
             }
-            if let Ok(decoded)
-                = <IsValidSignatureCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <IsValidSignatureCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::IsValidSignature(decoded));
             }
-            if let Ok(decoded)
-                = <IsValidSignatureWithDataCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <IsValidSignatureWithDataCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::IsValidSignatureWithData(decoded));
             }
-            if let Ok(decoded)
-                = <OnERC1155BatchReceivedCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <OnERC1155BatchReceivedCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::OnERC1155BatchReceived(decoded));
             }
-            if let Ok(decoded)
-                = <OnERC1155ReceivedCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <OnERC1155ReceivedCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::OnERC1155Received(decoded));
             }
-            if let Ok(decoded)
-                = <OnERC721ReceivedCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <OnERC721ReceivedCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::OnERC721Received(decoded));
             }
-            if let Ok(decoded)
-                = <SimulateCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <SimulateCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::Simulate(decoded));
             }
-            if let Ok(decoded)
-                = <SupportsInterfaceCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <SupportsInterfaceCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::SupportsInterface(decoded));
             }
-            if let Ok(decoded)
-                = <TokensReceivedCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) =
+                <TokensReceivedCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::TokensReceived(decoded));
             }
-            if let Ok(decoded)
-                = <ValidateUserOpCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) =
+                <ValidateUserOpCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::ValidateUserOp(decoded));
             }
             Err(::ethers::core::abi::Error::InvalidData.into())
@@ -712,87 +695,53 @@ pub mod safe_4337_module {
                 Self::SupportedEntrypoint(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::DomainSeparator(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::DomainSeparator(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::EncodeMessageDataForSafe(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::ExecuteUserOp(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::ExecuteUserOp(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::ExecuteUserOpWithErrorString(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::GetMessageHash(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::GetMessageHash(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::GetMessageHashForSafe(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::GetModules(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::GetOperationHash(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::IsValidSignature(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::GetModules(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::GetOperationHash(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::IsValidSignature(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::IsValidSignatureWithData(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
                 Self::OnERC1155BatchReceived(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::OnERC1155Received(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::OnERC721Received(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::Simulate(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::SupportsInterface(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::TokensReceived(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::ValidateUserOp(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::OnERC1155Received(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::OnERC721Received(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::Simulate(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::SupportsInterface(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::TokensReceived(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::ValidateUserOp(element) => ::ethers::core::abi::AbiEncode::encode(element),
             }
         }
     }
     impl ::core::fmt::Display for Safe4337ModuleCalls {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
             match self {
-                Self::SupportedEntrypoint(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::SupportedEntrypoint(element) => ::core::fmt::Display::fmt(element, f),
                 Self::DomainSeparator(element) => ::core::fmt::Display::fmt(element, f),
-                Self::EncodeMessageDataForSafe(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::EncodeMessageDataForSafe(element) => ::core::fmt::Display::fmt(element, f),
                 Self::ExecuteUserOp(element) => ::core::fmt::Display::fmt(element, f),
                 Self::ExecuteUserOpWithErrorString(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
                 Self::GetMessageHash(element) => ::core::fmt::Display::fmt(element, f),
-                Self::GetMessageHashForSafe(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::GetMessageHashForSafe(element) => ::core::fmt::Display::fmt(element, f),
                 Self::GetModules(element) => ::core::fmt::Display::fmt(element, f),
                 Self::GetOperationHash(element) => ::core::fmt::Display::fmt(element, f),
                 Self::IsValidSignature(element) => ::core::fmt::Display::fmt(element, f),
-                Self::IsValidSignatureWithData(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
-                Self::OnERC1155BatchReceived(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::IsValidSignatureWithData(element) => ::core::fmt::Display::fmt(element, f),
+                Self::OnERC1155BatchReceived(element) => ::core::fmt::Display::fmt(element, f),
                 Self::OnERC1155Received(element) => ::core::fmt::Display::fmt(element, f),
                 Self::OnERC721Received(element) => ::core::fmt::Display::fmt(element, f),
                 Self::Simulate(element) => ::core::fmt::Display::fmt(element, f),
@@ -822,8 +771,7 @@ pub mod safe_4337_module {
             Self::ExecuteUserOp(value)
         }
     }
-    impl ::core::convert::From<ExecuteUserOpWithErrorStringCall>
-    for Safe4337ModuleCalls {
+    impl ::core::convert::From<ExecuteUserOpWithErrorStringCall> for Safe4337ModuleCalls {
         fn from(value: ExecuteUserOpWithErrorStringCall) -> Self {
             Self::ExecuteUserOpWithErrorString(value)
         }
@@ -902,7 +850,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct SupportedEntrypointReturn(pub ::ethers::core::types::Address);
     ///Container type for all return fields from the `domainSeparator` function with signature `domainSeparator()` and selector `0xf698da25`
@@ -914,7 +862,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct DomainSeparatorReturn(pub [u8; 32]);
     ///Container type for all return fields from the `encodeMessageDataForSafe` function with signature `encodeMessageDataForSafe(address,bytes)` and selector `0x23031640`
@@ -926,7 +874,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct EncodeMessageDataForSafeReturn(pub ::ethers::core::types::Bytes);
     ///Container type for all return fields from the `getMessageHash` function with signature `getMessageHash(bytes)` and selector `0x0a1028c4`
@@ -938,7 +886,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct GetMessageHashReturn(pub [u8; 32]);
     ///Container type for all return fields from the `getMessageHashForSafe` function with signature `getMessageHashForSafe(address,bytes)` and selector `0x6ac24784`
@@ -950,7 +898,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct GetMessageHashForSafeReturn(pub [u8; 32]);
     ///Container type for all return fields from the `getModules` function with signature `getModules()` and selector `0xb2494df3`
@@ -962,7 +910,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct GetModulesReturn(pub ::std::vec::Vec<::ethers::core::types::Address>);
     ///Container type for all return fields from the `getOperationHash` function with signature `getOperationHash((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,bytes,bytes))` and selector `0xb25f3776`
@@ -974,7 +922,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct GetOperationHashReturn {
         pub operation_hash: [u8; 32],
@@ -988,7 +936,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct IsValidSignatureReturn(pub [u8; 4]);
     ///Container type for all return fields from the `isValidSignature` function with signature `isValidSignature(bytes,bytes)` and selector `0x20c13b0b`
@@ -1000,7 +948,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct IsValidSignatureWithDataReturn(pub [u8; 4]);
     ///Container type for all return fields from the `onERC1155BatchReceived` function with signature `onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)` and selector `0xbc197c81`
@@ -1012,7 +960,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct OnERC1155BatchReceivedReturn(pub [u8; 4]);
     ///Container type for all return fields from the `onERC1155Received` function with signature `onERC1155Received(address,address,uint256,uint256,bytes)` and selector `0xf23a6e61`
@@ -1024,7 +972,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct OnERC1155ReceivedReturn(pub [u8; 4]);
     ///Container type for all return fields from the `onERC721Received` function with signature `onERC721Received(address,address,uint256,bytes)` and selector `0x150b7a02`
@@ -1036,7 +984,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct OnERC721ReceivedReturn(pub [u8; 4]);
     ///Container type for all return fields from the `simulate` function with signature `simulate(address,bytes)` and selector `0xbd61951d`
@@ -1048,7 +996,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct SimulateReturn {
         pub response: ::ethers::core::types::Bytes,
@@ -1062,7 +1010,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct SupportsInterfaceReturn(pub bool);
     ///Container type for all return fields from the `validateUserOp` function with signature `validateUserOp((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,bytes,bytes),bytes32,uint256)` and selector `0x3a871cdd`
@@ -1074,7 +1022,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct ValidateUserOpReturn {
         pub validation_data: ::ethers::core::types::U256,
@@ -1088,7 +1036,7 @@ pub mod safe_4337_module {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct UserOperation {
         pub sender: ::ethers::core::types::Address,

@@ -7,14 +7,16 @@ pub use safe_l2::*;
     clippy::upper_case_acronyms,
     clippy::type_complexity,
     dead_code,
-    non_camel_case_types,
+    non_camel_case_types
 )]
 pub mod safe_l2 {
     #[rustfmt::skip]
     const __ABI: &str = "[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"AddedOwner\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"approvedHash\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"ApproveHash\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"handler\",\"type\":\"address\"}],\"name\":\"ChangedFallbackHandler\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"guard\",\"type\":\"address\"}],\"name\":\"ChangedGuard\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"threshold\",\"type\":\"uint256\"}],\"name\":\"ChangedThreshold\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"module\",\"type\":\"address\"}],\"name\":\"DisabledModule\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"module\",\"type\":\"address\"}],\"name\":\"EnabledModule\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"txHash\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"payment\",\"type\":\"uint256\"}],\"name\":\"ExecutionFailure\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"module\",\"type\":\"address\"}],\"name\":\"ExecutionFromModuleFailure\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"module\",\"type\":\"address\"}],\"name\":\"ExecutionFromModuleSuccess\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"txHash\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"payment\",\"type\":\"uint256\"}],\"name\":\"ExecutionSuccess\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"RemovedOwner\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"module\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"},{\"indexed\":false,\"internalType\":\"enum Enum.Operation\",\"name\":\"operation\",\"type\":\"uint8\"}],\"name\":\"SafeModuleTransaction\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"},{\"indexed\":false,\"internalType\":\"enum Enum.Operation\",\"name\":\"operation\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"safeTxGas\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"baseGas\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"gasPrice\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"gasToken\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address payable\",\"name\":\"refundReceiver\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"signatures\",\"type\":\"bytes\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"additionalInfo\",\"type\":\"bytes\"}],\"name\":\"SafeMultiSigTransaction\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"SafeReceived\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"initiator\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address[]\",\"name\":\"owners\",\"type\":\"address[]\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"threshold\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"initializer\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"fallbackHandler\",\"type\":\"address\"}],\"name\":\"SafeSetup\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"msgHash\",\"type\":\"bytes32\"}],\"name\":\"SignMsg\",\"type\":\"event\"},{\"stateMutability\":\"nonpayable\",\"type\":\"fallback\"},{\"inputs\":[],\"name\":\"VERSION\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_threshold\",\"type\":\"uint256\"}],\"name\":\"addOwnerWithThreshold\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"hashToApprove\",\"type\":\"bytes32\"}],\"name\":\"approveHash\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"approvedHashes\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_threshold\",\"type\":\"uint256\"}],\"name\":\"changeThreshold\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"dataHash\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"signatures\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"requiredSignatures\",\"type\":\"uint256\"}],\"name\":\"checkNSignatures\",\"outputs\":[],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"dataHash\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"signatures\",\"type\":\"bytes\"}],\"name\":\"checkSignatures\",\"outputs\":[],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"prevModule\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"module\",\"type\":\"address\"}],\"name\":\"disableModule\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"domainSeparator\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"module\",\"type\":\"address\"}],\"name\":\"enableModule\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"},{\"internalType\":\"enum Enum.Operation\",\"name\":\"operation\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"safeTxGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"baseGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"gasPrice\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"gasToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"refundReceiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_nonce\",\"type\":\"uint256\"}],\"name\":\"encodeTransactionData\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"},{\"internalType\":\"enum Enum.Operation\",\"name\":\"operation\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"safeTxGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"baseGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"gasPrice\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"gasToken\",\"type\":\"address\"},{\"internalType\":\"address payable\",\"name\":\"refundReceiver\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"signatures\",\"type\":\"bytes\"}],\"name\":\"execTransaction\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"},{\"internalType\":\"enum Enum.Operation\",\"name\":\"operation\",\"type\":\"uint8\"}],\"name\":\"execTransactionFromModule\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"success\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"},{\"internalType\":\"enum Enum.Operation\",\"name\":\"operation\",\"type\":\"uint8\"}],\"name\":\"execTransactionFromModuleReturnData\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"success\",\"type\":\"bool\"},{\"internalType\":\"bytes\",\"name\":\"returnData\",\"type\":\"bytes\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getChainId\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"start\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"pageSize\",\"type\":\"uint256\"}],\"name\":\"getModulesPaginated\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"array\",\"type\":\"address[]\"},{\"internalType\":\"address\",\"name\":\"next\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getOwners\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"offset\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"length\",\"type\":\"uint256\"}],\"name\":\"getStorageAt\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getThreshold\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"},{\"internalType\":\"enum Enum.Operation\",\"name\":\"operation\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"safeTxGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"baseGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"gasPrice\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"gasToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"refundReceiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_nonce\",\"type\":\"uint256\"}],\"name\":\"getTransactionHash\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"module\",\"type\":\"address\"}],\"name\":\"isModuleEnabled\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"isOwner\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"nonce\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"prevOwner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_threshold\",\"type\":\"uint256\"}],\"name\":\"removeOwner\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"handler\",\"type\":\"address\"}],\"name\":\"setFallbackHandler\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"guard\",\"type\":\"address\"}],\"name\":\"setGuard\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"_owners\",\"type\":\"address[]\"},{\"internalType\":\"uint256\",\"name\":\"_threshold\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"},{\"internalType\":\"address\",\"name\":\"fallbackHandler\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"paymentToken\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"payment\",\"type\":\"uint256\"},{\"internalType\":\"address payable\",\"name\":\"paymentReceiver\",\"type\":\"address\"}],\"name\":\"setup\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"signedMessages\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"targetContract\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"calldataPayload\",\"type\":\"bytes\"}],\"name\":\"simulateAndRevert\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"prevOwner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"oldOwner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"swapOwner\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"}]";
     ///The parsed JSON ABI of the contract.
-    pub static SAFEL2_ABI: ::ethers::contract::Lazy<::ethers::core::abi::Abi> = ::ethers::contract::Lazy::new(||
-    ::ethers::core::utils::__serde_json::from_str(__ABI).expect("ABI is always valid"));
+    pub static SAFEL2_ABI: ::ethers::contract::Lazy<::ethers::core::abi::Abi> =
+        ::ethers::contract::Lazy::new(|| {
+            ::ethers::core::utils::__serde_json::from_str(__ABI).expect("ABI is always valid")
+        });
     pub struct SafeL2<M>(::ethers::contract::Contract<M>);
     impl<M> ::core::clone::Clone for SafeL2<M> {
         fn clone(&self) -> Self {
@@ -34,7 +36,9 @@ pub mod safe_l2 {
     }
     impl<M> ::core::fmt::Debug for SafeL2<M> {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-            f.debug_tuple(stringify!(SafeL2)).field(&self.address()).finish()
+            f.debug_tuple(stringify!(SafeL2))
+                .field(&self.address())
+                .finish()
         }
     }
     impl<M: ::ethers::providers::Middleware> SafeL2<M> {
@@ -44,13 +48,11 @@ pub mod safe_l2 {
             address: T,
             client: ::std::sync::Arc<M>,
         ) -> Self {
-            Self(
-                ::ethers::contract::Contract::new(
-                    address.into(),
-                    SAFEL2_ABI.clone(),
-                    client,
-                ),
-            )
+            Self(::ethers::contract::Contract::new(
+                address.into(),
+                SAFEL2_ABI.clone(),
+                client,
+            ))
         }
         ///Calls the contract's `VERSION` (0xffa1ad74) function
         pub fn version(
@@ -135,9 +137,7 @@ pub mod safe_l2 {
                 .expect("method not found (this should never happen)")
         }
         ///Calls the contract's `domainSeparator` (0xf698da25) function
-        pub fn domain_separator(
-            &self,
-        ) -> ::ethers::contract::builders::ContractCall<M, [u8; 32]> {
+        pub fn domain_separator(&self) -> ::ethers::contract::builders::ContractCall<M, [u8; 32]> {
             self.0
                 .method_hash([246, 152, 218, 37], ())
                 .expect("method not found (this should never happen)")
@@ -164,10 +164,7 @@ pub mod safe_l2 {
             gas_token: ::ethers::core::types::Address,
             refund_receiver: ::ethers::core::types::Address,
             nonce: ::ethers::core::types::U256,
-        ) -> ::ethers::contract::builders::ContractCall<
-            M,
-            ::ethers::core::types::Bytes,
-        > {
+        ) -> ::ethers::contract::builders::ContractCall<M, ::ethers::core::types::Bytes> {
             self.0
                 .method_hash(
                     [232, 102, 55, 219],
@@ -237,10 +234,8 @@ pub mod safe_l2 {
             value: ::ethers::core::types::U256,
             data: ::ethers::core::types::Bytes,
             operation: u8,
-        ) -> ::ethers::contract::builders::ContractCall<
-            M,
-            (bool, ::ethers::core::types::Bytes),
-        > {
+        ) -> ::ethers::contract::builders::ContractCall<M, (bool, ::ethers::core::types::Bytes)>
+        {
             self.0
                 .method_hash([82, 41, 7, 63], (to, value, data, operation))
                 .expect("method not found (this should never happen)")
@@ -285,10 +280,7 @@ pub mod safe_l2 {
             &self,
             offset: ::ethers::core::types::U256,
             length: ::ethers::core::types::U256,
-        ) -> ::ethers::contract::builders::ContractCall<
-            M,
-            ::ethers::core::types::Bytes,
-        > {
+        ) -> ::ethers::contract::builders::ContractCall<M, ::ethers::core::types::Bytes> {
             self.0
                 .method_hash([86, 36, 178, 91], (offset, length))
                 .expect("method not found (this should never happen)")
@@ -449,81 +441,56 @@ pub mod safe_l2 {
         ///Gets the contract's `AddedOwner` event
         pub fn added_owner_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            AddedOwnerFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, AddedOwnerFilter> {
             self.0.event()
         }
         ///Gets the contract's `ApproveHash` event
         pub fn approve_hash_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            ApproveHashFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, ApproveHashFilter>
+        {
             self.0.event()
         }
         ///Gets the contract's `ChangedFallbackHandler` event
         pub fn changed_fallback_handler_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            ChangedFallbackHandlerFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, ChangedFallbackHandlerFilter>
+        {
             self.0.event()
         }
         ///Gets the contract's `ChangedGuard` event
         pub fn changed_guard_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            ChangedGuardFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, ChangedGuardFilter>
+        {
             self.0.event()
         }
         ///Gets the contract's `ChangedThreshold` event
         pub fn changed_threshold_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            ChangedThresholdFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, ChangedThresholdFilter>
+        {
             self.0.event()
         }
         ///Gets the contract's `DisabledModule` event
         pub fn disabled_module_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            DisabledModuleFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, DisabledModuleFilter>
+        {
             self.0.event()
         }
         ///Gets the contract's `EnabledModule` event
         pub fn enabled_module_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            EnabledModuleFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, EnabledModuleFilter>
+        {
             self.0.event()
         }
         ///Gets the contract's `ExecutionFailure` event
         pub fn execution_failure_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            ExecutionFailureFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, ExecutionFailureFilter>
+        {
             self.0.event()
         }
         ///Gets the contract's `ExecutionFromModuleFailure` event
@@ -549,31 +516,22 @@ pub mod safe_l2 {
         ///Gets the contract's `ExecutionSuccess` event
         pub fn execution_success_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            ExecutionSuccessFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, ExecutionSuccessFilter>
+        {
             self.0.event()
         }
         ///Gets the contract's `RemovedOwner` event
         pub fn removed_owner_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            RemovedOwnerFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, RemovedOwnerFilter>
+        {
             self.0.event()
         }
         ///Gets the contract's `SafeModuleTransaction` event
         pub fn safe_module_transaction_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            SafeModuleTransactionFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, SafeModuleTransactionFilter>
+        {
             self.0.event()
         }
         ///Gets the contract's `SafeMultiSigTransaction` event
@@ -589,21 +547,14 @@ pub mod safe_l2 {
         ///Gets the contract's `SafeReceived` event
         pub fn safe_received_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            SafeReceivedFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, SafeReceivedFilter>
+        {
             self.0.event()
         }
         ///Gets the contract's `SafeSetup` event
         pub fn safe_setup_filter(
             &self,
-        ) -> ::ethers::contract::builders::Event<
-            ::std::sync::Arc<M>,
-            M,
-            SafeSetupFilter,
-        > {
+        ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, SafeSetupFilter> {
             self.0.event()
         }
         ///Gets the contract's `SignMsg` event
@@ -616,11 +567,11 @@ pub mod safe_l2 {
         pub fn events(
             &self,
         ) -> ::ethers::contract::builders::Event<::std::sync::Arc<M>, M, SafeL2Events> {
-            self.0.event_with_filter(::core::default::Default::default())
+            self.0
+                .event_with_filter(::core::default::Default::default())
         }
     }
-    impl<M: ::ethers::providers::Middleware> From<::ethers::contract::Contract<M>>
-    for SafeL2<M> {
+    impl<M: ::ethers::providers::Middleware> From<::ethers::contract::Contract<M>> for SafeL2<M> {
         fn from(contract: ::ethers::contract::Contract<M>) -> Self {
             Self::new(contract.address(), contract.client())
         }
@@ -633,7 +584,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(name = "AddedOwner", abi = "AddedOwner(address)")]
     pub struct AddedOwnerFilter {
@@ -648,7 +599,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(name = "ApproveHash", abi = "ApproveHash(bytes32,address)")]
     pub struct ApproveHashFilter {
@@ -665,9 +616,12 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
-    #[ethevent(name = "ChangedFallbackHandler", abi = "ChangedFallbackHandler(address)")]
+    #[ethevent(
+        name = "ChangedFallbackHandler",
+        abi = "ChangedFallbackHandler(address)"
+    )]
     pub struct ChangedFallbackHandlerFilter {
         #[ethevent(indexed)]
         pub handler: ::ethers::core::types::Address,
@@ -680,7 +634,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(name = "ChangedGuard", abi = "ChangedGuard(address)")]
     pub struct ChangedGuardFilter {
@@ -695,7 +649,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(name = "ChangedThreshold", abi = "ChangedThreshold(uint256)")]
     pub struct ChangedThresholdFilter {
@@ -709,7 +663,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(name = "DisabledModule", abi = "DisabledModule(address)")]
     pub struct DisabledModuleFilter {
@@ -724,7 +678,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(name = "EnabledModule", abi = "EnabledModule(address)")]
     pub struct EnabledModuleFilter {
@@ -739,7 +693,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(name = "ExecutionFailure", abi = "ExecutionFailure(bytes32,uint256)")]
     pub struct ExecutionFailureFilter {
@@ -755,7 +709,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(
         name = "ExecutionFromModuleFailure",
@@ -773,7 +727,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(
         name = "ExecutionFromModuleSuccess",
@@ -791,7 +745,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(name = "ExecutionSuccess", abi = "ExecutionSuccess(bytes32,uint256)")]
     pub struct ExecutionSuccessFilter {
@@ -807,7 +761,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(name = "RemovedOwner", abi = "RemovedOwner(address)")]
     pub struct RemovedOwnerFilter {
@@ -822,7 +776,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(
         name = "SafeModuleTransaction",
@@ -843,7 +797,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(
         name = "SafeMultiSigTransaction",
@@ -870,7 +824,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(name = "SafeReceived", abi = "SafeReceived(address,uint256)")]
     pub struct SafeReceivedFilter {
@@ -886,7 +840,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(
         name = "SafeSetup",
@@ -908,7 +862,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethevent(name = "SignMsg", abi = "SignMsg(bytes32)")]
     pub struct SignMsgFilter {
@@ -1002,42 +956,24 @@ pub mod safe_l2 {
                 Self::ChangedFallbackHandlerFilter(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
-                Self::ChangedGuardFilter(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
-                Self::ChangedThresholdFilter(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
-                Self::DisabledModuleFilter(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
-                Self::EnabledModuleFilter(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
-                Self::ExecutionFailureFilter(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::ChangedGuardFilter(element) => ::core::fmt::Display::fmt(element, f),
+                Self::ChangedThresholdFilter(element) => ::core::fmt::Display::fmt(element, f),
+                Self::DisabledModuleFilter(element) => ::core::fmt::Display::fmt(element, f),
+                Self::EnabledModuleFilter(element) => ::core::fmt::Display::fmt(element, f),
+                Self::ExecutionFailureFilter(element) => ::core::fmt::Display::fmt(element, f),
                 Self::ExecutionFromModuleFailureFilter(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
                 Self::ExecutionFromModuleSuccessFilter(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
-                Self::ExecutionSuccessFilter(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
-                Self::RemovedOwnerFilter(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
-                Self::SafeModuleTransactionFilter(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::ExecutionSuccessFilter(element) => ::core::fmt::Display::fmt(element, f),
+                Self::RemovedOwnerFilter(element) => ::core::fmt::Display::fmt(element, f),
+                Self::SafeModuleTransactionFilter(element) => ::core::fmt::Display::fmt(element, f),
                 Self::SafeMultiSigTransactionFilter(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
-                Self::SafeReceivedFilter(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::SafeReceivedFilter(element) => ::core::fmt::Display::fmt(element, f),
                 Self::SafeSetupFilter(element) => ::core::fmt::Display::fmt(element, f),
                 Self::SignMsgFilter(element) => ::core::fmt::Display::fmt(element, f),
             }
@@ -1137,7 +1073,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "VERSION", abi = "VERSION()")]
     pub struct VersionCall;
@@ -1150,7 +1086,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "addOwnerWithThreshold",
@@ -1169,7 +1105,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "approveHash", abi = "approveHash(bytes32)")]
     pub struct ApproveHashCall {
@@ -1184,7 +1120,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "approvedHashes", abi = "approvedHashes(address,bytes32)")]
     pub struct ApprovedHashesCall(pub ::ethers::core::types::Address, pub [u8; 32]);
@@ -1197,7 +1133,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "changeThreshold", abi = "changeThreshold(uint256)")]
     pub struct ChangeThresholdCall {
@@ -1212,7 +1148,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "checkNSignatures",
@@ -1233,7 +1169,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "checkSignatures", abi = "checkSignatures(bytes32,bytes,bytes)")]
     pub struct CheckSignaturesCall {
@@ -1250,7 +1186,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "disableModule", abi = "disableModule(address,address)")]
     pub struct DisableModuleCall {
@@ -1266,7 +1202,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "domainSeparator", abi = "domainSeparator()")]
     pub struct DomainSeparatorCall;
@@ -1279,7 +1215,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "enableModule", abi = "enableModule(address)")]
     pub struct EnableModuleCall {
@@ -1294,7 +1230,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "encodeTransactionData",
@@ -1321,7 +1257,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "execTransaction",
@@ -1348,7 +1284,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "execTransactionFromModule",
@@ -1369,7 +1305,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "execTransactionFromModuleReturnData",
@@ -1390,7 +1326,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "getChainId", abi = "getChainId()")]
     pub struct GetChainIdCall;
@@ -1403,7 +1339,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "getModulesPaginated",
@@ -1422,7 +1358,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "getOwners", abi = "getOwners()")]
     pub struct GetOwnersCall;
@@ -1435,7 +1371,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "getStorageAt", abi = "getStorageAt(uint256,uint256)")]
     pub struct GetStorageAtCall {
@@ -1451,7 +1387,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "getThreshold", abi = "getThreshold()")]
     pub struct GetThresholdCall;
@@ -1464,7 +1400,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "getTransactionHash",
@@ -1491,7 +1427,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "isModuleEnabled", abi = "isModuleEnabled(address)")]
     pub struct IsModuleEnabledCall {
@@ -1506,7 +1442,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "isOwner", abi = "isOwner(address)")]
     pub struct IsOwnerCall {
@@ -1521,7 +1457,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "nonce", abi = "nonce()")]
     pub struct NonceCall;
@@ -1534,7 +1470,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "removeOwner", abi = "removeOwner(address,address,uint256)")]
     pub struct RemoveOwnerCall {
@@ -1551,7 +1487,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "setFallbackHandler", abi = "setFallbackHandler(address)")]
     pub struct SetFallbackHandlerCall {
@@ -1566,7 +1502,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "setGuard", abi = "setGuard(address)")]
     pub struct SetGuardCall {
@@ -1581,7 +1517,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(
         name = "setup",
@@ -1606,7 +1542,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "signedMessages", abi = "signedMessages(bytes32)")]
     pub struct SignedMessagesCall(pub [u8; 32]);
@@ -1619,7 +1555,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "simulateAndRevert", abi = "simulateAndRevert(address,bytes)")]
     pub struct SimulateAndRevertCall {
@@ -1635,7 +1571,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     #[ethcall(name = "swapOwner", abi = "swapOwner(address,address,address)")]
     pub struct SwapOwnerCall {
@@ -1682,142 +1618,132 @@ pub mod safe_l2 {
             data: impl AsRef<[u8]>,
         ) -> ::core::result::Result<Self, ::ethers::core::abi::AbiError> {
             let data = data.as_ref();
-            if let Ok(decoded)
-                = <VersionCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <VersionCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::Version(decoded));
             }
-            if let Ok(decoded)
-                = <AddOwnerWithThresholdCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <AddOwnerWithThresholdCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::AddOwnerWithThreshold(decoded));
             }
-            if let Ok(decoded)
-                = <ApproveHashCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <ApproveHashCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::ApproveHash(decoded));
             }
-            if let Ok(decoded)
-                = <ApprovedHashesCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) =
+                <ApprovedHashesCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::ApprovedHashes(decoded));
             }
-            if let Ok(decoded)
-                = <ChangeThresholdCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) =
+                <ChangeThresholdCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::ChangeThreshold(decoded));
             }
-            if let Ok(decoded)
-                = <CheckNSignaturesCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <CheckNSignaturesCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::CheckNSignatures(decoded));
             }
-            if let Ok(decoded)
-                = <CheckSignaturesCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) =
+                <CheckSignaturesCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::CheckSignatures(decoded));
             }
-            if let Ok(decoded)
-                = <DisableModuleCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <DisableModuleCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::DisableModule(decoded));
             }
-            if let Ok(decoded)
-                = <DomainSeparatorCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) =
+                <DomainSeparatorCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::DomainSeparator(decoded));
             }
-            if let Ok(decoded)
-                = <EnableModuleCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <EnableModuleCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::EnableModule(decoded));
             }
-            if let Ok(decoded)
-                = <EncodeTransactionDataCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <EncodeTransactionDataCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::EncodeTransactionData(decoded));
             }
-            if let Ok(decoded)
-                = <ExecTransactionCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) =
+                <ExecTransactionCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::ExecTransaction(decoded));
             }
-            if let Ok(decoded)
-                = <ExecTransactionFromModuleCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <ExecTransactionFromModuleCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::ExecTransactionFromModule(decoded));
             }
-            if let Ok(decoded)
-                = <ExecTransactionFromModuleReturnDataCall as ::ethers::core::abi::AbiDecode>::decode(
+            if let Ok(decoded) =
+                <ExecTransactionFromModuleReturnDataCall as ::ethers::core::abi::AbiDecode>::decode(
                     data,
-                ) {
+                )
+            {
                 return Ok(Self::ExecTransactionFromModuleReturnData(decoded));
             }
-            if let Ok(decoded)
-                = <GetChainIdCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <GetChainIdCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::GetChainId(decoded));
             }
-            if let Ok(decoded)
-                = <GetModulesPaginatedCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <GetModulesPaginatedCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::GetModulesPaginated(decoded));
             }
-            if let Ok(decoded)
-                = <GetOwnersCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <GetOwnersCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::GetOwners(decoded));
             }
-            if let Ok(decoded)
-                = <GetStorageAtCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <GetStorageAtCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::GetStorageAt(decoded));
             }
-            if let Ok(decoded)
-                = <GetThresholdCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <GetThresholdCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::GetThreshold(decoded));
             }
-            if let Ok(decoded)
-                = <GetTransactionHashCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <GetTransactionHashCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::GetTransactionHash(decoded));
             }
-            if let Ok(decoded)
-                = <IsModuleEnabledCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) =
+                <IsModuleEnabledCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::IsModuleEnabled(decoded));
             }
-            if let Ok(decoded)
-                = <IsOwnerCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <IsOwnerCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::IsOwner(decoded));
             }
-            if let Ok(decoded)
-                = <NonceCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <NonceCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::Nonce(decoded));
             }
-            if let Ok(decoded)
-                = <RemoveOwnerCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <RemoveOwnerCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::RemoveOwner(decoded));
             }
-            if let Ok(decoded)
-                = <SetFallbackHandlerCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <SetFallbackHandlerCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::SetFallbackHandler(decoded));
             }
-            if let Ok(decoded)
-                = <SetGuardCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <SetGuardCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::SetGuard(decoded));
             }
-            if let Ok(decoded)
-                = <SetupCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <SetupCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::Setup(decoded));
             }
-            if let Ok(decoded)
-                = <SignedMessagesCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) =
+                <SignedMessagesCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::SignedMessages(decoded));
             }
-            if let Ok(decoded)
-                = <SimulateAndRevertCall as ::ethers::core::abi::AbiDecode>::decode(
-                    data,
-                ) {
+            if let Ok(decoded) =
+                <SimulateAndRevertCall as ::ethers::core::abi::AbiDecode>::decode(data)
+            {
                 return Ok(Self::SimulateAndRevert(decoded));
             }
-            if let Ok(decoded)
-                = <SwapOwnerCall as ::ethers::core::abi::AbiDecode>::decode(data) {
+            if let Ok(decoded) = <SwapOwnerCall as ::ethers::core::abi::AbiDecode>::decode(data) {
                 return Ok(Self::SwapOwner(decoded));
             }
             Err(::ethers::core::abi::Error::InvalidData.into())
@@ -1830,84 +1756,46 @@ pub mod safe_l2 {
                 Self::AddOwnerWithThreshold(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::ApproveHash(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::ApprovedHashes(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::ChangeThreshold(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::CheckNSignatures(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::CheckSignatures(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::DisableModule(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::DomainSeparator(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::EnableModule(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::ApproveHash(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::ApprovedHashes(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::ChangeThreshold(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::CheckNSignatures(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::CheckSignatures(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::DisableModule(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::DomainSeparator(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::EnableModule(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::EncodeTransactionData(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::ExecTransaction(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::ExecTransaction(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::ExecTransactionFromModule(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
                 Self::ExecTransactionFromModuleReturnData(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::GetChainId(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::GetChainId(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::GetModulesPaginated(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::GetOwners(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::GetStorageAt(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::GetThreshold(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::GetOwners(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::GetStorageAt(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::GetThreshold(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::GetTransactionHash(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::IsModuleEnabled(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::IsModuleEnabled(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::IsOwner(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::Nonce(element) => ::ethers::core::abi::AbiEncode::encode(element),
-                Self::RemoveOwner(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::RemoveOwner(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::SetFallbackHandler(element) => {
                     ::ethers::core::abi::AbiEncode::encode(element)
                 }
-                Self::SetGuard(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::SetGuard(element) => ::ethers::core::abi::AbiEncode::encode(element),
                 Self::Setup(element) => ::ethers::core::abi::AbiEncode::encode(element),
-                Self::SignedMessages(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::SimulateAndRevert(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
-                Self::SwapOwner(element) => {
-                    ::ethers::core::abi::AbiEncode::encode(element)
-                }
+                Self::SignedMessages(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::SimulateAndRevert(element) => ::ethers::core::abi::AbiEncode::encode(element),
+                Self::SwapOwner(element) => ::ethers::core::abi::AbiEncode::encode(element),
             }
         }
     }
@@ -1915,9 +1803,7 @@ pub mod safe_l2 {
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
             match self {
                 Self::Version(element) => ::core::fmt::Display::fmt(element, f),
-                Self::AddOwnerWithThreshold(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::AddOwnerWithThreshold(element) => ::core::fmt::Display::fmt(element, f),
                 Self::ApproveHash(element) => ::core::fmt::Display::fmt(element, f),
                 Self::ApprovedHashes(element) => ::core::fmt::Display::fmt(element, f),
                 Self::ChangeThreshold(element) => ::core::fmt::Display::fmt(element, f),
@@ -1926,33 +1812,23 @@ pub mod safe_l2 {
                 Self::DisableModule(element) => ::core::fmt::Display::fmt(element, f),
                 Self::DomainSeparator(element) => ::core::fmt::Display::fmt(element, f),
                 Self::EnableModule(element) => ::core::fmt::Display::fmt(element, f),
-                Self::EncodeTransactionData(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::EncodeTransactionData(element) => ::core::fmt::Display::fmt(element, f),
                 Self::ExecTransaction(element) => ::core::fmt::Display::fmt(element, f),
-                Self::ExecTransactionFromModule(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::ExecTransactionFromModule(element) => ::core::fmt::Display::fmt(element, f),
                 Self::ExecTransactionFromModuleReturnData(element) => {
                     ::core::fmt::Display::fmt(element, f)
                 }
                 Self::GetChainId(element) => ::core::fmt::Display::fmt(element, f),
-                Self::GetModulesPaginated(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::GetModulesPaginated(element) => ::core::fmt::Display::fmt(element, f),
                 Self::GetOwners(element) => ::core::fmt::Display::fmt(element, f),
                 Self::GetStorageAt(element) => ::core::fmt::Display::fmt(element, f),
                 Self::GetThreshold(element) => ::core::fmt::Display::fmt(element, f),
-                Self::GetTransactionHash(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::GetTransactionHash(element) => ::core::fmt::Display::fmt(element, f),
                 Self::IsModuleEnabled(element) => ::core::fmt::Display::fmt(element, f),
                 Self::IsOwner(element) => ::core::fmt::Display::fmt(element, f),
                 Self::Nonce(element) => ::core::fmt::Display::fmt(element, f),
                 Self::RemoveOwner(element) => ::core::fmt::Display::fmt(element, f),
-                Self::SetFallbackHandler(element) => {
-                    ::core::fmt::Display::fmt(element, f)
-                }
+                Self::SetFallbackHandler(element) => ::core::fmt::Display::fmt(element, f),
                 Self::SetGuard(element) => ::core::fmt::Display::fmt(element, f),
                 Self::Setup(element) => ::core::fmt::Display::fmt(element, f),
                 Self::SignedMessages(element) => ::core::fmt::Display::fmt(element, f),
@@ -2120,7 +1996,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct VersionReturn(pub ::std::string::String);
     ///Container type for all return fields from the `approvedHashes` function with signature `approvedHashes(address,bytes32)` and selector `0x7d832974`
@@ -2132,7 +2008,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct ApprovedHashesReturn(pub ::ethers::core::types::U256);
     ///Container type for all return fields from the `domainSeparator` function with signature `domainSeparator()` and selector `0xf698da25`
@@ -2144,7 +2020,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct DomainSeparatorReturn(pub [u8; 32]);
     ///Container type for all return fields from the `encodeTransactionData` function with signature `encodeTransactionData(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,uint256)` and selector `0xe86637db`
@@ -2156,7 +2032,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct EncodeTransactionDataReturn(pub ::ethers::core::types::Bytes);
     ///Container type for all return fields from the `execTransaction` function with signature `execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)` and selector `0x6a761202`
@@ -2168,7 +2044,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct ExecTransactionReturn(pub bool);
     ///Container type for all return fields from the `execTransactionFromModule` function with signature `execTransactionFromModule(address,uint256,bytes,uint8)` and selector `0x468721a7`
@@ -2180,7 +2056,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct ExecTransactionFromModuleReturn {
         pub success: bool,
@@ -2194,7 +2070,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct ExecTransactionFromModuleReturnDataReturn {
         pub success: bool,
@@ -2209,7 +2085,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct GetChainIdReturn(pub ::ethers::core::types::U256);
     ///Container type for all return fields from the `getModulesPaginated` function with signature `getModulesPaginated(address,uint256)` and selector `0xcc2f8452`
@@ -2221,7 +2097,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct GetModulesPaginatedReturn {
         pub array: ::std::vec::Vec<::ethers::core::types::Address>,
@@ -2236,7 +2112,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct GetOwnersReturn(pub ::std::vec::Vec<::ethers::core::types::Address>);
     ///Container type for all return fields from the `getStorageAt` function with signature `getStorageAt(uint256,uint256)` and selector `0x5624b25b`
@@ -2248,7 +2124,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct GetStorageAtReturn(pub ::ethers::core::types::Bytes);
     ///Container type for all return fields from the `getThreshold` function with signature `getThreshold()` and selector `0xe75235b8`
@@ -2260,7 +2136,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct GetThresholdReturn(pub ::ethers::core::types::U256);
     ///Container type for all return fields from the `getTransactionHash` function with signature `getTransactionHash(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,uint256)` and selector `0xd8d11f78`
@@ -2272,7 +2148,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct GetTransactionHashReturn(pub [u8; 32]);
     ///Container type for all return fields from the `isModuleEnabled` function with signature `isModuleEnabled(address)` and selector `0x2d9ad53d`
@@ -2284,7 +2160,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct IsModuleEnabledReturn(pub bool);
     ///Container type for all return fields from the `isOwner` function with signature `isOwner(address)` and selector `0x2f54bf6e`
@@ -2296,7 +2172,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct IsOwnerReturn(pub bool);
     ///Container type for all return fields from the `nonce` function with signature `nonce()` and selector `0xaffed0e0`
@@ -2308,7 +2184,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct NonceReturn(pub ::ethers::core::types::U256);
     ///Container type for all return fields from the `signedMessages` function with signature `signedMessages(bytes32)` and selector `0x5ae6bd37`
@@ -2320,7 +2196,7 @@ pub mod safe_l2 {
         Debug,
         PartialEq,
         Eq,
-        Hash
+        Hash,
     )]
     pub struct SignedMessagesReturn(pub ::ethers::core::types::U256);
 }
