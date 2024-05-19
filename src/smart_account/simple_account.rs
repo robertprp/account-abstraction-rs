@@ -76,7 +76,7 @@ impl BaseAccount for SimpleAccount {
         let Some(account_address) = *self.account_address.read().await else {
             let address: Address = self.get_counterfactual_address().await?;
             *self.account_address.write().await = Some(address);
-            return Ok(address)
+            return Ok(address);
         };
 
         Ok(account_address)
@@ -168,7 +168,7 @@ mod tests {
         types::{AccountCall, ExecuteCall, UserOperationRequest},
     };
 
-    const RPC_URL: &str = "https://eth-goerli.g.alchemy.com/v2/Lekp6yzHz5yAPLKPNvGpMKaqbGunnXHS"; //"https://eth-mainnet.g.alchemy.com/v2/lRcdJTfR_zjZSef3yutTGE6OIY9YFx1E";
+    const RPC_URL: &str = "https://base-sepolia.g.alchemy.com/v2/HvnvemJhpDTfxwhfcGGnXHuo_dtgZVN6"; //"https://eth-goerli.g.alchemy.com/v2/Lekp6yzHz5yAPLKPNvGpMKaqbGunnXHS"; //"https://eth-mainnet.g.alchemy.com/v2/lRcdJTfR_zjZSef3yutTGE6OIY9YFx1E";
     const SIMPLE_ACCOUNT_FACTORY_ADDRESS: &str = "0x9406Cc6185a346906296840746125a0E44976454";
     const ENTRY_POINT_ADDRESS: &str = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
 

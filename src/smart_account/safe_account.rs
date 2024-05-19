@@ -26,11 +26,11 @@ use tokio::sync::RwLock;
 const RPC_URL: &str = "https://eth-goerli.g.alchemy.com/v2/Lekp6yzHz5yAPLKPNvGpMKaqbGunnXHS"; //"https://eth-mainnet.g.alchemy.com/v2/lRcdJTfR_zjZSef3yutTGE6OIY9YFx1E";
 
 const SAFE_SIGNER_LAUNCHPAD_ADDRESS: &str = "0x845712F64E53AFb2bC0aB3C6559cA5BfC75eee50";
-const SAFE_4337_MODULE_ADDRESS: &str = "0xD9752e2e2A577Fe7c4340d79b5DD2C9775656bD6";
-const ADD_MODULES_LIB_ADDRESS: &str = "0x8EcD4ec46D4D2a6B64fE960B3D64e8B94B2234eb";
+const SAFE_4337_MODULE_ADDRESS: &str = "0xa581c4A4DB7175302464fF3C06380BC3270b4037"; //
+const ADD_MODULES_LIB_ADDRESS: &str = "0x8EcD4ec46D4D2a6B64fE960B3D64e8B94B2234eb"; //
 const WEBAUTHN_SIGNER_FACTORY_ADDRESS: &str = "0x329e21291fb2d7265aEf128D4A5c35287Bb0eF91";
-const SAFE_PROXY_FACTORY_ADDRESS: &str = "0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67";
-const SAFE_SINGLETON_ADDRESS: &str = "0x29fcB43b46531BcA003ddC8FCB67FFE91900C762";
+const SAFE_PROXY_FACTORY_ADDRESS: &str = "0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67"; //
+const SAFE_SINGLETON_ADDRESS: &str = "0x29fcB43b46531BcA003ddC8FCB67FFE91900C762"; //
 const ENTRYPOINT_ADDRESS: &str = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
 const XANDER_BLAZE_NFT_ADDRESS: &str = "0xBb9ebb7b8Ee75CDBf64e5cE124731A89c2BC4A07";
 
@@ -110,7 +110,7 @@ impl BaseAccount for SafeAccount {
         let Some(account_address) = *self.account_address.read().await else {
             let address: Address = self.get_counterfactual_address().await?;
             *self.account_address.write().await = Some(address);
-            return Ok(address)
+            return Ok(address);
         };
 
         Ok(account_address)

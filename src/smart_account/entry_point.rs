@@ -36,7 +36,7 @@ where
                     let Ok(sender_address) = SenderAddressResult::decode(revert_err) else {
                         return Err(EntryPointError::RevertError(format!(
                             "Decode sender address result error."
-                        )))
+                        )));
                     };
 
                     Ok(sender_address.sender)
