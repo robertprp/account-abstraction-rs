@@ -20,7 +20,7 @@ use tokio::sync::RwLock;
 // const SIMPLE_ACCOUNT_FACTORY_ADDRESS: &str = "0x9406Cc6185a346906296840746125a0E44976454";
 
 #[derive(Debug)]
-struct SimpleAccount {
+pub struct SimpleAccount {
     inner: Arc<Provider<Http>>,
     owner: Address,
     account_address: RwLock<Option<Address>>,
@@ -31,7 +31,7 @@ struct SimpleAccount {
 }
 
 impl SimpleAccount {
-    fn new(
+    pub fn new(
         inner: Arc<Provider<Http>>,
         owner: Address,
         account_address: RwLock<Option<Address>>,

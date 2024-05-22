@@ -39,7 +39,7 @@ const SafeProxyBytecode: &str = "0x608060405234801561001057600080fd5b50604051610
 const ENTRY_POINT_ADDRESS: &str = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
 
 #[derive(Debug)]
-struct SafeAccount {
+pub struct SafeAccount {
     inner: Arc<Provider<Http>>,
     owner: Address,
     account_address: RwLock<Option<Address>>,
@@ -52,7 +52,7 @@ struct SafeAccount {
 }
 
 impl SafeAccount {
-    fn new(
+    pub fn new(
         inner: Arc<Provider<Http>>,
         owner: Address,
         account_address: RwLock<Option<Address>>,

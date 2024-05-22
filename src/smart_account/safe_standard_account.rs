@@ -33,7 +33,7 @@ const ENTRYPOINT_ADDRESS: &str = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
 const FALLBACK_HANDLER_ADDRESS: &str = "0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99";
 
 #[derive(Debug)]
-struct SafeStandardAccount {
+pub struct SafeStandardAccount {
     inner: Arc<Provider<Http>>,
     owners: Vec<Address>,
     threshold: U256,
@@ -47,7 +47,7 @@ struct SafeStandardAccount {
 }
 
 impl SafeStandardAccount {
-    fn new(
+    pub fn new(
         inner: Arc<Provider<Http>>,
         owners: Vec<Address>,
         threshold: U256,
