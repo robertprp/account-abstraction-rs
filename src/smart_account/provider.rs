@@ -31,7 +31,7 @@ where
         Self { inner, account }
     }
 
-    fn provider(&self) -> &P {
+    pub fn provider(&self) -> &P {
         &self.inner
     }
 }
