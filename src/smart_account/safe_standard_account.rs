@@ -6,16 +6,17 @@ use crate::contracts::{
     self, safe_proxy_factory, EnableModulesCall, ExecuteUserOpCall, Safe4337Module,
     Safe4337ModuleCalls, SafeL2Calls, UserOperation,
 };
-use crate::types::ExecuteCall;
+use crate::types::{ExecuteCall, UserOperationRequest};
 
 use async_trait::async_trait;
 use ethers::abi::AbiEncode;
-use ethers::providers::Http;
+use ethers::providers::{Http, Middleware};
 use ethers::types::Chain;
 use ethers::{
     providers::Provider,
     types::{Address, Bytes, U256},
 };
+use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -23,7 +24,7 @@ use tokio::sync::RwLock;
 // const ENTRY_POINT_ADDRESS: &str = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
 // const SIMPLE_ACCOUNT_FACTORY_ADDRESS: &str = "0x9406Cc6185a346906296840746125a0E44976454";
 
-const RPC_URL: &str = "https://base-sepolia.g.alchemy.com/v2/HvnvemJhpDTfxwhfcGGnXHuo_dtgZVN6"; //"https://eth-goerli.g.alchemy.com/v2/Lekp6yzHz5yAPLKPNvGpMKaqbGunnXHS"; //"https://eth-mainnet.g.alchemy.com/v2/lRcdJTfR_zjZSef3yutTGE6OIY9YFx1E";
+const RPC_URL: &str = "https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx"; //"https://eth-goerli.g.alchemy.com/v2/Lekp6yzHz5yAPLKPNvGpMKaqbGunnXHS"; //"https://eth-mainnet.g.alchemy.com/v2/lRcdJTfR_zjZSef3yutTGE6OIY9YFx1E";
 
 const SAFE_4337_MODULE_ADDRESS: &str = "0xa581c4A4DB7175302464fF3C06380BC3270b4037";
 const ADD_MODULES_LIB_ADDRESS: &str = "0x8EcD4ec46D4D2a6B64fE960B3D64e8B94B2234eb";
@@ -261,6 +262,77 @@ impl SafeStandardAccount {
 
         buffer
     }
+
+    async fn get_paymaster_and_data<U: Into<UserOperationRequest> + Send + Sync>(
+        &self,
+        user_op: U,
+    ) -> Result<UserOperationRequest, AccountError> {
+        let user_op_req: UserOperationRequest = user_op.into();
+        let nonce: U256 = self.get_nonce().await.unwrap_or(U256::from(0));
+        let init_code: Bytes = self.get_init_code().await.unwrap_or(Bytes::new());
+
+        let policy_id = "831ad866-14bf-4f4e-96e7-a5f3d083ba0a";
+
+        let updated_user_op_req = user_op_req
+            .nonce(nonce)
+            .init_code(init_code);
+
+        let params = AlchemyPaymasterParams {
+            policy_id: policy_id.to_string(),
+            entry_point: ENTRYPOINT_ADDRESS.to_string(),
+            dummy_signature: "0xe8fe34b166b64d118dccf44c7198648127bf8a76a48a042862321af6058026d276ca6abb4ed4b60ea265d1e57e33840d7466de75e13f072bbd3b7e64387eebfe1b".to_string(),
+            user_operation: updated_user_op_req.clone(),
+        };
+        
+        let result: Result<AlchemyPaymasterResponse, AccountError> = self.inner()
+            .provider()
+            .request("alchemy_requestGasAndPaymasterAndData", [params])
+            .await
+            .map_err(|e| AccountError::ProviderError(e.into()));
+
+        match result {
+            Ok(resp) => {
+                let final_user_op_req: UserOperationRequest = updated_user_op_req
+                    .paymaster_and_data(resp.paymaster_and_data)
+                    .call_gas_limit(resp.call_gas_limit)
+                    .verification_gas_limit(resp.verification_gas_limit)
+                    .pre_verification_gas(resp.pre_verification_gas)
+                    .max_fee_per_gas(resp.max_fee_per_gas)
+                    .max_priority_fee_per_gas(resp.max_priority_fee_per_gas);
+
+                Ok(final_user_op_req)
+            },
+            Err(err) => Err(err),
+        }
+    }
+}
+
+#[derive(Serialize, Debug)]
+struct AlchemyPaymasterParams {
+    #[serde(rename = "policyId", default)]
+    policy_id: String,
+    #[serde(rename = "entryPoint", default)]
+    entry_point: String,
+    #[serde(rename = "dummySignature", default)]
+    dummy_signature: String,
+    #[serde(rename = "userOperation", default)]
+    user_operation: UserOperationRequest,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+struct AlchemyPaymasterResponse {
+    #[serde(rename = "paymasterAndData", default)]
+    paymaster_and_data: Bytes,
+    #[serde(rename = "callGasLimit", default)]
+    pub call_gas_limit: U256,
+    #[serde(rename = "verificationGasLimit", default)]
+    pub verification_gas_limit: U256,
+    #[serde(rename = "preVerificationGas", default)]
+    pub pre_verification_gas: U256,
+    #[serde(rename = "maxFeePerGas", default)]
+    pub max_fee_per_gas: U256,
+    #[serde(rename = "maxPriorityFeePerGas", default)]
+    pub max_priority_fee_per_gas: U256,
 }
 
 #[cfg(test)]
@@ -338,19 +410,30 @@ mod tests {
             Chain::BaseSepolia,
         );
 
-        let provider = make_provider(account);
-
         let to_address: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
             .parse()
             .unwrap();
 
-        let req = UserOperationRequest::new().call(AccountCall::Execute(ExecuteCall::new(
+        let sender: Address = account.get_account_address().await.unwrap();
+
+        let call = ExecuteCall::new(
             to_address,
             100,
             Bytes::new(),
-        )));
+        );
 
-        let result = provider.send_user_operation(req, &wallet).await;
+        let encoded_call = account.encode_execute(call).await.unwrap();
+
+        let req = UserOperationRequest::new()
+            .call_data(encoded_call)
+            .sender(sender);
+
+        let updated_user_op: UserOperationRequest = account.get_paymaster_and_data(req).await.unwrap();
+
+        let provider = make_provider(account);
+
+        println!("updated_user_op {:?}", updated_user_op);
+        let result = provider.send_user_operation(updated_user_op, &wallet).await;
 
         let user_op_hash = result.unwrap();
 
