@@ -263,7 +263,7 @@ impl SafeStandardAccount {
         buffer
     }
 
-    async fn get_paymaster_and_data<U: Into<UserOperationRequest> + Send + Sync>(
+    pub async fn get_paymaster_and_data<U: Into<UserOperationRequest> + Send + Sync>(
         &self,
         user_op: U,
     ) -> Result<UserOperationRequest, AccountError> {
