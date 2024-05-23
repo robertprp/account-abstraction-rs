@@ -4,7 +4,8 @@ use ethers::{
     types::{Bytes, U256},
     utils,
 };
-use std::{fmt::Debug, ops::Add};
+use serde::{Deserialize, Serialize};
+use std::{fmt::Debug, ops::Add, str::FromStr};
 
 use crate::types::{
     AccountCall, FromErr, UserOpHash, UserOperation, UserOperationGasEstimate,
@@ -157,16 +158,6 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
                 Some(self.account.get_verification_gas_limit().add(init_gas));
         }
 
-        if let Ok(paymaster_and_data) = self.get_paymaster_and_data(user_op.clone()).await {
-            let pre_verification_gas = self.account.get_pre_verification_gas(user_op.clone());
-
-            user_op.pre_verification_gas = Some(pre_verification_gas);
-
-            user_op.paymaster_and_data = Some(paymaster_and_data);
-        } else {
-            user_op.paymaster_and_data = Some(Bytes::new());
-        }
-
         if user_op.call_gas_limit.is_none()
             || user_op.verification_gas_limit.is_none()
             || user_op.pre_verification_gas.is_none()
@@ -189,6 +180,22 @@ impl<P: JsonRpcClient, A: BaseAccount> SmartAccountMiddleware for SmartAccountPr
                     .verification_gas_limit
                     .unwrap_or(gas_estimate.verification_gas_limit.into()),
             );
+        }
+
+        // TODO: hard coding for now. we'll need to call alchemy_requestGasAndPaymasterAndData as gas also depends on paymaster data
+        // user_op.pre_verification_gas = Some(U256::from(67076));
+
+        if user_op.paymaster_and_data.is_none() {
+            if let Ok(paymaster_and_data) = self.get_paymaster_and_data(user_op.clone()).await {
+                user_op.paymaster_and_data = Some(paymaster_and_data);
+
+                // Update pre-verification gas with the additional paymaster data.
+                let pre_verification_gas = self.account.get_pre_verification_gas(user_op.clone());
+    
+                user_op.pre_verification_gas = Some(pre_verification_gas);
+            } else {
+                user_op.paymaster_and_data = Some(Bytes::new());
+            }
         }
 
         Ok(())
