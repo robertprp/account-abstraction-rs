@@ -1,10 +1,11 @@
 use crate::contracts::{EntryPoint as EthersEntryPoint, SenderAddressResult};
+use alloy::primitives::{Address, Bytes, U256};
 use async_trait::async_trait;
-use ethers::{
-    abi::AbiDecode,
-    providers::Middleware,
-    types::{Address, Bytes, U256},
-};
+// use ethers::{
+//     abi::AbiDecode,
+//     providers::Middleware,
+//     types::{Address, Bytes, U256},
+// };
 use std::fmt::Debug;
 use thiserror::Error;
 

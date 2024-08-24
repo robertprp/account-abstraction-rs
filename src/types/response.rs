@@ -1,13 +1,16 @@
-use ethers::types::{
-    serde_helpers::deserialize_stringified_u64, Address, Bytes, TransactionReceipt, H256, U256,
-};
+// use ethers::types::{
+//     serde_helpers::deserialize_stringified_u64, Address, Bytes, TransactionReceipt, H256, U256,
+// };
+use alloy::{primitives::{
+    Address, Bytes, B256, U256,
+}, rpc::types::TransactionReceipt};
 use serde::{Deserialize, Serialize};
 
 /// Details of a signed user operation
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Default)]
 pub struct UserOperation {
     /// The account initiating the UserOperation.
-    #[serde(default = "ethers::types::Address::zero")]
+    #[serde(default = "alloy::primitives::Address::zero")]
     pub sender: Address,
 
     /// Nonce
@@ -51,13 +54,13 @@ pub struct UserOperation {
     #[serde(default)]
     pub signature: Bytes,
 
-    #[serde(default = "ethers::types::Address::zero", rename = "entryPoint")]
+    #[serde(default = "alloy::primitives::Address::zero", rename = "entryPoint")]
     /// Entry point address
     pub entry_point: Address,
 
     /// Block hash. None when pending.
     #[serde(default, rename = "blockHash")]
-    pub block_hash: Option<H256>,
+    pub block_hash: Option<B256>,
 
     /// Number of the block this user operation was included within.
     #[serde(default, rename = "blockNumber")]
@@ -65,7 +68,7 @@ pub struct UserOperation {
 
     /// Transaction hash
     #[serde(default, rename = "transactionHash")]
-    pub transaction_hash: Option<H256>,
+    pub transaction_hash: Option<B256>,
 }
 
 /// Details of an executed user operation
@@ -73,18 +76,18 @@ pub struct UserOperation {
 pub struct UserOperationReceipt {
     /// The request hash of the UserOperation.
     #[serde(default, rename = "userOpHash")]
-    pub user_op_hash: H256,
+    pub user_op_hash: B256,
 
     /// The entrypoint address the request should be sent through.
-    #[serde(default = "ethers::types::Address::zero", rename = "entryPoint")]
+    #[serde(default = "alloy::primitives::Address::zero", rename = "entryPoint")]
     pub entry_point: Address,
 
     /// The account initiating the UserOperation.
-    #[serde(default = "ethers::types::Address::zero")]
+    #[serde(default = "alloy::primitives::Address::zero")]
     pub sender: Address,
 
     /// The paymaster used for this UserOperation (or empty).
-    #[serde(default = "ethers::types::Address::zero")]
+    #[serde(default = "alloy::primitives::Address::zero")]
     pub paymaster: Address,
 
     /// Nonce
@@ -119,30 +122,31 @@ pub struct UserOperationLog {
     #[serde(rename = "blockNumber", default)]
     pub block_number: U256,
     #[serde(rename = "transactionHash", default)]
-    pub transaction_hash: H256,
+    pub transaction_hash: B256,
     #[serde(rename = "transactionIndex", default)]
     pub transaction_index: String,
     #[serde(rename = "blockHash", default)]
-    pub block_hash: H256,
+    pub block_hash: B256,
     #[serde(rename = "logIndex", default)]
     pub log_index: String,
     removed: bool,
 }
 
+// TODO: Update
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Default)]
 pub struct UserOperationGasEstimate {
     /// Pre-verification gas
-    #[serde(deserialize_with = "deserialize_stringified_u64")]
+    // #[serde(deserialize_with = "deserialize_stringified_u64")]
     #[serde(rename = "preVerificationGas")]
     pub pre_verification_gas: u64,
 
     /// Verification gas
-    #[serde(deserialize_with = "deserialize_stringified_u64")]
+    // #[serde(deserialize_with = "deserialize_stringified_u64")]
     #[serde(rename = "verificationGasLimit")]
     pub verification_gas_limit: u64,
 
     /// Call gas limit
-    #[serde(deserialize_with = "deserialize_stringified_u64")]
+    // #[serde(deserialize_with = "deserialize_stringified_u64")]
     #[serde(rename = "callGasLimit")]
     pub call_gas_limit: u64,
 }

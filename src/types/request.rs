@@ -1,4 +1,5 @@
-use ethers::types::{Address, Bytes, H256, U256};
+// use ethers::types::{Address, Bytes, H256, U256};
+use alloy::primitives::{Address, Bytes, B256, U256};
 use serde::Serialize;
 
 /// Parameters for sending a user operation
@@ -201,7 +202,7 @@ impl UserOperationRequest {
     }
 }
 
-pub type UserOpHash = H256;
+pub type UserOpHash = B256;
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub enum AccountCall {

@@ -1,7 +1,8 @@
 use crate::contracts::UserOperation;
-use ethers::abi::AbiEncode;
-use ethers::types::Bytes;
-use ethers::{abi::Address, types::U256, utils::keccak256};
+// use ethers::abi::AbiEncode;
+// use ethers::types::Bytes;
+use alloy::primitives::{keccak256, Address, Bytes, U256};
+// use ethers::{abi::Address, types::U256, utils::keccak256};
 
 pub fn pack_user_op(user_op: UserOperation, include_signature: bool) -> Vec<u8> {
     if include_signature {
@@ -68,8 +69,8 @@ pub fn calc_pre_verification_gas(user_op: UserOperation, overheads: Option<GasOv
 
 #[derive(
     Clone,
-    ::ethers::contract::EthAbiType,
-    ::ethers::contract::EthAbiCodec,
+    // ::alloy::contract::EthAbiType,
+    // ::alloy::contract::EthAbiCodec,
     Default,
     Debug,
     PartialEq,
@@ -82,7 +83,7 @@ struct UserOperationHashInput {
     chain_id: U256,
 }
 
-#[derive(Debug, Clone, ::ethers::contract::EthAbiType, ::ethers::contract::EthAbiCodec)]
+#[derive(Debug, Clone)]//, ::ethers::contract::EthAbiType, ::ethers::contract::EthAbiCodec)]
 struct UserOperationWithoutSignature {
     sender: Address,
     nonce: U256,
@@ -149,7 +150,7 @@ mod tests {
     use std::str::FromStr;
 
     use super::*;
-    use ethers::core::types::{Address, Bytes, U256};
+    use alloy::primitives::{Address, Bytes, U256};
 
     #[test]
     fn test_calc_pre_verification_gas() {

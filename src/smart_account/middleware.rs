@@ -1,8 +1,9 @@
+use alloy::{primitives::Bytes, providers::Provider};
 use async_trait::async_trait;
-use ethers::{
-    providers::{JsonRpcClient, Provider},
-    types::Bytes,
-};
+// use ethers::{
+//     providers::{JsonRpcClient, Provider},
+//     types::Bytes,
+// };
 use std::error::Error;
 use std::fmt::Debug;
 

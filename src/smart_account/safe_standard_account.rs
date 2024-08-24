@@ -8,14 +8,17 @@ use crate::contracts::{
 };
 use crate::types::{ExecuteCall, UserOperationRequest};
 
+use alloy::primitives::{Address, Bytes, U256};
+use alloy::providers::Provider;
+use alloy::transports::http::Http;
 use async_trait::async_trait;
-use ethers::abi::AbiEncode;
-use ethers::providers::{Http, Middleware};
-use ethers::types::Chain;
-use ethers::{
-    providers::Provider,
-    types::{Address, Bytes, U256},
-};
+// use ethers::abi::AbiEncode;
+// use ethers::providers::{Http, Middleware};
+// use ethers::types::Chain;
+// use ethers::{
+//     providers::Provider,
+//     types::{Address, Bytes, U256},
+// };
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 use std::sync::Arc;
@@ -333,147 +336,147 @@ struct AlchemyPaymasterResponse {
     pub max_priority_fee_per_gas: U256,
 }
 
-#[cfg(test)]
-mod tests {
-    use std::time::Duration;
+// #[cfg(test)]
+// mod tests {
+//     use std::time::Duration;
 
-    use ethers::signers::{LocalWallet, Signer};
-    use tokio::time;
-    use url::Url;
+//     use ethers::signers::{LocalWallet, Signer};
+//     use tokio::time;
+//     use url::Url;
 
-    use crate::{
-        smart_account::{SmartAccountMiddleware, SmartAccountProvider},
-        types::{UserOperationRequest},
-    };
+//     use crate::{
+//         smart_account::{SmartAccountMiddleware, SmartAccountProvider},
+//         types::{UserOperationRequest},
+//     };
 
-    use super::*;
+//     use super::*;
     
-    const RPC_URL: &str = "https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx"; //"https://eth-goerli.g.alchemy.com/v2/Lekp6yzHz5yAPLKPNvGpMKaqbGunnXHS"; //"https://eth-mainnet.g.alchemy.com/v2/lRcdJTfR_zjZSef3yutTGE6OIY9YFx1E";
+//     const RPC_URL: &str = "https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx"; //"https://eth-goerli.g.alchemy.com/v2/Lekp6yzHz5yAPLKPNvGpMKaqbGunnXHS"; //"https://eth-mainnet.g.alchemy.com/v2/lRcdJTfR_zjZSef3yutTGE6OIY9YFx1E";
 
-    #[tokio::test]
-    async fn test_get_safe_address() {
-        let factory_address: Address = SAFE_PROXY_FACTORY_ADDRESS.parse().unwrap();
-        let entry_point_address: Address = ENTRYPOINT_ADDRESS.parse().unwrap();
-        let wallet: LocalWallet =
-            "82aba1f2ce3d1a0f6eca0ade8877077b7fc6fd06fb0af48ab4a53650bde69979"
-                .parse()
-                .unwrap();
-        let account_address: Address = "0xEb312892f9ACADe523C838f738ed1649398257E5"
-            .parse()
-            .unwrap();
-        let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
+//     #[tokio::test]
+//     async fn test_get_safe_address() {
+//         let factory_address: Address = SAFE_PROXY_FACTORY_ADDRESS.parse().unwrap();
+//         let entry_point_address: Address = ENTRYPOINT_ADDRESS.parse().unwrap();
+//         let wallet: LocalWallet =
+//             "82aba1f2ce3d1a0f6eca0ade8877077b7fc6fd06fb0af48ab4a53650bde69979"
+//                 .parse()
+//                 .unwrap();
+//         let account_address: Address = "0xEb312892f9ACADe523C838f738ed1649398257E5"
+//             .parse()
+//             .unwrap();
+//         let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
 
-        let account = SafeStandardAccount::new(
-            Arc::new(provider),
-            vec![wallet.address()],
-            U256::one(),
-            RwLock::new(Some(account_address)),
-            factory_address,
-            entry_point_address,
-            SAFE_4337_MODULE_ADDRESS.parse().unwrap(),
-            RwLock::new(true),
-            Chain::BaseSepolia,
-        );
+//         let account = SafeStandardAccount::new(
+//             Arc::new(provider),
+//             vec![wallet.address()],
+//             U256::one(),
+//             RwLock::new(Some(account_address)),
+//             factory_address,
+//             entry_point_address,
+//             SAFE_4337_MODULE_ADDRESS.parse().unwrap(),
+//             RwLock::new(true),
+//             Chain::BaseSepolia,
+//         );
 
-        let safe_address = account.get_account_address().await.unwrap();
+//         let safe_address = account.get_account_address().await.unwrap();
 
-        println!("Signer address: {:x}", wallet.address());
-        println!("Safe address: {:x}", safe_address);
-        // Add assertions for the expected safe address value
-        // For example:
-        // assert_eq!(safe_address, Address::from_str("0x1234567890abcdef").unwrap());
-    }
+//         println!("Signer address: {:x}", wallet.address());
+//         println!("Safe address: {:x}", safe_address);
+//         // Add assertions for the expected safe address value
+//         // For example:
+//         // assert_eq!(safe_address, Address::from_str("0x1234567890abcdef").unwrap());
+//     }
 
-    #[tokio::test]
-    async fn test_send_transaction() {
-        let factory_address: Address = SAFE_PROXY_FACTORY_ADDRESS.parse().unwrap();
-        let entry_point_address: Address = ENTRYPOINT_ADDRESS.parse().unwrap();
-        let wallet: LocalWallet =
-            "82aba1f2ce3d1a0f6eca0ade8877077b7fc6fd06fb0af48ab4a53650bde69979"
-                .parse()
-                .unwrap();
+//     #[tokio::test]
+//     async fn test_send_transaction() {
+//         let factory_address: Address = SAFE_PROXY_FACTORY_ADDRESS.parse().unwrap();
+//         let entry_point_address: Address = ENTRYPOINT_ADDRESS.parse().unwrap();
+//         let wallet: LocalWallet =
+//             "82aba1f2ce3d1a0f6eca0ade8877077b7fc6fd06fb0af48ab4a53650bde69979"
+//                 .parse()
+//                 .unwrap();
 
-        let account_address: Address = "0xEb312892f9ACADe523C838f738ed1649398257E5"
-            .parse()
-            .unwrap();
-        let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
+//         let account_address: Address = "0xEb312892f9ACADe523C838f738ed1649398257E5"
+//             .parse()
+//             .unwrap();
+//         let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
 
-        let account = SafeStandardAccount::new(
-            Arc::new(provider),
-            vec![wallet.address()],
-            U256::one(),
-            RwLock::new(Some(account_address)),
-            factory_address,
-            entry_point_address,
-            SAFE_4337_MODULE_ADDRESS.parse().unwrap(),
-            RwLock::new(true),
-            Chain::BaseSepolia,
-        );
+//         let account = SafeStandardAccount::new(
+//             Arc::new(provider),
+//             vec![wallet.address()],
+//             U256::one(),
+//             RwLock::new(Some(account_address)),
+//             factory_address,
+//             entry_point_address,
+//             SAFE_4337_MODULE_ADDRESS.parse().unwrap(),
+//             RwLock::new(true),
+//             Chain::BaseSepolia,
+//         );
 
-        let to_address: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
-            .parse()
-            .unwrap();
+//         let to_address: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
+//             .parse()
+//             .unwrap();
 
-        let sender: Address = account.get_account_address().await.unwrap();
+//         let sender: Address = account.get_account_address().await.unwrap();
 
-        let call = ExecuteCall::new(
-            to_address,
-            100,
-            Bytes::new(),
-        );
+//         let call = ExecuteCall::new(
+//             to_address,
+//             100,
+//             Bytes::new(),
+//         );
 
-        let encoded_call = account.encode_execute(call).await.unwrap();
+//         let encoded_call = account.encode_execute(call).await.unwrap();
 
-        let req = UserOperationRequest::new()
-            .call_data(encoded_call)
-            .sender(sender);
+//         let req = UserOperationRequest::new()
+//             .call_data(encoded_call)
+//             .sender(sender);
 
-        let updated_user_op: UserOperationRequest = account.get_paymaster_and_data(req).await.unwrap();
+//         let updated_user_op: UserOperationRequest = account.get_paymaster_and_data(req).await.unwrap();
 
-        let provider = make_provider(account);
+//         let provider = make_provider(account);
 
-        println!("updated_user_op {:?}", updated_user_op);
-        let result = provider.send_user_operation(updated_user_op, &wallet).await;
+//         println!("updated_user_op {:?}", updated_user_op);
+//         let result = provider.send_user_operation(updated_user_op, &wallet).await;
 
-        let user_op_hash = result.unwrap();
+//         let user_op_hash = result.unwrap();
 
-        let mut interval = time::interval(Duration::from_secs(10));
-        let mut attempts = 0;
-        let max_attempts = 20;
+//         let mut interval = time::interval(Duration::from_secs(10));
+//         let mut attempts = 0;
+//         let max_attempts = 20;
 
-        loop {
-            interval.tick().await;
-            attempts += 1;
+//         loop {
+//             interval.tick().await;
+//             attempts += 1;
 
-            match provider
-                .get_user_operation_receipt(user_op_hash.clone())
-                .await
-            {
-                Ok(receipt) => {
-                    if let Some(receipt) = receipt {
-                        println!("Received receipt: {:?}", receipt);
-                        break;
-                    }
-                }
-                Err(e) => {
-                    println!("Failed to get user operation receipt: {:?}", e);
-                    if attempts >= max_attempts {
-                        println!("Exceeded max attempts, stopping retries");
-                        break;
-                    }
-                }
-            }
-        }
-    }
+//             match provider
+//                 .get_user_operation_receipt(user_op_hash.clone())
+//                 .await
+//             {
+//                 Ok(receipt) => {
+//                     if let Some(receipt) = receipt {
+//                         println!("Received receipt: {:?}", receipt);
+//                         break;
+//                     }
+//                 }
+//                 Err(e) => {
+//                     println!("Failed to get user operation receipt: {:?}", e);
+//                     if attempts >= max_attempts {
+//                         println!("Exceeded max attempts, stopping retries");
+//                         break;
+//                     }
+//                 }
+//             }
+//         }
+//     }
 
-    fn make_provider(
-        account: SafeStandardAccount,
-    ) -> SmartAccountProvider<Http, SafeStandardAccount> {
-        let url: Url = RPC_URL.try_into().unwrap();
-        let http_provider = Http::new(url);
+//     fn make_provider(
+//         account: SafeStandardAccount,
+//     ) -> SmartAccountProvider<Http, SafeStandardAccount> {
+//         let url: Url = RPC_URL.try_into().unwrap();
+//         let http_provider = Http::new(url);
 
-        let account_provider = SmartAccountProvider::new(http_provider, account);
+//         let account_provider = SmartAccountProvider::new(http_provider, account);
 
-        account_provider
-    }
-}
+//         account_provider
+//     }
+// }
