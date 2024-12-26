@@ -10,14 +10,14 @@ use thiserror::Error;
 
 use crate::types::{ExecuteCall, UserOperation};
 
-use super::{utils, EntryPoint, EntryPointError, SmartAccountSigner};
+use super::{utils, EntryPointTrait, EntryPointError, SmartAccountSigner};
 
 #[async_trait]
 pub trait SmartAccount<P: Provider<T, N>, T: Transport + Clone, N: Network = Ethereum>:
     Sync + Send + Debug
 {
     type P: Provider<T, N>; // ProviderLayer?
-    type EntryPoint: EntryPoint;
+    type EntryPoint: EntryPointTrait;
 
     fn provider(&self) -> &Self::P;
 
