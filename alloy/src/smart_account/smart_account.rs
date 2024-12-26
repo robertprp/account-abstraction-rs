@@ -10,7 +10,7 @@ use thiserror::Error;
 
 use crate::types::{ExecuteCall, UserOperation};
 
-use super::{utils, EntryPointTrait, EntryPointError, SmartAccountSigner};
+use super::{utils, EntryPointError, EntryPointTrait, SmartAccountSigner};
 
 #[async_trait]
 pub trait SmartAccount<P: Provider<T, N>, T: Transport + Clone, N: Network = Ethereum>:
