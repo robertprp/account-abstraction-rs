@@ -54,8 +54,6 @@ impl<P: Provider<T, N> + Clone + Debug, T: Transport + Clone + Debug, N: Network
     }
 
     async fn get_sender_address(&self, init_code: Bytes) -> Result<Address, EntryPointError> {
-        println!("init_code: {:?}", init_code);
-
         let contract = EntryPointContract::new(self.address, self.provider.clone());
 
         let result = contract.getSenderAddress(init_code).call().await;
@@ -65,13 +63,12 @@ impl<P: Provider<T, N> + Clone + Debug, T: Transport + Clone + Debug, N: Network
                 "Get sender address must revert.".to_string(),
             )),
             Err(e) => {
-                println!("Error: {:?}", e);
                 match e {
                     Error::TransportError(RpcError::ErrorResp(error_payload)) => {
                         error_payload
                             .as_revert_data()
                             .filter(|data| data.len() >= 36)
-                            .map(|data| Address::from_slice(&data[4..24]))
+                            .map(|data| Address::from_slice(&data[16..36]))
                             .ok_or(EntryPointError::RevertError("Invalid revert error format".into()))
                     }
                     _ => Err(EntryPointError::RevertError("Invalid revert error format".into()))
@@ -125,12 +122,11 @@ mod tests {
             provider,
         );
 
-        let init_code = Bytes::from_str("0x4e1dcf7ad4e460cfd30791ccc4f9c8a4f820ec671688f0b900000000000000000000000029fcb43b46531bca003ddc8fcb67ffe91900c7620000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001e4b63e800d000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000010000000000000000000000008ecd4ec46d4d2a6b64fe960b3d64e8b94b2234eb0000000000000000000000000000000000000000000000000000000000000140000000000000000000000000a581c4a4db7175302464ff3c06380bc3270b40370000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000a666d9ebcc3feecf8e09c050c9c2379df1e5b33300000000000000000000000000000000000000000000000000000000000000648d0dc49f00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000001000000000000000000000000a581c4a4db7175302464ff3c06380bc3270b40370000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000").unwrap();
+        let init_code = Bytes::from_str("0x9406cc6185a346906296840746125a0e449764545fbfb9cf0000000000000000000000002c7536e3605d9c16a7a3d7b1898e529396a65c230000000000000000000000000000000000000000000000000000000000000000").unwrap();
         let result = entry_point.get_sender_address(init_code).await;
 
-        println!("Result: {:?}", result);
-        // assert!(result.is_ok());
-        // assert_eq!(result.unwrap(), Address::ZERO);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), "0x982ffac966b962bddf89d3b26fee91da6f68df13".parse::<Address>().unwrap());
     }
 }
 
