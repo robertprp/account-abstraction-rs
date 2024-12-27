@@ -1,6 +1,10 @@
-use alloy::primitives::{Address, Bytes, B256};
+use alloy::{
+    primitives::{eip191_hash_message, Address, Bytes, B256},
+    signers::{k256::ecdsa::SigningKey, local::LocalSigner, Signer},
+};
 use async_trait::async_trait;
 use std::error::Error;
+use thiserror::Error;
 
 #[async_trait]
 pub trait SmartAccountSigner: std::fmt::Debug + Send + Sync {
@@ -14,46 +18,56 @@ pub trait SmartAccountSigner: std::fmt::Debug + Send + Sync {
         message: S,
     ) -> Result<Bytes, Self::Error>;
 
-    fn sign_hash_data(&self, hash: B256) -> Result<Bytes, Self::Error>;
+    async fn sign_hash_data(&self, hash: &B256) -> Result<Bytes, Self::Error>;
 
-    async fn sign_typed_eip712_data<T: Send + Sync>(
-        &self,
-        payload: &T,
-    ) -> Result<Bytes, Self::Error>;
+    // async fn sign_typed_eip712_data<T: Send + Sync>(
+    //     &self,
+    //     payload: &T,
+    // ) -> Result<Bytes, Self::Error>;
 }
 
-// #[async_trait]
-// // impl SmartAccountSigner for Wallet<SigningKey> {
-// impl SmartAccountSigner for LocalSigner<SigningKey> {
-//     type Error = WalletError;
+#[async_trait]
+impl SmartAccountSigner for LocalSigner<SigningKey> {
+    type Error = SignerError;
 
-//     fn get_address(&self) -> Address {
-//         self.address()
-//     }
+    fn get_address(&self) -> Address {
+        self.address()
+    }
 
-//     async fn sign_message<S: Send + Sync + AsRef<[u8]>>(
-//         &self,
-//         message: S,
-//     ) -> Result<Bytes, Self::Error> {
-//         let message = message.as_ref();
-//         let message_hash: B256 = hash_message(message); // eip191_hash_message?
-//         let ecdsa_signature: Bytes = self.sign_hash(message_hash)?.to_vec().into();
+    async fn sign_message<S: Send + Sync + AsRef<[u8]>>(
+        &self,
+        message: S,
+    ) -> Result<Bytes, Self::Error> {
+        let message = message.as_ref();
+        let message_hash = eip191_hash_message(message);
+        let signature = self
+            .sign_hash(&message_hash.into())
+            .await
+            .map_err(|e| SignerError::HashSigningError(e.to_string()))?;
 
-//         Ok(ecdsa_signature)
-//     }
+        Ok(signature.as_bytes().to_vec().into())
+    }
 
-//     fn sign_hash_data(&self, hash: B256) -> Result<Bytes, Self::Error> {
-//         let signature: Bytes = self.sign_hash(hash)?.to_vec().into();
+    async fn sign_hash_data(&self, hash: &B256) -> Result<Bytes, Self::Error> {
+        let signature = self
+            .sign_hash(&hash)
+            .await
+            .map_err(|e| SignerError::HashSigningError(e.to_string()))?;
 
-//         Ok(signature)
-//     }
+        Ok(signature.as_bytes().to_vec().into())
+    }
 
-//     async fn sign_typed_eip712_data<T: Eip712 + Send + Sync>(
-//         &self,
-//         payload: &T,
-//     ) -> Result<Bytes, Self::Error> {
-//         let signature: Bytes = self.sign_typed_data(payload).await?.to_vec().into();
+    // async fn sign_typed_eip712_data<T: Send + Sync>(
+    //     &self,
+    //     payload: &T,
+    // ) -> Result<Bytes, Self::Error> {
+    //     let signature = self.sign_typed_data(payload).await?;
+    //     Ok(signature.to_vec().into())
+    // }
+}
 
-//         Ok(signature)
-//     }
-// }
+#[derive(Debug, Error)]
+pub enum SignerError {
+    #[error("hash signing error: {0}")]
+    HashSigningError(String),
+}
