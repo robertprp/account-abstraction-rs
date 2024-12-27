@@ -62,25 +62,25 @@ impl<P: Provider<T, N> + Clone + Debug, T: Transport + Clone + Debug, N: Network
             Ok(_) => Err(EntryPointError::RevertError(
                 "Get sender address must revert.".to_string(),
             )),
-            Err(e) => {
-                match e {
-                    Error::TransportError(RpcError::ErrorResp(error_payload)) => {
-                        error_payload
-                            .as_revert_data()
-                            .filter(|data| data.len() >= 36)
-                            .map(|data| Address::from_slice(&data[16..36]))
-                            .ok_or(EntryPointError::RevertError("Invalid revert error format".into()))
-                    }
-                    _ => Err(EntryPointError::RevertError("Invalid revert error format".into()))
-                }
-            }
+            Err(e) => match e {
+                Error::TransportError(RpcError::ErrorResp(error_payload)) => error_payload
+                    .as_revert_data()
+                    .filter(|data| data.len() >= 36)
+                    .map(|data| Address::from_slice(&data[16..36]))
+                    .ok_or(EntryPointError::RevertError(
+                        "Invalid revert error format".into(),
+                    )),
+                _ => Err(EntryPointError::RevertError(
+                    "Invalid revert error format".into(),
+                )),
+            },
         }
     }
 
     async fn get_nonce(&self, address: Address) -> Result<U256, EntryPointError> {
         let contract = EntryPointContract::new(self.address, self.provider.clone());
 
-        let nonce =contract
+        let nonce = contract
             .getNonce(address, U192::ZERO)
             .call()
             .await
@@ -111,7 +111,7 @@ mod tests {
         let rpc_url =
             Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
                 .unwrap(); //anvil.endpoint_url();
-            
+
         let provider = ProviderBuilder::new()
             .with_recommended_fillers()
             .wallet(wallet)
@@ -126,7 +126,12 @@ mod tests {
         let result = entry_point.get_sender_address(init_code).await;
 
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), "0x982ffac966b962bddf89d3b26fee91da6f68df13".parse::<Address>().unwrap());
+        assert_eq!(
+            result.unwrap(),
+            "0x982ffac966b962bddf89d3b26fee91da6f68df13"
+                .parse::<Address>()
+                .unwrap()
+        );
     }
 }
 
