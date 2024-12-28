@@ -1,4 +1,4 @@
-use crate::smart_account::EntryPointContract::PackedUserOperation;
+use crate::entry_point::EntryPointContract::PackedUserOperation;
 use alloy::contract::Error;
 use alloy::transports::RpcError;
 use alloy::{network::Network, providers::Provider, transports::Transport};
@@ -110,7 +110,7 @@ mod tests {
 
         let rpc_url =
             Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
-                .unwrap(); //anvil.endpoint_url();
+                .unwrap();
 
         let provider = ProviderBuilder::new()
             .with_recommended_fillers()

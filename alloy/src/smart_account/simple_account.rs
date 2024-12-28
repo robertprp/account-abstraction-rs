@@ -11,11 +11,11 @@ use std::sync::{Arc, RwLock};
 use SimpleAccountContract::{executeBatchCall, executeCall, SimpleAccountContractCalls};
 use SimpleAccountFactoryContract::{createAccountCall, SimpleAccountFactoryContractCalls};
 
-use super::{
-    AccountError, EntryPointContractWrapper, SmartAccount,
-    SmartAccountSigner,
-};
+use crate::entry_point::EntryPointContractWrapper;
+use crate::signer::SmartAccountSigner;
 use crate::types::ExecuteCall;
+
+use super::{AccountError, SmartAccount};
 
 sol!(
     #[allow(missing_docs)]
@@ -183,9 +183,10 @@ mod tests {
 
     #[tokio::test]
     async fn test_account_init_code() {
-        let signer: PrivateKeySigner = "4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318"
-            .parse()
-            .unwrap();
+        let signer: PrivateKeySigner =
+            "4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318"
+                .parse()
+                .unwrap();
 
         let address: Address = signer.address();
 
@@ -216,9 +217,10 @@ mod tests {
 
     #[tokio::test]
     async fn test_encode_execute() {
-        let signer: PrivateKeySigner = "4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318"
-            .parse()
-            .unwrap();
+        let signer: PrivateKeySigner =
+            "4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318"
+                .parse()
+                .unwrap();
 
         let address: Address = signer.address();
 
@@ -259,12 +261,13 @@ mod tests {
 
         assert_eq!(result, expected_result)
     }
-    
+
     #[tokio::test]
     async fn test_get_counterfactual_address() {
-        let signer: PrivateKeySigner = "4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318"
-            .parse()
-            .unwrap();
+        let signer: PrivateKeySigner =
+            "4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318"
+                .parse()
+                .unwrap();
 
         let address: Address = signer.address();
 

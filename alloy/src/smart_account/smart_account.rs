@@ -8,9 +8,11 @@ use async_trait::async_trait;
 use std::fmt::Debug;
 use thiserror::Error;
 
+use crate::entry_point::{EntryPointError, EntryPointTrait};
+use crate::signer::SmartAccountSigner;
 use crate::types::{ExecuteCall, UserOperation};
 
-use super::{utils, EntryPointError, EntryPointTrait, SmartAccountSigner};
+use crate::utils;
 
 #[async_trait]
 pub trait SmartAccount<P: Provider<T, N>, T: Transport + Clone, N: Network = Ethereum>:
