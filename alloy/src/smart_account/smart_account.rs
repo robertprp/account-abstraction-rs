@@ -78,7 +78,7 @@ pub trait SmartAccount<P: Provider<T, N>, T: Transport + Clone, N: Network = Eth
 
     async fn sign_user_op_hash<S: SmartAccountSigner>(
         &self,
-        user_op_hash: [u8; 32],
+        user_op_hash: &[u8; 32],
         signer: &S,
     ) -> Result<Bytes, AccountError>;
 
@@ -90,7 +90,7 @@ pub trait SmartAccount<P: Provider<T, N>, T: Transport + Clone, N: Network = Eth
         // can also be account.getEntryPoint().getUserOperationHash(request)
 
         let user_op_hash = self.get_user_op_hash(user_op).await?;
-        let signature = self.sign_user_op_hash(user_op_hash, signer).await;
+        let signature = self.sign_user_op_hash(&user_op_hash, signer).await;
 
         signature
     }
@@ -112,6 +112,9 @@ pub enum AccountError {
 
     // #[error("provider error: {0}")]
     // ProviderError(ProviderError),
+    #[error("rpc error: {0}")]
+    RpcError(String),
+
     #[error("nonce error")]
     NonceError,
 

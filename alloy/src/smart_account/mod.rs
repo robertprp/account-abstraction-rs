@@ -9,3 +9,6 @@ pub use entry_point::*;
 
 mod signer;
 pub use signer::*;
+
+mod simple_account;
+pub use simple_account::*;
