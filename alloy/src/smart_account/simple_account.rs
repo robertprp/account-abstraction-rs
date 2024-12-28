@@ -213,6 +213,50 @@ mod tests {
 
         assert_eq!(result, expected_init_code);
     }
+
+    #[tokio::test]
+    async fn test_encode_execute() {
+        let signer: PrivateKeySigner = "4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318"
+            .parse()
+            .unwrap();
+
+        let address: Address = signer.address();
+
+        let wallet = EthereumWallet::from(signer);
+
+        let rpc_url =
+            Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
+                .unwrap();
+        let provider = ProviderBuilder::new()
+            .with_recommended_fillers()
+            .wallet(wallet)
+            .on_http(rpc_url);
+
+        let account = SimpleAccount::new(
+            Arc::new(provider),
+            address,
+            Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
+            Address::from_str(ENTRY_POINT_ADDRESS).unwrap(),
+            84532,
+        );
+
+        let target_address: Address = "0xA87395ef99Fc13Bb043245521C559030aA1827a7"
+            .parse()
+            .unwrap();
+
+        let call_data: Bytes =
+            "0xa71bbebe00000000000000000000000000000000000000000000000000000000000000010021fb3f"
+                .parse()
+                .unwrap();
+
+        let result: Bytes = account
+            .encode_execute(ExecuteCall::new(target_address, U256::from(100), call_data))
+            .await
+            .unwrap()
+            .into();
+
+        let expected_result: Bytes = "0xb61d27f6000000000000000000000000a87395ef99fc13bb043245521c559030aa1827a7000000000000000000000000000000000000000000000000000000000000006400000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000028a71bbebe00000000000000000000000000000000000000000000000000000000000000010021fb3f000000000000000000000000000000000000000000000000".parse().unwrap();
+
+        assert_eq!(result, expected_result)
+    }
 }
-
-
