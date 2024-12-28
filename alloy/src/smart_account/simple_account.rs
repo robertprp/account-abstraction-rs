@@ -259,4 +259,40 @@ mod tests {
 
         assert_eq!(result, expected_result)
     }
+    
+    #[tokio::test]
+    async fn test_get_counterfactual_address() {
+        let signer: PrivateKeySigner = "4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318"
+            .parse()
+            .unwrap();
+
+        let address: Address = signer.address();
+
+        let wallet = EthereumWallet::from(signer);
+
+        let rpc_url =
+            Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
+                .unwrap();
+        let provider = ProviderBuilder::new()
+            .with_recommended_fillers()
+            .wallet(wallet)
+            .on_http(rpc_url);
+
+        let account = SimpleAccount::new(
+            Arc::new(provider),
+            address,
+            Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
+            Address::from_str(ENTRY_POINT_ADDRESS).unwrap(),
+            84532,
+        );
+
+        let result = account.get_counterfactual_address().await.unwrap();
+
+        assert_eq!(
+            result,
+            "0x982ffac966b962bddf89d3b26fee91da6f68df13"
+                .parse::<Address>()
+                .unwrap()
+        );
+    }
 }
