@@ -166,3 +166,53 @@ where
             .map_err(|_| AccountError::SignerError)
     }
 }
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use alloy::{
+        network::EthereumWallet,
+        primitives::{Address, Bytes},
+        providers::ProviderBuilder,
+        signers::local::PrivateKeySigner,
+    };
+    use std::str::FromStr;
+    use url::Url;
+
+    const ENTRY_POINT_ADDRESS: &str = "0x0000000071727De22E5E9d8BAf0edAc6f37da032";
+    const SIMPLE_ACCOUNT_FACTORY_ADDRESS: &str = "0x9406Cc6185a346906296840746125a0E44976454";
+
+    #[tokio::test]
+    async fn test_account_init_code() {
+        let signer: PrivateKeySigner = "4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318"
+            .parse()
+            .unwrap();
+
+        let address: Address = signer.address();
+
+        let wallet = EthereumWallet::from(signer);
+
+        let rpc_url =
+            Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
+                .unwrap();
+        let provider = ProviderBuilder::new()
+            .with_recommended_fillers()
+            .wallet(wallet)
+            .on_http(rpc_url);
+
+        let account = SimpleAccount::new(
+            Arc::new(provider),
+            address,
+            Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
+            Address::from_str(ENTRY_POINT_ADDRESS).unwrap(),
+            84532,
+        );
+
+        let result = account.get_init_code().await.unwrap();
+
+        let expected_init_code = Bytes::from_str("0x9406cc6185a346906296840746125a0e449764545fbfb9cf0000000000000000000000002c7536e3605d9c16a7a3d7b1898e529396a65c230000000000000000000000000000000000000000000000000000000000000000").unwrap();
+
+        assert_eq!(result, expected_init_code);
+    }
+}
+
+
