@@ -1,7 +1,4 @@
-use alloy::{
-    primitives::{Address, Bytes, U256},
-    sol,
-};
+use alloy::sol;
 
 pub mod request;
 pub use request::*;
@@ -35,22 +32,4 @@ sol! {
         bytes paymasterAndData;
         bytes signature;
     }
-}
-
-#[derive(Clone, Debug, Default, PartialEq)]
-pub struct UserOperation {
-    pub sender: Address,
-    pub nonce: U256,
-    pub init_code: Bytes,
-    pub call_data: Bytes,
-    pub call_gas_limit: U256,
-    pub verification_gas_limit: U256,
-    pub pre_verification_gas: U256,
-    pub max_fee_per_gas: U256,
-    pub max_priority_fee_per_gas: U256,
-    pub paymaster: Address,
-    pub paymaster_verification_gas_limit: U256,
-    pub paymaster_post_op_gas_limit: U256,
-    pub paymaster_data: Bytes,
-    pub signature: Bytes,
 }
