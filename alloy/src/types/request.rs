@@ -98,9 +98,6 @@ pub struct UserOperationRequest {
     /// Data passed into the account to verify authorization
     #[serde(skip_serializing_if = "Option::is_none")]
     pub signature: Option<Bytes>,
-
-    #[serde(skip_serializing)]
-    pub call: Option<AccountCall>,
 }
 
 impl UserOperationRequest {
@@ -125,7 +122,6 @@ impl UserOperationRequest {
             paymaster_post_op_gas_limit: self.paymaster_post_op_gas_limit,
             paymaster_data: self.paymaster_data,
             signature: Some(self.signature.unwrap_or_else(|| "0xb6905c3cc524616247f41b6de20bced7d4437a6513a5cf1c90ab6a28415eb6993e1236443130bce47d1580ab289bcc8f32270acb4ae7e46a17fe158f473fd4991c".parse().unwrap())),
-            call: self.call,
         }
     }
 
@@ -224,31 +220,42 @@ impl UserOperationRequest {
         self
     }
 
-    #[must_use]
-    pub fn call<T: Into<AccountCall>>(mut self, call: T) -> Self {
-        self.call = Some(call.into());
-        self
-    }
-
-    #[must_use]
-    pub fn execute<T: Into<Address>, V: Into<U256>, D: Into<Bytes>>(
-        mut self,
-        target: T,
-        value: V,
-        data: D,
-    ) -> Self {
-        self.call = Some(AccountCall::Execute(ExecuteCall::new(
-            target.into(),
-            value.into(),
-            data.into(),
-        )));
-        self
-    }
-
-    #[must_use]
-    pub fn execute_batch(mut self, calls: Vec<ExecuteCall>) -> Self {
-        self.call = Some(AccountCall::ExecuteBatch(calls));
-        self
+    pub async fn build_user_operation(self) -> Result<UserOperation, &'static str> {
+        Ok(UserOperation {
+            sender: self
+                .sender
+                .ok_or("Missing 'sender' field for UserOperation")?,
+            nonce: self
+                .nonce
+                .ok_or("Missing 'nonce' field for UserOperation")?,
+            factory: self.factory,
+            factory_data: self.factory_data,
+            call_data: self
+                .call_data
+                .ok_or("Missing 'call_data' field for UserOperation")?,
+            verification_gas_limit: self
+                .verification_gas_limit
+                .ok_or("Missing 'verification_gas_limit' field for UserOperation")?,
+            call_gas_limit: self
+                .call_gas_limit
+                .ok_or("Missing 'call_gas_limit' field for UserOperation")?,
+            pre_verification_gas: self
+                .pre_verification_gas
+                .ok_or("Missing 'pre_verification_gas' field for UserOperation")?,
+            max_fee_per_gas: self
+                .max_fee_per_gas
+                .ok_or("Missing 'max_fee_per_gas' field for UserOperation")?,
+            max_priority_fee_per_gas: self
+                .max_priority_fee_per_gas
+                .ok_or("Missing 'max_priority_fee_per_gas' field for UserOperation")?,
+            paymaster: self.paymaster,
+            paymaster_verification_gas_limit: self.paymaster_verification_gas_limit,
+            paymaster_post_op_gas_limit: self.paymaster_post_op_gas_limit,
+            paymaster_data: self.paymaster_data,
+            signature: self
+                .signature
+                .ok_or("Missing 'signature' field for UserOperation")?,
+        })
     }
 }
 
