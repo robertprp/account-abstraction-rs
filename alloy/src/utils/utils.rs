@@ -25,12 +25,12 @@ pub fn encode_user_op(user_op: &UserOperation, for_signature: bool) -> Bytes {
         let encoded = UserOpForSignature {
             sender: packed_user_op.sender,
             nonce: packed_user_op.nonce,
-            initCodeHash: keccak256(packed_user_op.initCode),
-            callDataHash: keccak256(packed_user_op.callData),
+            initCode: keccak256(packed_user_op.initCode).into(),
+            callData: keccak256(packed_user_op.callData).into(),
             accountGasLimits: packed_user_op.accountGasLimits,
             preVerificationGas: packed_user_op.preVerificationGas,
             gasFees: packed_user_op.gasFees,
-            paymasterAndDataHash: keccak256(packed_user_op.paymasterAndData),
+            paymasterAndData: keccak256(packed_user_op.paymasterAndData).into(),
         }
         .abi_encode();
 
@@ -138,12 +138,12 @@ sol! {
     struct UserOpForSignature {
         address sender;
         uint256 nonce;
-        bytes32 initCodeHash;
-        bytes32 callDataHash;
+        bytes initCode;
+        bytes callData;
         bytes32 accountGasLimits;
         uint256 preVerificationGas;
         bytes32 gasFees;
-        bytes32 paymasterAndDataHash;
+        bytes paymasterAndData;
     }
 }
 
