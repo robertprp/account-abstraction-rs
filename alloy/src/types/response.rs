@@ -66,6 +66,7 @@ pub struct UserOperationResponse {
     pub transaction_hash: Option<B256>,
 }
 
+// TODO: Can be removed (replaced by alloy types)
 /// Details of an executed user operation
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Default)]
 pub struct UserOperationReceipt {
@@ -126,7 +127,7 @@ pub struct UserOperationLog {
     removed: bool,
 }
 
-// TODO: Update
+// TODO: Can be removed (replaced by alloy types)
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Default)]
 pub struct UserOperationGasEstimate {
     /// Pre-verification gas

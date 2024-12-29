@@ -60,7 +60,9 @@ pub fn pack_user_op(user_op: &UserOperation) -> PackedUserOperation {
     let gas_fees =
         pack_account_gas_limits(user_op.max_priority_fee_per_gas, user_op.max_fee_per_gas);
 
-    let init_code = if let (Some(factory), Some(factory_data)) = (user_op.factory, user_op.factory_data.clone()) {
+    let init_code = if let (Some(factory), Some(factory_data)) =
+        (user_op.factory, user_op.factory_data.clone())
+    {
         if !factory.is_zero() {
             let mut code = Vec::new();
             code.extend_from_slice(factory.as_slice());
@@ -74,7 +76,7 @@ pub fn pack_user_op(user_op: &UserOperation) -> PackedUserOperation {
     };
 
     let paymaster_and_data = if let Some(paymaster) = user_op.paymaster {
-        if !paymaster.is_zero() 
+        if !paymaster.is_zero()
             && user_op.paymaster_verification_gas_limit.is_some()
             && user_op.paymaster_post_op_gas_limit.is_some()
             && user_op.paymaster_data.is_some()
