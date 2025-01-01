@@ -1,8 +1,11 @@
 use alloy::primitives::{Address, Bytes, B256, U256};
 use serde::Serialize;
 
-#[derive(Clone, Default, Serialize, PartialEq, Eq, Debug)]
+#[derive(Clone, Serialize, PartialEq, Eq, Debug)]
 pub struct UserOperationRequest {
+    #[serde(skip_serializing)]
+    pub call: AccountCall,
+
     /// The account making the operation
     #[serde(skip_serializing_if = "Option::is_none", default)]
     pub sender: Option<Address>,
@@ -101,12 +104,30 @@ pub struct UserOperationRequest {
 }
 
 impl UserOperationRequest {
-    pub fn new() -> Self {
-        Self::default()
+    pub fn new(call: AccountCall) -> Self {
+        Self {
+            sender: None,
+            nonce: None,
+            factory: None,
+            factory_data: None,
+            call_data: None,
+            call_gas_limit: None,
+            verification_gas_limit: None,
+            pre_verification_gas: None,
+            max_fee_per_gas: None,
+            max_priority_fee_per_gas: None,
+            paymaster: None,
+            paymaster_verification_gas_limit: None,
+            paymaster_post_op_gas_limit: None,
+            paymaster_data: None,
+            signature: None,
+            call,
+        }
     }
 
     pub fn with_defaults(self) -> Self {
         Self {
+            call: self.call,
             sender: Some(self.sender.unwrap_or_else(|| Address::ZERO)),
             nonce: Some(self.nonce.unwrap_or_else(|| U256::ZERO)),
             factory: self.factory,
