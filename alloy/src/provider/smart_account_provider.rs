@@ -1,6 +1,7 @@
 use crate::signer::SmartAccountSigner;
 use crate::smart_account::SmartAccount;
 use crate::types::request::{UserOpHash, UserOperation, UserOperationRequest};
+use crate::types::AccountCall;
 use alloy::providers::RootProvider;
 use alloy::{
     network::Network,
@@ -158,59 +159,55 @@ where
         &self,
         user_op: &mut UserOperationRequest,
     ) -> Result<(), Self::Error> {
-        // if let Some(ref call) = user_op.call {
-        //     let call_data: Bytes = match call {
-        //         AccountCall::Execute(execute_call) => {
-        //             let call_data = self
-        //                 .account
-        //                 .encode_execute(execute_call.clone())
-        //                 .await
-        //                 .map_err(|e| SmartAccountError::Provider(format!("Failed to encode execute: {}", e)))?;
+        if user_op.call_data.is_none() {
+            let call_data: Bytes = match user_op.call.clone() {
+                AccountCall::Execute(execute_call) => {
+                    let call_data = self
+                        .account
+                        .encode_execute(execute_call.clone())
+                        .await
+                        .map_err(|e| {
+                            SmartAccountError::Provider(format!("Failed to encode execute: {}", e))
+                        })?;
 
-        //             call_data.into()
-        //         }
-        //         AccountCall::ExecuteBatch(execute_calls) => {
-        //             let call_data = self
-        //                 .account
-        //                 .encode_execute_batch(execute_calls.clone())
-        //                 .await
-        //                 .map_err(|e| SmartAccountError::Provider(format!("Failed to encode execute batch: {}", e)))?;
+                    call_data.into()
+                }
+                AccountCall::ExecuteBatch(execute_calls) => {
+                    let call_data = self
+                        .account
+                        .encode_execute_batch(execute_calls.clone())
+                        .await
+                        .map_err(|e| {
+                            SmartAccountError::Provider(format!(
+                                "Failed to encode execute batch: {}",
+                                e
+                            ))
+                        })?;
 
-        //             call_data.into()
-        //         }
-        //     };
+                    call_data.into()
+                }
+            };
 
-        //     user_op.call_data = Some(call_data);
-        // }
+            user_op.call_data = Some(call_data);
+        }
 
         if user_op.nonce.is_none() {
-            let nonce = self
-                .account
-                .get_nonce()
-                .await
-                .unwrap_or_default();
+            let nonce = self.account.get_nonce().await.unwrap_or_default();
             user_op.nonce = Some(nonce);
         }
 
         if user_op.sender.is_none() {
-            user_op.sender = Some(
-                self.account
-                    .get_account_address()
-                    .await
-                    .map_err(|e| SmartAccountError::Provider(format!("Failed to get account address: {}", e)))?,
-            );
+            user_op.sender = Some(self.account.get_account_address().await.map_err(|e| {
+                SmartAccountError::Provider(format!("Failed to get account address: {}", e))
+            })?);
         }
 
         if user_op.factory_data.is_none() {
-            user_op.factory_data = Some(
-                self.account
-                    .get_init_code()
-                    .await
-                    .map_err(|e| SmartAccountError::Provider(format!("Failed to get init code: {}", e)))?,
-            );
+            user_op.factory_data = Some(self.account.get_init_code().await.map_err(|e| {
+                SmartAccountError::Provider(format!("Failed to get init code: {}", e))
+            })?);
         }
 
-        // If gas parameters are missing, estimate them
         if user_op.call_gas_limit.is_none()
             || user_op.verification_gas_limit.is_none()
             || user_op.pre_verification_gas.is_none()
@@ -231,17 +228,19 @@ where
             if user_op.verification_gas_limit.is_none() {
                 user_op.verification_gas_limit = Some(gas_estimate.verification_gas);
             }
-            
+
             if user_op.pre_verification_gas.is_none() {
                 user_op.pre_verification_gas = Some(gas_estimate.pre_verification_gas);
             }
-            
-            if user_op.paymaster_verification_gas_limit.is_none() && !user_op.paymaster_data.is_none() {
-                user_op.paymaster_verification_gas_limit = Some(gas_estimate.paymaster_verification_gas);
+
+            if user_op.paymaster_verification_gas_limit.is_none()
+                && !user_op.paymaster_data.is_none()
+            {
+                user_op.paymaster_verification_gas_limit =
+                    Some(gas_estimate.paymaster_verification_gas);
             }
         }
 
-        // If paymaster data is missing, try to get it
         if user_op.paymaster_data.is_none() {
             let paymaster_data = self.get_paymaster_and_data(user_op.clone()).await?;
             user_op.paymaster_data = Some(paymaster_data);
@@ -309,6 +308,7 @@ where
             .map_err(SmartAccountError::from)
     }
 
+    // TODO: Move this to separate paymaster trait
     async fn get_paymaster_and_data(
         &self,
         _user_op: UserOperationRequest,
@@ -330,6 +330,11 @@ pub enum SmartAccountError {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::{
+        entry_point::{EntryPointError, EntryPointTrait},
+        smart_account::AccountError,
+        types::ExecuteCall,
+    };
     use alloy::{
         network::{Ethereum, EthereumWallet},
         primitives::{Address, Bytes, ChainId, U256},
@@ -339,13 +344,12 @@ mod tests {
     };
     use alloy_node_bindings::Anvil;
     use url::Url;
-    use crate::{entry_point::{EntryPointError, EntryPointTrait}, smart_account::AccountError, types::ExecuteCall};
 
     #[derive(Debug)]
     struct MockSmartAccount;
 
     #[async_trait]
-    impl<P> SmartAccount<P, Http<Client>, Ethereum> for MockSmartAccount 
+    impl<P> SmartAccount<P, Http<Client>, Ethereum> for MockSmartAccount
     where
         P: Provider<Http<Client>, Ethereum> + Clone + Debug + Send + Sync,
     {
@@ -380,7 +384,10 @@ mod tests {
             Ok(vec![])
         }
 
-        async fn encode_execute_batch(&self, _calls: Vec<ExecuteCall>) -> Result<Vec<u8>, AccountError> {
+        async fn encode_execute_batch(
+            &self,
+            _calls: Vec<ExecuteCall>,
+        ) -> Result<Vec<u8>, AccountError> {
             Ok(vec![])
         }
 
