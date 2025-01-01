@@ -8,8 +8,8 @@ use alloy::{
 };
 use async_trait::async_trait;
 
-/// This is an adapted version of 
-/// https://github.com/alloy-rs/alloy/blob/main/crates/provider/src/ext/erc4337.rs 
+/// This is an adapted version of
+/// https://github.com/alloy-rs/alloy/blob/main/crates/provider/src/ext/erc4337.rs
 /// which has minor errors and is incomplete.
 ///
 /// ERC-4337 Account Abstraction API
