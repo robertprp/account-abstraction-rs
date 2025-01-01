@@ -192,7 +192,10 @@ where
         }
 
         if user_op.nonce.is_none() {
-            let nonce = self.account.get_nonce().await.unwrap_or_default();
+            let nonce =
+                self.account.get_nonce().await.map_err(|e| {
+                    SmartAccountError::Provider(format!("Failed to get nonce: {}", e))
+                })?;
             user_op.nonce = Some(nonce);
         }
 
@@ -251,13 +254,22 @@ where
 
     async fn sign_user_operation<S>(
         &self,
-        _user_op: UserOperationRequest,
-        _signer: &S,
+        user_op: UserOperationRequest,
+        signer: &S,
     ) -> Result<Bytes, Self::Error>
     where
         S: SmartAccountSigner + Send + Sync,
     {
-        Ok(Bytes::default())
+        let _user_op = user_op.build_user_operation().await.map_err(|e| {
+            SmartAccountError::Provider(format!("Failed to build user operation: {}", e))
+        })?;
+
+        self.account
+            .sign_user_op(_user_op, signer)
+            .await
+            .map_err(|e| {
+                SmartAccountError::Provider(format!("Failed to sign user operation: {}", e))
+            })
     }
 
     async fn estimate_user_operation_gas(
