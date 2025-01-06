@@ -205,10 +205,12 @@ where
             })?);
         }
 
+        if user_op.factory.is_none() {
+            user_op.factory = Some(self.account.get_factory_address());
+        }
+
         if user_op.factory_data.is_none() {
-            user_op.factory_data = Some(self.account.get_init_code().await.map_err(|e| {
-                SmartAccountError::Provider(format!("Failed to get init code: {}", e))
-            })?);
+            user_op.factory_data = Some(self.account.get_factory_data().await);
         }
 
         if user_op.call_gas_limit.is_none()
@@ -376,6 +378,9 @@ mod tests {
             unimplemented!()
         }
 
+        fn get_factory_address(&self) -> Address {
+            Address::ZERO
+        }
         fn chain_id(&self) -> ChainId {
             84532
         }

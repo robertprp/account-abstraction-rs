@@ -26,6 +26,17 @@ pub trait SmartAccount<P: Provider<T, N>, T: Transport + Clone, N: Network = Eth
 
     fn chain_id(&self) -> ChainId;
 
+    fn get_factory_address(&self) -> Address;
+
+    async fn get_factory_data(&self) -> Bytes {
+        let init_code = self.get_init_code().await.unwrap_or_default();
+        if init_code.len() <= 20 {
+            return Bytes::default();
+        }
+        
+        Bytes::from(init_code[20..].to_vec())
+    }
+
     async fn get_account_address(&self) -> Result<Address, AccountError>;
 
     async fn get_nonce(&self) -> Result<U256, AccountError> {

@@ -88,6 +88,10 @@ where
         self.chain_id
     }
 
+    fn get_factory_address(&self) -> Address {
+        self.factory_address
+    }
+
     async fn get_account_address(&self) -> Result<Address, AccountError> {
         // Check if we have a cached address
         if let Some(addr) = *self.account_address.read().unwrap() {
