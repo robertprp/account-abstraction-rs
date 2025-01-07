@@ -36,6 +36,7 @@ where
     async fn fill_user_operation(
         &self,
         user_op: &mut UserOperationRequest,
+        entry_point: Address,
     ) -> Result<(), Self::Error>;
 
     /// Signs a user operation using the provided signer
@@ -132,12 +133,13 @@ where
         &self,
         mut user_op: UserOperationRequest,
         signer: &S,
+        // TODO: Add entry point to init
         entry_point: Address,
     ) -> Result<UserOpHash, Self::Error>
     where
         S: SmartAccountSigner + Send + Sync,
     {
-        self.fill_user_operation(&mut user_op).await?;
+        self.fill_user_operation(&mut user_op, entry_point).await?;
 
         if user_op.signature.is_none() {
             let signature = self.sign_user_operation(user_op.clone(), signer).await?;
@@ -158,6 +160,8 @@ where
     async fn fill_user_operation(
         &self,
         user_op: &mut UserOperationRequest,
+        // TODO: Add entry point to init
+        entry_point: Address,
     ) -> Result<(), Self::Error> {
         if user_op.call_data.is_none() {
             let call_data: Bytes = match user_op.call.clone() {
@@ -220,9 +224,7 @@ where
             let gas_estimate = self
                 .estimate_user_operation_gas(
                     &user_op.clone().with_defaults(),
-                    user_op
-                        .sender
-                        .ok_or_else(|| SmartAccountError::Provider("Missing sender".into()))?,
+                    entry_point,
                 )
                 .await?;
 
