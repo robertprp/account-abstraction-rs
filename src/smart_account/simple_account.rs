@@ -417,10 +417,7 @@ mod tests {
 
         let smart_account_provider = SmartAccountProvider::new(provider, account);
         let result = smart_account_provider
-            .estimate_user_operation_gas(
-                &req.with_defaults(),
-                Address::from_str(ENTRY_POINT_ADDRESS).unwrap(),
-            )
+            .estimate_user_operation_gas(&req.with_defaults())
             .await;
 
         println!("Gas estimation result: {:?}", result);
@@ -465,11 +462,7 @@ mod tests {
 
         let smart_account_provider = SmartAccountProvider::new(provider, account);
         let result = smart_account_provider
-            .send_user_operation(
-                req,
-                &signer,
-                Address::from_str(ENTRY_POINT_ADDRESS).unwrap(),
-            )
+            .send_user_operation(req, &signer)
             .await;
 
         let user_op_hash = result.expect("Failed to send user operation");

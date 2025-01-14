@@ -1,3 +1,4 @@
+use crate::entry_point::EntryPointTrait;
 use crate::signer::SmartAccountSigner;
 use crate::smart_account::SmartAccount;
 use crate::types::request::{UserOpHash, UserOperation, UserOperationRequest};
@@ -27,7 +28,6 @@ where
         &self,
         user_op: UserOperationRequest,
         signer: &S,
-        entry_point: Address,
     ) -> Result<UserOpHash, Self::Error>
     where
         S: SmartAccountSigner + Send + Sync;
@@ -36,7 +36,6 @@ where
     async fn fill_user_operation(
         &self,
         user_op: &mut UserOperationRequest,
-        entry_point: Address,
     ) -> Result<(), Self::Error>;
 
     /// Signs a user operation using the provided signer
@@ -52,7 +51,6 @@ where
     async fn estimate_user_operation_gas(
         &self,
         user_op: &UserOperationRequest,
-        entry_point: Address,
     ) -> Result<UserOperationGasEstimation, Self::Error>;
 
     /// Retrieves a user operation by its hash
@@ -133,13 +131,13 @@ where
         &self,
         mut user_op: UserOperationRequest,
         signer: &S,
-        // TODO: Add entry point to init
-        entry_point: Address,
     ) -> Result<UserOpHash, Self::Error>
     where
         S: SmartAccountSigner + Send + Sync,
     {
-        self.fill_user_operation(&mut user_op, entry_point).await?;
+        let entry_point_address = self.account.entry_point().get_address();
+
+        self.fill_user_operation(&mut user_op).await?;
 
         if user_op.signature.is_none() {
             let signature = self.sign_user_operation(user_op.clone(), signer).await?;
@@ -152,7 +150,10 @@ where
 
         self.inner
             .client()
-            .request("eth_sendUserOperation", (user_operation, entry_point))
+            .request(
+                "eth_sendUserOperation",
+                (user_operation, entry_point_address),
+            )
             .await
             .map_err(SmartAccountError::from)
     }
@@ -160,8 +161,6 @@ where
     async fn fill_user_operation(
         &self,
         user_op: &mut UserOperationRequest,
-        // TODO: Add entry point to init
-        entry_point: Address,
     ) -> Result<(), Self::Error> {
         if user_op.call_data.is_none() {
             let call_data: Bytes = match user_op.call.clone() {
@@ -260,7 +259,7 @@ where
             || user_op.pre_verification_gas.is_none()
         {
             let gas_estimate = self
-                .estimate_user_operation_gas(&user_op.clone().with_defaults(), entry_point)
+                .estimate_user_operation_gas(&user_op.clone().with_defaults())
                 .await?;
 
             if user_op.call_gas_limit.is_none() {
@@ -310,11 +309,15 @@ where
     async fn estimate_user_operation_gas(
         &self,
         user_op: &UserOperationRequest,
-        entry_point: Address,
     ) -> Result<UserOperationGasEstimation, Self::Error> {
+        let entry_point_address = self.account.entry_point().get_address();
+
         self.inner
             .client()
-            .request("eth_estimateUserOperationGas", (user_op, entry_point))
+            .request(
+                "eth_estimateUserOperationGas",
+                (user_op, entry_point_address),
+            )
             .await
             .map_err(SmartAccountError::from)
     }
