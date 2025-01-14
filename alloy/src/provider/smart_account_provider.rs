@@ -1,13 +1,13 @@
 use crate::signer::SmartAccountSigner;
 use crate::smart_account::SmartAccount;
 use crate::types::request::{UserOpHash, UserOperation, UserOperationRequest};
-use crate::types::AccountCall;
+use crate::types::{AccountCall, UserOperationGasEstimation};
 use alloy::providers::RootProvider;
 use alloy::{
     network::Network,
-    primitives::{Address, Bytes},
+    primitives::{Address, Bytes, U256},
     providers::Provider,
-    rpc::types::{UserOperationGasEstimation, UserOperationReceipt},
+    rpc::types::UserOperationReceipt,
     transports::{Transport, TransportError},
 };
 use async_trait::async_trait;
@@ -209,12 +209,13 @@ where
             })?);
         }
 
-        if user_op.factory.is_none() {
+        if user_op.factory.is_none() && !self.account.is_account_deployed().await.map_err(|e| {
+            SmartAccountError::Provider(format!("Failed to check if account is deployed: {}", e))
+        })? {
             user_op.factory = Some(self.account.get_factory_address());
+            user_op.factory_data = Some(self.account.get_factory_data().await);
         }
 
-        if user_op.factory_data.is_none() {
-            user_op.factory_data = Some(self.account.get_factory_data().await);
         if user_op.max_fee_per_gas.is_none() || user_op.max_priority_fee_per_gas.is_none() {
             let eip1559_fees = self
                 .inner
@@ -249,7 +250,7 @@ where
             }
 
             if user_op.verification_gas_limit.is_none() {
-                user_op.verification_gas_limit = Some(gas_estimate.verification_gas);
+                user_op.verification_gas_limit = Some(gas_estimate.verification_gas_limit);
             }
 
             if user_op.pre_verification_gas.is_none() {
@@ -260,7 +261,7 @@ where
                 && !user_op.paymaster_data.is_none()
             {
                 user_op.paymaster_verification_gas_limit =
-                    Some(gas_estimate.paymaster_verification_gas);
+                    gas_estimate.paymaster_verification_gas_limit;
             }
         }
 
