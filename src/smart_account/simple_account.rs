@@ -1,238 +1,260 @@
-use super::{AccountError, BaseAccount, SmartAccountSigner};
+use alloy::{
+    network::Ethereum,
+    primitives::{Address, Bytes, ChainId, Uint, U256},
+    providers::Provider,
+    sol,
+    sol_types::SolInterface,
+    transports::http::{Client, Http},
+};
+use async_trait::async_trait;
+use std::sync::{Arc, RwLock};
+use SimpleAccountContract::{executeBatchCall, executeCall, SimpleAccountContractCalls};
+use SimpleAccountFactoryContract::{createAccountCall, SimpleAccountFactoryContractCalls};
 
-use crate::contracts::{simple_account, simple_account_factory, SimpleAccountFactoryCalls};
-use crate::contracts::{EntryPoint as EthersEntryPoint, ExecuteBatchCall, SimpleAccountCalls};
+use crate::entry_point::EntryPointContractWrapper;
+use crate::signer::SmartAccountSigner;
 use crate::types::ExecuteCall;
 
-use async_trait::async_trait;
-use ethers::abi::AbiEncode;
-use ethers::providers::Http;
-use ethers::types::Chain;
-use ethers::{
-    providers::Provider,
-    types::{Address, Bytes, U256},
-};
-use std::fmt::Debug;
-use std::sync::Arc;
-use tokio::sync::RwLock;
+use super::{AccountError, SmartAccount};
 
-// TODO: Inject through env
-// const ENTRY_POINT_ADDRESS: &str = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
-// const SIMPLE_ACCOUNT_FACTORY_ADDRESS: &str = "0x9406Cc6185a346906296840746125a0E44976454";
+sol!(
+    #[allow(missing_docs)]
+    #[sol(rpc)]
+    SimpleAccountContract,
+    "src/abi/SimpleAccount.json"
+);
+
+sol!(
+    #[allow(missing_docs)]
+    #[sol(rpc)]
+    SimpleAccountFactoryContract,
+    "src/abi/SimpleAccountFactory.json"
+);
 
 #[derive(Debug)]
-struct SimpleAccount {
-    inner: Arc<Provider<Http>>,
+pub struct SimpleAccount<P: Provider<Http<Client>, Ethereum>> {
+    provider: Arc<P>,
     owner: Address,
     account_address: RwLock<Option<Address>>,
     factory_address: Address,
-    is_deployed: RwLock<bool>,
-    entry_point: Arc<EthersEntryPoint<Provider<Http>>>,
-    chain: Chain,
+    entry_point: Arc<EntryPointContractWrapper<P, Http<Client>, Ethereum>>,
+    chain_id: ChainId,
 }
 
-impl SimpleAccount {
-    fn new(
-        inner: Arc<Provider<Http>>,
+impl<P> SimpleAccount<P>
+where
+    P: Provider<Http<Client>, Ethereum> + Clone + std::fmt::Debug,
+{
+    pub fn new(
+        provider: Arc<P>,
         owner: Address,
-        account_address: RwLock<Option<Address>>,
         factory_address: Address,
         entry_point_address: Address,
-        is_deployed: RwLock<bool>,
-        chain: Chain,
+        chain_id: ChainId,
     ) -> Self {
-        let entry_point = Arc::new(EthersEntryPoint::new(entry_point_address, inner.clone()));
+        let entry_point = Arc::new(EntryPointContractWrapper::new(
+            entry_point_address,
+            (*provider).clone(),
+        ));
 
         Self {
-            inner,
+            provider,
             owner,
-            account_address,
+            account_address: RwLock::new(None),
             factory_address,
-            is_deployed,
             entry_point,
-            chain,
+            chain_id,
         }
     }
 }
 
 #[async_trait]
-impl BaseAccount for SimpleAccount {
-    
-    type EntryPoint = EthersEntryPoint<Provider<Http>>;
-    type Provider = Http;
-    type Inner = Provider<Http>;
+impl<P> SmartAccount<P, Http<Client>, Ethereum> for SimpleAccount<P>
+where
+    P: Provider<Http<Client>, Ethereum> + Clone + std::fmt::Debug + Send + Sync,
+{
+    type P = P;
+    type EntryPoint = EntryPointContractWrapper<P, Http<Client>, Ethereum>;
 
-    fn inner(&self) -> &Self::Inner {
-        &self.inner
+    fn provider(&self) -> &Self::P {
+        &self.provider
     }
 
     fn entry_point(&self) -> &Self::EntryPoint {
         &self.entry_point
     }
 
-    fn get_chain(&self) -> Chain {
-        self.chain
+    fn chain_id(&self) -> ChainId {
+        self.chain_id
+    }
+
+    fn get_factory_address(&self) -> Address {
+        self.factory_address
     }
 
     async fn get_account_address(&self) -> Result<Address, AccountError> {
-        let Some(account_address) = *self.account_address.read().await else {
-            let address = self.get_counterfactual_address().await?;
-            *self.account_address.write().await = Some(address);
-            return Ok(address)
-        };
+        // Check if we have a cached address
+        if let Some(addr) = *self.account_address.read().unwrap() {
+            return Ok(addr);
+        }
 
-        Ok(account_address)
+        // If not deployed, get the counterfactual address
+        let addr = self.get_counterfactual_address().await?;
+
+        // Cache the address
+        *self.account_address.write().unwrap() = Some(addr);
+
+        Ok(addr)
     }
 
-    async fn get_account_init_code(&self) -> Result<Bytes, AccountError> {
-        let factory_address: Address = self.factory_address;
-        let owner: Address = self.owner;
+    async fn get_init_code(&self) -> Result<Bytes, AccountError> {
+        // Create a vector to store the factory address and encoded call
+        let mut init_code = Vec::new();
 
-        // TODO: Add optional index
-        let index = U256::from(0);
+        // Add the factory address bytes
+        init_code.extend_from_slice(self.factory_address.as_slice());
 
-        let call =
-            SimpleAccountFactoryCalls::CreateAccount(simple_account_factory::CreateAccountCall {
-                owner,
-                salt: index,
-            });
+        let call = SimpleAccountFactoryContractCalls::createAccount(createAccountCall {
+            owner: self.owner,
+            salt: U256::ZERO,
+        })
+        .abi_encode();
+        // Add the encoded call bytes
+        init_code.extend_from_slice(&call);
 
-        let mut result: Vec<u8> = Vec::new();
-
-        result.extend_from_slice(factory_address.as_bytes());
-        result.extend_from_slice(&call.encode());
-
-        let result_bytes = Bytes::from(result);
-
-        Ok(result_bytes)
+        Ok(Bytes::from(init_code))
     }
 
-    async fn is_deployed(&self) -> bool {
-        *self.is_deployed.read().await
-    }
+    async fn is_account_deployed(&self) -> Result<bool, AccountError> {
+        // TODO: Add flag to check if account is deployed to avoid get_code call
 
-    async fn set_is_deployed(&self, is_deployed: bool) {
-        *self.is_deployed.write().await = is_deployed;
+        let addr = self.get_account_address().await?;
+        let code = self
+            .provider
+            .get_code_at(addr)
+            .await
+            .map_err(|e| AccountError::RpcError(e.to_string()))?;
+
+        Ok(!code.is_empty())
     }
 
     async fn encode_execute(&self, call: ExecuteCall) -> Result<Vec<u8>, AccountError> {
-        let call = SimpleAccountCalls::Execute(simple_account::ExecuteCall {
+        let call = SimpleAccountContractCalls::execute(executeCall {
             dest: call.target,
             value: call.value,
             func: call.data,
-        });
+        })
+        .abi_encode();
 
-        Ok(call.encode())
+        Ok(call)
     }
 
     async fn encode_execute_batch(&self, calls: Vec<ExecuteCall>) -> Result<Vec<u8>, AccountError> {
         let targets: Vec<Address> = calls.iter().map(|call| call.target).collect();
         let data: Vec<Bytes> = calls.iter().map(|call| call.data.clone()).collect();
-        let multi_call = SimpleAccountCalls::ExecuteBatch(ExecuteBatchCall {
+        let values: Vec<Uint<256, 4>> = calls.iter().map(|call| call.value).collect();
+        let call = SimpleAccountContractCalls::executeBatch(executeBatchCall {
             dest: targets,
+            value: values,
             func: data,
-        });
+        })
+        .abi_encode();
 
-        Ok(multi_call.encode())
+        Ok(call)
     }
 
     async fn sign_user_op_hash<S: SmartAccountSigner>(
         &self,
-        user_op_hash: [u8; 32],
+        user_op_hash: &[u8; 32],
         signer: &S,
     ) -> Result<Bytes, AccountError> {
         signer
-            .sign_message(&user_op_hash)
+            .sign_message(user_op_hash)
             .await
             .map_err(|_| AccountError::SignerError)
     }
 }
-
 #[cfg(test)]
 mod tests {
-    use std::{sync::Arc, time::Duration};
-
-    use ethers::{
-        prelude::k256::ecdsa::SigningKey,
-        providers::{Http, Provider},
-        signers::{LocalWallet, Signer, Wallet},
-        types::{Address, Bytes, Chain, U256},
+    use crate::{
+        provider::{SmartAccountProvider, SmartAccountProviderTrait},
+        types::{AccountCall, UserOperation, UserOperationRequest},
     };
-    use tokio::{sync::RwLock, time};
+
+    use super::*;
+    use alloy::{
+        network::EthereumWallet,
+        primitives::{Address, Bytes},
+        providers::ProviderBuilder,
+        signers::local::PrivateKeySigner,
+    };
+    use std::str::FromStr;
     use url::Url;
 
-    use crate::{
-        contracts::UserOperation,
-        smart_account::{
-            simple_account::SimpleAccount, BaseAccount, SmartAccountMiddleware,
-            SmartAccountProvider,
-        },
-        types::{AccountCall, ExecuteCall, UserOperationRequest},
-    };
-
-    const RPC_URL: &str = "https://eth-goerli.g.alchemy.com/v2/Lekp6yzHz5yAPLKPNvGpMKaqbGunnXHS"; //"https://eth-mainnet.g.alchemy.com/v2/lRcdJTfR_zjZSef3yutTGE6OIY9YFx1E";
-    const SIMPLE_ACCOUNT_FACTORY_ADDRESS: &str = "0x9406Cc6185a346906296840746125a0E44976454";
-    const ENTRY_POINT_ADDRESS: &str = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
-
-    #[tokio::test]
-    async fn test_get_counterfactual_address() {
-        let account = make_simple_account();
-
-        let result = account.get_counterfactual_address().await.unwrap();
-
-        assert_eq!(
-            result,
-            "0x982ffac966b962bddf89d3b26fee91da6f68df13"
-                .parse()
-                .unwrap()
-        )
-    }
-
-    #[tokio::test]
-    async fn test_sign_user_op() {
-        let account = make_simple_account();
-
-        let wallet = make_wallet();
-
-        let target_address: Address = "0xA87395ef99Fc13Bb043245521C559030aA1827a7"
-            .parse()
-            .unwrap();
-
-        let user_op = crate::contracts::UserOperation {
-            sender: target_address,
-            nonce: U256::from(1),
-            init_code: Bytes::from(vec![]),
-            call_data: Bytes::from(vec![]),
-            call_gas_limit: U256::from(0),
-            verification_gas_limit: U256::from(21000),
-            pre_verification_gas: U256::from(0),
-            max_fee_per_gas: U256::from(0),
-            max_priority_fee_per_gas: U256::from(0),
-            paymaster_and_data: Bytes::from(vec![]),
-            signature: Bytes::from(vec![]),
-        };
-
-        let result = account.sign_user_op(user_op, &wallet).await.unwrap();
-
-        let expected_signature: Bytes = "0xe24cd218d33046a7f0f9d3a296ebb0f89d4bc34149a4ee29b036f101ace9d2f85b86451955472e607feca50b51451887a742cee69f16e6a15a9354abce4ab50c1b".parse().unwrap();
-
-        assert_eq!(result, expected_signature)
-    }
+    const ENTRY_POINT_ADDRESS: &str = "0x0000000071727De22E5E9d8BAf0edAc6f37da032";
+    const SIMPLE_ACCOUNT_FACTORY_ADDRESS: &str = "0x91E60e0613810449d098b0b5Ec8b51A0FE8c8985"; //"0x9406Cc6185a346906296840746125a0E44976454";
 
     #[tokio::test]
     async fn test_account_init_code() {
-        let account = make_simple_account();
+        let signer: PrivateKeySigner =
+            "4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318"
+                .parse()
+                .unwrap();
 
-        let result = account.get_account_init_code().await.unwrap();
+        let address: Address = signer.address();
 
-        let expected_init_code: Bytes = "0x9406cc6185a346906296840746125a0e449764545fbfb9cf0000000000000000000000002c7536e3605d9c16a7a3d7b1898e529396a65c230000000000000000000000000000000000000000000000000000000000000000".parse().unwrap();
+        let wallet = EthereumWallet::from(signer);
 
-        assert_eq!(result, expected_init_code)
+        let rpc_url =
+            Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
+                .unwrap();
+        let provider = ProviderBuilder::new()
+            .with_recommended_fillers()
+            .wallet(wallet)
+            .on_http(rpc_url);
+
+        let account = SimpleAccount::new(
+            Arc::new(provider),
+            address,
+            Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
+            Address::from_str(ENTRY_POINT_ADDRESS).unwrap(),
+            84532,
+        );
+
+        let result = account.get_init_code().await.unwrap();
+
+        let expected_init_code = Bytes::from_str("0x9406cc6185a346906296840746125a0e449764545fbfb9cf0000000000000000000000002c7536e3605d9c16a7a3d7b1898e529396a65c230000000000000000000000000000000000000000000000000000000000000000").unwrap();
+
+        assert_eq!(result, expected_init_code);
     }
 
     #[tokio::test]
     async fn test_encode_execute() {
-        let account = make_simple_account();
+        let signer: PrivateKeySigner =
+            "4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318"
+                .parse()
+                .unwrap();
+
+        let address: Address = signer.address();
+
+        let wallet = EthereumWallet::from(signer);
+
+        let rpc_url =
+            Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
+                .unwrap();
+        let provider = ProviderBuilder::new()
+            .with_recommended_fillers()
+            .wallet(wallet)
+            .on_http(rpc_url);
+
+        let account = SimpleAccount::new(
+            Arc::new(provider),
+            address,
+            Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
+            Address::from_str(ENTRY_POINT_ADDRESS).unwrap(),
+            84532,
+        );
+
         let target_address: Address = "0xA87395ef99Fc13Bb043245521C559030aA1827a7"
             .parse()
             .unwrap();
@@ -254,317 +276,236 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_user_op_hash() {
-        let owner: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
+    async fn test_get_counterfactual_address() {
+        let signer: PrivateKeySigner =
+            "4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318"
+                .parse()
+                .unwrap();
+
+        let address: Address = signer.address();
+
+        let wallet = EthereumWallet::from(signer);
+
+        let rpc_url =
+            Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
+                .unwrap();
+        let provider = ProviderBuilder::new()
+            .with_recommended_fillers()
+            .wallet(wallet)
+            .on_http(rpc_url);
+
+        let account = SimpleAccount::new(
+            Arc::new(provider),
+            address,
+            Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
+            Address::from_str(ENTRY_POINT_ADDRESS).unwrap(),
+            84532,
+        );
+
+        let result = account.get_counterfactual_address().await.unwrap();
+
+        assert_eq!(
+            result,
+            "0x982ffac966b962bddf89d3b26fee91da6f68df13"
+                .parse::<Address>()
+                .unwrap()
+        );
+    }
+
+    #[tokio::test]
+    async fn test_sign_user_op() {
+        let signer: PrivateKeySigner =
+            "4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318"
+                .parse()
+                .unwrap();
+
+        let address: Address = signer.address();
+        let wallet = EthereumWallet::from(signer.clone());
+
+        let rpc_url =
+            Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
+                .unwrap();
+        let provider = ProviderBuilder::new()
+            .with_recommended_fillers()
+            .wallet(wallet)
+            .on_http(rpc_url);
+
+        let account = SimpleAccount::new(
+            Arc::new(provider),
+            address,
+            Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
+            Address::from_str(ENTRY_POINT_ADDRESS).unwrap(),
+            84532,
+        );
+
+        let target_address: Address = "0xA87395ef99Fc13Bb043245521C559030aA1827a7"
             .parse()
             .unwrap();
 
-        let account = make_simple_account();
-
         let user_op = UserOperation {
-            sender: owner,
+            sender: target_address,
             nonce: U256::from(1),
-            init_code: account.get_account_init_code().await.unwrap(),
-            call_data: Bytes::from(vec![]),
-            call_gas_limit: U256::from(0),
-            verification_gas_limit: U256::from(0),
-            pre_verification_gas: U256::from(0),
-            max_fee_per_gas: U256::from(0),
-            max_priority_fee_per_gas: U256::from(0),
-            paymaster_and_data: Bytes::from(vec![]),
-            signature: Bytes::from(vec![]),
+            factory: None,
+            factory_data: None,
+            call_data: Bytes::default(),
+            call_gas_limit: U256::ZERO,
+            verification_gas_limit: U256::from(21000),
+            pre_verification_gas: U256::ZERO,
+            max_fee_per_gas: U256::ZERO,
+            max_priority_fee_per_gas: U256::ZERO,
+            paymaster: None,
+            paymaster_verification_gas_limit: None,
+            paymaster_post_op_gas_limit: None,
+            paymaster_data: None,
+            signature: Bytes::default(),
         };
 
-        let onchain_hash = account.get_onchain_user_op_hash(user_op.clone()).await;
-        let offchain_hash = account.get_user_op_hash(user_op.clone()).await.unwrap();
+        let result = account.sign_user_op(user_op, &signer).await.unwrap();
 
-        assert!(onchain_hash == offchain_hash)
+        let expected_signature: Bytes = "0x20cef8f1e5b636465cabaa6091be01b06d06afe27591892668498e76b4bc9b2d0e454f5e4a42233b243880a92ea906e3be6f064523d67974da53306d4cc746ef1c".parse().unwrap();
+
+        assert_eq!(result, expected_signature);
     }
 
     #[tokio::test]
     async fn test_estimate_user_op() {
-        let wallet: LocalWallet =
+        let signer: PrivateKeySigner =
             "82aba1f2ce3d1a0f6eca0ade8877077b7fc6fd06fb0af48ab4a53650bde69979"
                 .parse()
                 .unwrap();
 
-        let account_address: Address = "0x8898886f1adacdb475a8c6778d8c3a011e2c54a6"
-            .parse()
-            .unwrap();
-        let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
-        let factory_address: Address = SIMPLE_ACCOUNT_FACTORY_ADDRESS.parse().unwrap();
-        let entry_point_address: Address = ENTRY_POINT_ADDRESS.parse().unwrap();
+        let wallet = EthereumWallet::from(signer.clone());
+        let rpc_url =
+            Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
+                .unwrap();
+        let provider = ProviderBuilder::new()
+            .with_recommended_fillers()
+            .wallet(wallet)
+            .on_http(rpc_url);
 
-        println!("account address {:?}", account_address);
         let account = SimpleAccount::new(
-            Arc::new(provider),
-            wallet.address(),
-            RwLock::new(Some(account_address)),
-            factory_address,
-            entry_point_address,
-            RwLock::new(false),
-            Chain::Goerli,
+            Arc::new(provider.clone()),
+            signer.address(),
+            Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
+            Address::from_str(ENTRY_POINT_ADDRESS).unwrap(),
+            84532,
         );
 
         let nonce = account.get_nonce().await.unwrap();
 
-        let provider = make_provider(account);
-
         let to_address: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
             .parse()
             .unwrap();
 
-        let sender: Address = "0x8898886f1adacdb475a8c6778d8c3a011e2c54a6"
+        let sender: Address = "0xd03d38efd09e8ba5e2108d602059886c4c4ffefd"
             .parse()
             .unwrap();
 
-        let req = UserOperationRequest::new()
-            .call(AccountCall::Execute(ExecuteCall::new(
-                to_address,
-                100,
-                Bytes::new(),
-            )))
-            .sender(sender)
-            .max_fee_per_gas(100)
-            .max_priority_fee_per_gas(10)
-            .nonce(nonce);
+        let req = UserOperationRequest::new(AccountCall::Execute(ExecuteCall::new(
+            to_address,
+            U256::from(100),
+            Bytes::new(),
+        )))
+        .sender(sender)
+        .max_fee_per_gas(U256::from(100000))
+        .max_priority_fee_per_gas(U256::from(10000))
+        .factory(Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap())
+        .factory_data("0x5fbfb9cf000000000000000000000000a666d9ebcc3feecf8e09c050c9c2379df1e5b3330000000000000000000000000000000000000000000000000000000000000000")
+        .call_data("0xb61d27f6000000000000000000000000de3e943a1c2211cfb087dc6654af2a9728b15536000000000000000000000000000000000000000000000000000000000000006400000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000")
+        .signature("0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c")
+        .nonce(nonce);
 
-        let result = provider
-            .estimate_user_operation_gas(&req.with_defaults())
+        let smart_account_provider = SmartAccountProvider::new(provider, account);
+        let result = smart_account_provider
+            .estimate_user_operation_gas(
+                &req.with_defaults(),
+                Address::from_str(ENTRY_POINT_ADDRESS).unwrap(),
+            )
             .await;
 
-        println!("{:?}", result);
+        println!("Gas estimation result: {:?}", result);
+        assert!(result.is_ok());
     }
 
     #[tokio::test]
     async fn test_send_transaction() {
-        let wallet: LocalWallet =
+        let signer: PrivateKeySigner =
             "82aba1f2ce3d1a0f6eca0ade8877077b7fc6fd06fb0af48ab4a53650bde69979"
                 .parse()
                 .unwrap();
 
-        let account_address: Address = "0x8898886f1adacdb475a8c6778d8c3a011e2c54a6"
-            .parse()
-            .unwrap();
-        let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
-        let factory_address: Address = SIMPLE_ACCOUNT_FACTORY_ADDRESS.parse().unwrap();
-        let entry_point_address: Address = ENTRY_POINT_ADDRESS.parse().unwrap();
+        println!("Signer address: {:?}", signer.address());
 
-        println!("account address {:?}", account_address);
+        let wallet = EthereumWallet::from(signer.clone());
+        let rpc_url =
+            Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
+                .unwrap();
+        let provider = ProviderBuilder::new()
+            .with_recommended_fillers()
+            .wallet(wallet)
+            .on_http(rpc_url);
+
         let account = SimpleAccount::new(
-            Arc::new(provider),
-            wallet.address(),
-            RwLock::new(Some(account_address)),
-            factory_address,
-            entry_point_address,
-            RwLock::new(false),
-            Chain::Goerli,
+            Arc::new(provider.clone()),
+            signer.address(),
+            Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
+            Address::from_str(ENTRY_POINT_ADDRESS).unwrap(),
+            84532,
         );
-
-        let provider = make_provider(account);
 
         let to_address: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
             .parse()
             .unwrap();
 
-        let req = UserOperationRequest::new().call(AccountCall::Execute(ExecuteCall::new(
+        let req = UserOperationRequest::new(AccountCall::Execute(ExecuteCall::new(
             to_address,
-            100,
-            Bytes::new(),
+            U256::from(100),
+            Bytes::default(),
         )));
 
-        let result = provider.send_user_operation(req, &wallet).await;
+        let smart_account_provider = SmartAccountProvider::new(provider, account);
+        let result = smart_account_provider
+            .send_user_operation(
+                req,
+                &signer,
+                Address::from_str(ENTRY_POINT_ADDRESS).unwrap(),
+            )
+            .await;
 
-        let user_op_hash = result.unwrap();
+        let user_op_hash = result.expect("Failed to send user operation");
+        println!("User operation hash: {:?}", user_op_hash);
 
-        let mut interval = time::interval(Duration::from_secs(10));
+        let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(10));
         let mut attempts = 0;
         let max_attempts = 20;
-
-        println!("user op hash {:?}", user_op_hash);
 
         loop {
             interval.tick().await;
             attempts += 1;
 
-            match provider
-                .get_user_operation_receipt(user_op_hash.clone())
+            match smart_account_provider
+                .get_user_operation_receipt(user_op_hash)
                 .await
             {
-                Ok(receipt) => {
-                    if let Some(receipt) = receipt {
-                        println!("Received receipt: {:?}", receipt);
-                        break;
-                    }
+                Ok(Some(receipt)) => {
+                    println!("Received receipt: {:?}", receipt);
+                    break;
+                }
+                Ok(None) => {
+                    println!("Receipt not available yet, retrying...");
                 }
                 Err(e) => {
                     println!("Failed to get user operation receipt: {:?}", e);
                     if attempts >= max_attempts {
-                        println!("Exceeded max attempts, stopping retries");
+                        println!("Exceeded max attempts ({max_attempts}), stopping retries");
                         break;
                     }
                 }
             }
-        }
-    }
 
-    // #[tokio::test]
-    // async fn test_new_wallet() {
-    //     let wallet = LocalWallet::new(&mut rand::thread_rng());
-
-    //     // Bytes(0x82aba1f2ce3d1a0f6eca0ade8877077b7fc6fd06fb0af48ab4a53650bde69979)
-    //     // 0xa666d9ebcc3feecf8e09c050c9c2379df1e5b333
-
-    //     // SA 0x8898886f1adacdb475a8c6778d8c3a011e2c54a6
-    //     println!("{:?}", wallet.address());
-
-    //     let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
-
-    //     let account = SimpleAccount::new(
-    //         Arc::new(provider),
-    //         wallet.address(),
-    //         RwLock::new(None),
-    //         RwLock::new(false),
-    //         RPC_URL.to_string(),
-    //     );
-
-    //     // let contract_address = account.get_counterfactual_address().await.unwrap();
-
-    //     // println!("{:?}", contract_address);
-
-    //     let middleware = SmartAccountMiddleware::new(Provider::<Http>::try_from("https://api.stackup.sh/v1/node/2e0bd6d2d67c8003121fb3ac53c3cd866dc2ce425f68f817d6e9b723fe3cfd5f").unwrap(), account);
-
-    //     let to_address: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
-    //         .parse()
-    //         .unwrap();
-
-    //     let req = UserOperationRequest::new().call(AccountCall::Execute(ExecuteCall::new(
-    //         to_address,
-    //         100,
-    //         Bytes::new(),
-    //     )));
-    //     // .target_address(to_address)
-    //     // .tx_value(100);
-    //     // .tx_data(Bytes::new());
-    //     // .call_gas_limit(40000);
-    //     let result = middleware.send_user_operation(req, &wallet).await;
-
-    //     // fix : Err(ProviderError(JsonRpcClientError(JsonRpcError(JsonRpcError { code: -32602, message: "callGasLimit: below expected gas of 33100", data: Some(String("callGasLimit: below expected gas of 33100")) }))))
-
-    //     println!("send result {:?}", result);
-
-    //     let user_op_hash = result.unwrap();
-
-    //     let mut interval = time::interval(Duration::from_secs(10));
-    //     let mut attempts = 0;
-    //     let max_attempts = 20;
-
-    //     loop {
-    //         interval.tick().await;
-    //         attempts += 1;
-
-    //         match middleware
-    //             .get_user_operation_receipt(user_op_hash.clone())
-    //             // .get_user_operation(user_op_hash)
-    //             .await
-    //         {
-    //             Ok(receipt) => {
-    //                 println!("Received receipt: {:?}", receipt);
-    //                 break;
-    //             }
-    //             Err(e) => {
-    //                 println!("Failed to get user operation receipt: {:?}", e);
-    //                 if attempts >= max_attempts {
-    //                     println!("Exceeded max attempts, stopping retries");
-    //                     break;
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     // let receipt = middleware.get_user_operation_receipt(result.unwrap()).await;
-    //     //0x6303715bf1ecc999f96baf320896de93ff7951e908506e6ed68ac46190c09746
-    //     // println!("receipt {:?}", receipt);
-    // }
-
-    // #[tokio::test]
-    // async fn test_get_user_op() {
-    //     let wallet: LocalWallet =
-    //         "82aba1f2ce3d1a0f6eca0ade8877077b7fc6fd06fb0af48ab4a53650bde69979"
-    //             .parse()
-    //             .unwrap();
-
-    //     // Bytes(0x82aba1f2ce3d1a0f6eca0ade8877077b7fc6fd06fb0af48ab4a53650bde69979)
-    //     // 0xa666d9ebcc3feecf8e09c050c9c2379df1e5b333
-
-    //     // SA 0x8898886f1adacdb475a8c6778d8c3a011e2c54a6
-    //     println!("{:?}", wallet.address());
-
-    //     let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
-
-    //     let account = SimpleAccount::new(
-    //         Arc::new(provider),
-    //         wallet.address(),
-    //         RwLock::new(Some(
-    //             "0x8898886f1adacdb475a8c6778d8c3a011e2c54a6"
-    //                 .parse()
-    //                 .unwrap(),
-    //         )),
-    //         RwLock::new(true),
-    //         RPC_URL.to_string(),
-    //     );
-    //     let middleware = SmartAccountMiddleware::new(Provider::<Http>::try_from("https://api.stackup.sh/v1/node/2e0bd6d2d67c8003121fb3ac53c3cd866dc2ce425f68f817d6e9b723fe3cfd5f").unwrap(), account);
-
-    //     let user_op_hash: UserOpHash =
-    //         "0x6303715bf1ecc999f96baf320896de93ff7951e908506e6ed68ac46190c09746"
-    //             .parse::<H256>()
-    //             .unwrap()
-    //             .into();
-
-    //     let user_op = middleware.get_user_operation(user_op_hash).await;
-
-    //     println!("{:?}", user_op);
-    // }
-
-    fn make_simple_account() -> SimpleAccount {
-        let account_address: Address = make_wallet().address();
-        let provider = Provider::<Http>::try_from(RPC_URL).unwrap();
-        let factory_address: Address = SIMPLE_ACCOUNT_FACTORY_ADDRESS.parse().unwrap();
-        let entry_point_address: Address = ENTRY_POINT_ADDRESS.parse().unwrap();
-
-        println!("account address {:?}", account_address);
-        SimpleAccount::new(
-            Arc::new(provider),
-            account_address,
-            RwLock::new(None),
-            factory_address,
-            entry_point_address,
-            RwLock::new(false),
-            Chain::Goerli,
-        )
-    }
-
-    fn make_provider(account: SimpleAccount) -> SmartAccountProvider<Http, SimpleAccount> {
-        let url: Url = RPC_URL.try_into().unwrap();
-        let http_provider = Http::new(url);
-
-        let account_provider = SmartAccountProvider::new(http_provider, account);
-
-        account_provider
-    }
-
-    fn make_wallet() -> Wallet<SigningKey> {
-        "4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318"
-            .parse()
-            .unwrap()
-    }
-
-    impl SimpleAccount {
-        async fn get_onchain_user_op_hash(&self, user_op: UserOperation) -> [u8; 32] {
-            self.entry_point()
-                .get_user_op_hash(user_op.into())
-                .call()
-                .await
-                .unwrap()
+            if attempts >= max_attempts {
+                panic!("Failed to get receipt after {max_attempts} attempts");
+            }
         }
     }
 }
