@@ -142,7 +142,7 @@ impl UserOperationRequest {
             paymaster_verification_gas_limit: self.paymaster_verification_gas_limit,
             paymaster_post_op_gas_limit: self.paymaster_post_op_gas_limit,
             paymaster_data: self.paymaster_data,
-            signature: Some(self.signature.unwrap_or_else(|| "0xb6905c3cc524616247f41b6de20bced7d4437a6513a5cf1c90ab6a28415eb6993e1236443130bce47d1580ab289bcc8f32270acb4ae7e46a17fe158f473fd4991c".parse().unwrap())),
+            signature: Some(self.signature.unwrap_or_else(|| "0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c".parse().unwrap())),
         }
     }
 
@@ -277,6 +277,28 @@ impl UserOperationRequest {
                 .signature
                 .ok_or("Missing 'signature' field for UserOperation")?,
         })
+    }
+}
+
+impl From<UserOperationRequest> for UserOperation {
+    fn from(request: UserOperationRequest) -> Self {
+        Self {
+            sender: request.sender.unwrap_or_else(|| Address::ZERO),
+            nonce: request.nonce.unwrap_or_else(|| U256::ZERO), 
+            factory: request.factory,
+            factory_data: request.factory_data,
+            call_data: request.call_data.unwrap_or_else(|| Bytes::new()),
+            verification_gas_limit: request.verification_gas_limit.unwrap_or_else(|| U256::ZERO),
+            call_gas_limit: request.call_gas_limit.unwrap_or_else(|| U256::ZERO),
+            pre_verification_gas: request.pre_verification_gas.unwrap_or_else(|| U256::ZERO),
+            max_fee_per_gas: request.max_fee_per_gas.unwrap_or_else(|| U256::ZERO),
+            max_priority_fee_per_gas: request.max_priority_fee_per_gas.unwrap_or_else(|| U256::ZERO),
+            paymaster: request.paymaster,
+            paymaster_verification_gas_limit: request.paymaster_verification_gas_limit,
+            paymaster_post_op_gas_limit: request.paymaster_post_op_gas_limit,
+            paymaster_data: request.paymaster_data,
+            signature: request.signature.unwrap_or_else(|| Bytes::new()),
+        }
     }
 }
 
