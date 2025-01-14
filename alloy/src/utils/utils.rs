@@ -150,12 +150,12 @@ sol! {
     struct UserOpForSignature {
         address sender;
         uint256 nonce;
-        bytes initCode;
-        bytes callData;
+        bytes32 initCode;
+        bytes32 callData;
         bytes32 accountGasLimits;
         uint256 preVerificationGas;
         bytes32 gasFees;
-        bytes paymasterAndData;
+        bytes32 paymasterAndData;
     }
 }
 
