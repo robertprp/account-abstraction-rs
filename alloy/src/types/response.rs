@@ -145,3 +145,24 @@ pub struct UserOperationGasEstimate {
     #[serde(rename = "callGasLimit")]
     pub call_gas_limit: u64,
 }
+
+/// Represents the gas estimation for a user operation.
+// #[derive(Debug, Clone, PartialEq, Eq)]
+// #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+// #[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
+
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Default)]
+pub struct UserOperationGasEstimation {
+    /// The gas limit for the pre-verification.
+    #[serde(rename = "preVerificationGas")]
+    pub pre_verification_gas: U256,
+    /// The gas limit for the verification.
+    #[serde(rename = "verificationGasLimit")]
+    pub verification_gas_limit: U256,
+    /// The gas limit for the paymaster verification.
+    #[serde(rename = "paymasterVerificationGasLimit")]
+    pub paymaster_verification_gas_limit: Option<U256>,
+    /// The gas limit for the call.
+    #[serde(rename = "callGasLimit")]
+    pub call_gas_limit: U256,
+}
