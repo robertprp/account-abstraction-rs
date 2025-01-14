@@ -236,6 +236,25 @@ where
             }
         }
 
+        // if user_op.pre_verification_gas.is_none() {
+        //     let init_gas: U256 = self
+        //         .account
+        //         .estimate_creation_gas()
+        //         .await
+        //         .map_err(SmartAccountProviderError::AccountError)?;
+        //     user_op.verification_gas_limit =
+        //         Some(self.account.get_verification_gas_limit().add(init_gas));
+        // }
+
+        // // TODO: Only add factory fields if account not deployed
+        // if user_op.factory.is_none() {
+        //     user_op.factory = Some(self.account.get_factory_address());
+        // }
+
+        // if user_op.factory_data.is_none() {
+        //     user_op.factory_data = Some(self.account.get_factory_data().await);
+        // }
+
         if user_op.call_gas_limit.is_none()
             || user_op.verification_gas_limit.is_none()
             || user_op.pre_verification_gas.is_none()

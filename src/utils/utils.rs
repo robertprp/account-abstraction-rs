@@ -6,6 +6,7 @@ use alloy::{
 
 use crate::types::{PackedUserOperation, UserOperation};
 
+// TODO: Move to entry_point getUserOperationHash()
 pub fn get_user_op_hash(user_op: &UserOperation, entry_point: Address, chain_id: U256) -> [u8; 32] {
     // First get the hash of the encoded user operation
     let user_op_encoded = encode_user_op(user_op, true);
@@ -52,6 +53,28 @@ pub fn encode_user_op(user_op: &UserOperation, for_signature: bool) -> Bytes {
         encoded.into()
     }
 }
+
+// export function encodeUserOp (userOp: UserOperation, forSignature = true): string {
+//     const packedUserOp = packUserOp(userOp)
+//     if (forSignature) {
+//       return defaultAbiCoder.encode(
+//         ['address', 'uint256', 'bytes32', 'bytes32',
+//           'bytes32', 'uint256', 'bytes32',
+//           'bytes32'],
+//         [packedUserOp.sender, packedUserOp.nonce, keccak256(packedUserOp.initCode), keccak256(packedUserOp.callData),
+//           packedUserOp.accountGasLimits, packedUserOp.preVerificationGas, packedUserOp.gasFees,
+//           keccak256(packedUserOp.paymasterAndData)])
+//     } else {
+//       // for the purpose of calculating gas cost encode also signature (and no keccak of bytes)
+//       return defaultAbiCoder.encode(
+//         ['address', 'uint256', 'bytes', 'bytes',
+//           'bytes32', 'uint256', 'bytes32',
+//           'bytes', 'bytes'],
+//         [packedUserOp.sender, packedUserOp.nonce, packedUserOp.initCode, packedUserOp.callData,
+//           packedUserOp.accountGasLimits, packedUserOp.preVerificationGas, packedUserOp.gasFees,
+//           packedUserOp.paymasterAndData, packedUserOp.signature])
+//     }
+//   }
 
 pub fn pack_user_op(user_op: &UserOperation) -> PackedUserOperation {
     let account_gas_limits =

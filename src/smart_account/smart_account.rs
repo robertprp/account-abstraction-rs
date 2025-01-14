@@ -71,8 +71,35 @@ pub trait SmartAccount<P: Provider<T, N>, T: Transport + Clone, N: Network = Eth
             return Err(AccountError::InvalidInitCodeError);
         }
 
+        println!("Counterfactual address: {:?}", address);
+
         Ok(address)
     }
+
+    // async fn estimate_creation_gas(&self) -> Result<U256, AccountError> {
+    //     let init_code: Bytes = self.get_init_code().await?;
+
+    //     if init_code.is_empty() {
+    //         Ok(U256::zero())
+    //     } else {
+    //         let deployer_address = &init_code[0..20];
+    //         let deployer_address = Address::from_slice(deployer_address);
+    //         let deployer_call_data = &init_code[20..];
+
+    //         let typed_tx: TypedTransaction = TransactionRequest::new()
+    //             .to(deployer_address)
+    //             .data(deployer_call_data.to_vec())
+    //             .into();
+
+    //         let gas_estimate: U256 = self
+    //             .provider()
+    //             .estimate_gas(&typed_tx, None)
+    //             .await
+    //             .map_err(AccountError::ProviderError)?;
+
+    //         Ok(gas_estimate)
+    //     }
+    // }
 
     async fn get_user_op_hash<U: Into<UserOperation> + Send + Sync>(
         &self,
