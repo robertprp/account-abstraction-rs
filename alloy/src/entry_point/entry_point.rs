@@ -68,7 +68,7 @@ impl<P: Provider<T, N> + Clone + Debug, T: Transport + Clone + Debug, N: Network
                     .filter(|data| data.len() >= 36)
                     .map(|data| Address::from_slice(&data[16..36]))
                     .ok_or(EntryPointError::RevertError(
-                        "Invalid revert error format".into(),
+                        error_payload.message.clone().to_string(),
                     )),
                 _ => Err(EntryPointError::RevertError(
                     "Invalid revert error format".into(),
