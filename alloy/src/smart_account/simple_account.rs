@@ -1,6 +1,6 @@
 use alloy::{
     network::Ethereum,
-    primitives::{Address, Bytes, ChainId, U256},
+    primitives::{Address, Bytes, ChainId, Uint, U256},
     providers::Provider,
     sol,
     sol_types::SolInterface,
@@ -148,17 +148,17 @@ where
     }
 
     async fn encode_execute_batch(&self, calls: Vec<ExecuteCall>) -> Result<Vec<u8>, AccountError> {
-        unimplemented!()
-        // let targets: Vec<Address> = calls.iter().map(|call| call.target).collect();
-        // let data: Vec<Bytes> = calls.iter().map(|call| call.data.clone()).collect();
-        // let values: Vec<U256> = calls.iter().map(|call| call.value).collect();
-        // let call = SimpleAccountContractCalls::executeBatch(executeBatchCall {
-        //     dest: targets,
-        //     func: data,
-        // })
-        // .abi_encode();
+        let targets: Vec<Address> = calls.iter().map(|call| call.target).collect();
+        let data: Vec<Bytes> = calls.iter().map(|call| call.data.clone()).collect();
+        let values: Vec<Uint<256, 4>> = calls.iter().map(|call| call.value).collect();
+        let call = SimpleAccountContractCalls::executeBatch(executeBatchCall {
+            dest: targets,
+            value: values,
+            func: data,
+        })
+        .abi_encode();
 
-        // Ok(call)
+        Ok(call)
     }
 
     async fn sign_user_op_hash<S: SmartAccountSigner>(
