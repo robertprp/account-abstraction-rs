@@ -466,6 +466,14 @@ mod tests {
         async fn get_nonce(&self, _address: Address) -> Result<U256, EntryPointError> {
             Ok(U256::ZERO)
         }
+
+        async fn get_user_op_hash(
+            &self,
+            _user_op: &UserOperation,
+            _chain_id: U256,
+        ) -> Result<[u8; 32], EntryPointError> {
+            Ok([0; 32])
+        }
     }
 
     #[tokio::test]

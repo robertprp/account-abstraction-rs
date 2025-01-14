@@ -11,7 +11,6 @@ use thiserror::Error;
 use crate::entry_point::{EntryPointError, EntryPointTrait};
 use crate::signer::SmartAccountSigner;
 use crate::types::{ExecuteCall, UserOperation};
-use crate::utils;
 
 #[async_trait]
 pub trait SmartAccount<P: Provider<T, N>, T: Transport + Clone, N: Network = Ethereum>:
@@ -104,13 +103,13 @@ pub trait SmartAccount<P: Provider<T, N>, T: Transport + Clone, N: Network = Eth
         user_op: U,
     ) -> Result<[u8; 32], AccountError> {
         let chain_id = U256::from(self.chain_id());
-        let entry_point_address: Address = self.entry_point().get_address();
+        let user_op_hash = self
+            .entry_point()
+            .get_user_op_hash(&user_op.into(), chain_id)
+            .await
+            .map_err(AccountError::EntryPointError)?;
 
-        Ok(utils::get_user_op_hash(
-            &user_op.into(),
-            entry_point_address,
-            chain_id,
-        ))
+        Ok(user_op_hash)
     }
 
     async fn sign_user_op_hash<S: SmartAccountSigner>(
@@ -146,7 +145,7 @@ pub enum AccountError {
 
     #[error("contract error: {0}")]
     EntryPointError(EntryPointError),
-    
+
     #[error("rpc error: {0}")]
     RpcError(String),
 

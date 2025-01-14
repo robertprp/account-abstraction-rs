@@ -1,4 +1,7 @@
 use crate::entry_point::EntryPointContract::PackedUserOperation;
+use crate::types::UserOperation;
+use crate::utils;
+
 use alloy::contract::Error;
 use alloy::transports::RpcError;
 use alloy::{network::Network, providers::Provider, transports::Transport};
@@ -15,6 +18,11 @@ pub trait EntryPointTrait: Sync + Send + Debug {
     fn get_address(&self) -> Address;
     async fn get_sender_address(&self, init_code: Bytes) -> Result<Address, EntryPointError>;
     async fn get_nonce(&self, address: Address) -> Result<U256, EntryPointError>;
+    async fn get_user_op_hash(
+        &self,
+        user_op: &UserOperation,
+        chain_id: U256,
+    ) -> Result<[u8; 32], EntryPointError>;
 }
 
 sol!(
@@ -88,6 +96,14 @@ impl<P: Provider<T, N> + Clone + Debug, T: Transport + Clone + Debug, N: Network
             .nonce;
 
         Ok(nonce)
+    }
+
+    async fn get_user_op_hash(
+        &self,
+        user_op: &UserOperation,
+        chain_id: U256,
+    ) -> Result<[u8; 32], EntryPointError> {
+        Ok(utils::get_user_op_hash(&user_op, self.address, chain_id))
     }
 }
 
