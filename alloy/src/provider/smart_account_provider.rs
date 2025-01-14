@@ -209,24 +209,26 @@ where
             })?);
         }
 
-        if user_op.factory.is_none() && !self.account.is_account_deployed().await.map_err(|e| {
-            SmartAccountError::Provider(format!("Failed to check if account is deployed: {}", e))
-        })? {
+        if user_op.factory.is_none()
+            && !self.account.is_account_deployed().await.map_err(|e| {
+                SmartAccountError::Provider(format!(
+                    "Failed to check if account is deployed: {}",
+                    e
+                ))
+            })?
+        {
             user_op.factory = Some(self.account.get_factory_address());
             user_op.factory_data = Some(self.account.get_factory_data().await);
         }
 
         if user_op.max_fee_per_gas.is_none() || user_op.max_priority_fee_per_gas.is_none() {
-            let eip1559_fees = self
-                .inner
-                .estimate_eip1559_fees(None)
-                .await
-                .map_err(|e| {
-                    SmartAccountError::Provider(format!("Failed to estimate EIP1559 fees: {}", e))
-                })?;
-                
+            let eip1559_fees = self.inner.estimate_eip1559_fees(None).await.map_err(|e| {
+                SmartAccountError::Provider(format!("Failed to estimate EIP1559 fees: {}", e))
+            })?;
+
             if user_op.max_priority_fee_per_gas.is_none() {
-                user_op.max_priority_fee_per_gas = Some(U256::from(eip1559_fees.max_priority_fee_per_gas));
+                user_op.max_priority_fee_per_gas =
+                    Some(U256::from(eip1559_fees.max_priority_fee_per_gas));
             }
 
             if user_op.max_fee_per_gas.is_none() {
@@ -239,10 +241,7 @@ where
             || user_op.pre_verification_gas.is_none()
         {
             let gas_estimate = self
-                .estimate_user_operation_gas(
-                    &user_op.clone().with_defaults(),
-                    entry_point,
-                )
+                .estimate_user_operation_gas(&user_op.clone().with_defaults(), entry_point)
                 .await?;
 
             if user_op.call_gas_limit.is_none() {

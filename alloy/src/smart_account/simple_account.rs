@@ -174,7 +174,10 @@ where
 }
 #[cfg(test)]
 mod tests {
-    use crate::{provider::{SmartAccountProvider, SmartAccountProviderTrait}, types::{AccountCall, UserOperation, UserOperationRequest}};
+    use crate::{
+        provider::{SmartAccountProvider, SmartAccountProviderTrait},
+        types::{AccountCall, UserOperation, UserOperationRequest},
+    };
 
     use super::*;
     use alloy::{
@@ -187,7 +190,7 @@ mod tests {
     use url::Url;
 
     const ENTRY_POINT_ADDRESS: &str = "0x0000000071727De22E5E9d8BAf0edAc6f37da032";
-    const SIMPLE_ACCOUNT_FACTORY_ADDRESS: &str = "0x91E60e0613810449d098b0b5Ec8b51A0FE8c8985";//"0x9406Cc6185a346906296840746125a0E44976454";
+    const SIMPLE_ACCOUNT_FACTORY_ADDRESS: &str = "0x91E60e0613810449d098b0b5Ec8b51A0FE8c8985"; //"0x9406Cc6185a346906296840746125a0E44976454";
 
     #[tokio::test]
     async fn test_account_init_code() {
@@ -358,7 +361,7 @@ mod tests {
         let result = account.sign_user_op(user_op, &signer).await.unwrap();
 
         let expected_signature: Bytes = "0x20cef8f1e5b636465cabaa6091be01b06d06afe27591892668498e76b4bc9b2d0e454f5e4a42233b243880a92ea906e3be6f064523d67974da53306d4cc746ef1c".parse().unwrap();
-        
+
         assert_eq!(result, expected_signature);
     }
 
@@ -370,7 +373,9 @@ mod tests {
                 .unwrap();
 
         let wallet = EthereumWallet::from(signer.clone());
-        let rpc_url = Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx").unwrap();
+        let rpc_url =
+            Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
+                .unwrap();
         let provider = ProviderBuilder::new()
             .with_recommended_fillers()
             .wallet(wallet)
@@ -410,7 +415,10 @@ mod tests {
 
         let smart_account_provider = SmartAccountProvider::new(provider, account);
         let result = smart_account_provider
-            .estimate_user_operation_gas(&req.with_defaults(), Address::from_str(ENTRY_POINT_ADDRESS).unwrap())
+            .estimate_user_operation_gas(
+                &req.with_defaults(),
+                Address::from_str(ENTRY_POINT_ADDRESS).unwrap(),
+            )
             .await;
 
         println!("Gas estimation result: {:?}", result);
@@ -455,7 +463,11 @@ mod tests {
 
         let smart_account_provider = SmartAccountProvider::new(provider, account);
         let result = smart_account_provider
-            .send_user_operation(req, &signer, Address::from_str(ENTRY_POINT_ADDRESS).unwrap())
+            .send_user_operation(
+                req,
+                &signer,
+                Address::from_str(ENTRY_POINT_ADDRESS).unwrap(),
+            )
             .await;
 
         let user_op_hash = result.expect("Failed to send user operation");

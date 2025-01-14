@@ -284,7 +284,7 @@ impl From<UserOperationRequest> for UserOperation {
     fn from(request: UserOperationRequest) -> Self {
         Self {
             sender: request.sender.unwrap_or_else(|| Address::ZERO),
-            nonce: request.nonce.unwrap_or_else(|| U256::ZERO), 
+            nonce: request.nonce.unwrap_or_else(|| U256::ZERO),
             factory: request.factory,
             factory_data: request.factory_data,
             call_data: request.call_data.unwrap_or_else(|| Bytes::new()),
@@ -292,7 +292,9 @@ impl From<UserOperationRequest> for UserOperation {
             call_gas_limit: request.call_gas_limit.unwrap_or_else(|| U256::ZERO),
             pre_verification_gas: request.pre_verification_gas.unwrap_or_else(|| U256::ZERO),
             max_fee_per_gas: request.max_fee_per_gas.unwrap_or_else(|| U256::ZERO),
-            max_priority_fee_per_gas: request.max_priority_fee_per_gas.unwrap_or_else(|| U256::ZERO),
+            max_priority_fee_per_gas: request
+                .max_priority_fee_per_gas
+                .unwrap_or_else(|| U256::ZERO),
             paymaster: request.paymaster,
             paymaster_verification_gas_limit: request.paymaster_verification_gas_limit,
             paymaster_post_op_gas_limit: request.paymaster_post_op_gas_limit,

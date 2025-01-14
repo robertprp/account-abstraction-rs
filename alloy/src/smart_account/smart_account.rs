@@ -33,7 +33,7 @@ pub trait SmartAccount<P: Provider<T, N>, T: Transport + Clone, N: Network = Eth
         if init_code.len() <= 20 {
             return Bytes::default();
         }
-        
+
         Bytes::from(init_code[20..].to_vec())
     }
 
