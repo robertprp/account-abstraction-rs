@@ -125,18 +125,14 @@ fn pack_paymaster_data(
 ) -> Bytes {
     let mut result = Vec::with_capacity(20 + 32 + paymaster_data.len());
 
-    // Add paymaster address (20 bytes)
     result.extend_from_slice(paymaster.as_slice());
 
-    // Add verification gas limit (16 bytes)
     let ver_gas_bytes: [u8; 32] = paymaster_verification_gas_limit.to_be_bytes();
-    result.extend_from_slice(&ver_gas_bytes[16..32]); // Take last 16 bytes
+    result.extend_from_slice(&ver_gas_bytes[16..32]);
 
-    // Add post op gas limit (16 bytes)
     let post_gas_bytes: [u8; 32] = post_op_gas_limit.to_be_bytes();
-    result.extend_from_slice(&post_gas_bytes[16..32]); // Take last 16 bytes
+    result.extend_from_slice(&post_gas_bytes[16..32]);
 
-    // Add paymaster data
     result.extend_from_slice(&paymaster_data);
 
     Bytes::from(result)
@@ -176,7 +172,6 @@ mod tests {
 
     #[test]
     fn test_get_user_op_hash() {
-        // Create a test UserOperation
         let user_op = UserOperation {
             sender: Address::from_slice(&[1u8; 20]),
             nonce: U256::from(1),
@@ -195,13 +190,11 @@ mod tests {
             signature: Bytes::from(vec![6u8; 65]),
         };
 
-        // Test values
         let entry_point = Address::from_str("0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789").unwrap();
         let chain_id = U256::from(1);
 
         let hash = get_user_op_hash(&user_op, entry_point, chain_id);
 
-        // The hash should be 32 bytes
         assert_eq!(hash.len(), 32);
     }
 
@@ -212,7 +205,6 @@ mod tests {
 
         let result = pack_account_gas_limits(verification_gas, call_gas);
 
-        // Create full 32-byte arrays with padding
         let mut ver_bytes = [0u8; 32];
         let mut call_bytes = [0u8; 32];
         ver_bytes[16..].copy_from_slice(&result[..16]);
