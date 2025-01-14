@@ -8,14 +8,11 @@ use crate::types::{PackedUserOperation, UserOperation};
 
 // TODO: Move to entry_point getUserOperationHash()
 pub fn get_user_op_hash(user_op: &UserOperation, entry_point: Address, chain_id: U256) -> [u8; 32] {
-    // First get the hash of the encoded user operation
     let user_op_encoded = encode_user_op(user_op, true);
     let user_op_hash = keccak256(user_op_encoded);
 
-    // Create and encode the data
     let data = (user_op_hash, entry_point, chain_id);
 
-    // Return the keccak256 hash of the encoded data
     keccak256(data.abi_encode()).into()
 }
 
@@ -53,28 +50,6 @@ pub fn encode_user_op(user_op: &UserOperation, for_signature: bool) -> Bytes {
         encoded.into()
     }
 }
-
-// export function encodeUserOp (userOp: UserOperation, forSignature = true): string {
-//     const packedUserOp = packUserOp(userOp)
-//     if (forSignature) {
-//       return defaultAbiCoder.encode(
-//         ['address', 'uint256', 'bytes32', 'bytes32',
-//           'bytes32', 'uint256', 'bytes32',
-//           'bytes32'],
-//         [packedUserOp.sender, packedUserOp.nonce, keccak256(packedUserOp.initCode), keccak256(packedUserOp.callData),
-//           packedUserOp.accountGasLimits, packedUserOp.preVerificationGas, packedUserOp.gasFees,
-//           keccak256(packedUserOp.paymasterAndData)])
-//     } else {
-//       // for the purpose of calculating gas cost encode also signature (and no keccak of bytes)
-//       return defaultAbiCoder.encode(
-//         ['address', 'uint256', 'bytes', 'bytes',
-//           'bytes32', 'uint256', 'bytes32',
-//           'bytes', 'bytes'],
-//         [packedUserOp.sender, packedUserOp.nonce, packedUserOp.initCode, packedUserOp.callData,
-//           packedUserOp.accountGasLimits, packedUserOp.preVerificationGas, packedUserOp.gasFees,
-//           packedUserOp.paymasterAndData, packedUserOp.signature])
-//     }
-//   }
 
 pub fn pack_user_op(user_op: &UserOperation) -> PackedUserOperation {
     let account_gas_limits =
@@ -133,13 +108,11 @@ pub fn pack_user_op(user_op: &UserOperation) -> PackedUserOperation {
 fn pack_account_gas_limits(verification_gas_limit: U256, call_gas_limit: U256) -> [u8; 32] {
     let mut result = [0u8; 32];
 
-    // Convert verification_gas_limit to bytes and pad to 16 bytes
     let ver_gas_bytes: [u8; 32] = verification_gas_limit.to_be_bytes();
-    result[..16].copy_from_slice(&ver_gas_bytes[16..32]); // Take last 16 bytes
+    result[..16].copy_from_slice(&ver_gas_bytes[16..32]);
 
-    // Convert call_gas_limit to bytes and pad to 16 bytes
     let call_gas_bytes: [u8; 32] = call_gas_limit.to_be_bytes();
-    result[16..].copy_from_slice(&call_gas_bytes[16..32]); // Take last 16 bytes
+    result[16..].copy_from_slice(&call_gas_bytes[16..32]);
 
     result
 }

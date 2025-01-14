@@ -17,7 +17,7 @@ use crate::utils;
 pub trait SmartAccount<P: Provider<T, N>, T: Transport + Clone, N: Network = Ethereum>:
     Sync + Send + Debug
 {
-    type P: Provider<T, N>; // ProviderLayer?
+    type P: Provider<T, N>;
     type EntryPoint: EntryPointTrait;
 
     fn provider(&self) -> &Self::P;
@@ -70,8 +70,6 @@ pub trait SmartAccount<P: Provider<T, N>, T: Transport + Clone, N: Network = Eth
         if address == Address::ZERO {
             return Err(AccountError::InvalidInitCodeError);
         }
-
-        println!("Counterfactual address: {:?}", address);
 
         Ok(address)
     }
@@ -148,9 +146,7 @@ pub enum AccountError {
 
     #[error("contract error: {0}")]
     EntryPointError(EntryPointError),
-
-    // #[error("provider error: {0}")]
-    // ProviderError(ProviderError),
+    
     #[error("rpc error: {0}")]
     RpcError(String),
 
