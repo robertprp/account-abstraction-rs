@@ -174,6 +174,8 @@ where
 }
 #[cfg(test)]
 mod tests {
+    use crate::{provider::{SmartAccountProvider, SmartAccountProviderTrait}, types::{AccountCall, UserOperation, UserOperationRequest}};
+
     use super::*;
     use alloy::{
         network::EthereumWallet,
@@ -185,7 +187,7 @@ mod tests {
     use url::Url;
 
     const ENTRY_POINT_ADDRESS: &str = "0x0000000071727De22E5E9d8BAf0edAc6f37da032";
-    const SIMPLE_ACCOUNT_FACTORY_ADDRESS: &str = "0x9406Cc6185a346906296840746125a0E44976454";
+    const SIMPLE_ACCOUNT_FACTORY_ADDRESS: &str = "0x91E60e0613810449d098b0b5Ec8b51A0FE8c8985";//"0x9406Cc6185a346906296840746125a0E44976454";
 
     #[tokio::test]
     async fn test_account_init_code() {
@@ -303,5 +305,193 @@ mod tests {
                 .parse::<Address>()
                 .unwrap()
         );
+    }
+
+    #[tokio::test]
+    async fn test_sign_user_op() {
+        let signer: PrivateKeySigner =
+            "4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318"
+                .parse()
+                .unwrap();
+
+        let address: Address = signer.address();
+        let wallet = EthereumWallet::from(signer.clone());
+
+        let rpc_url =
+            Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
+                .unwrap();
+        let provider = ProviderBuilder::new()
+            .with_recommended_fillers()
+            .wallet(wallet)
+            .on_http(rpc_url);
+
+        let account = SimpleAccount::new(
+            Arc::new(provider),
+            address,
+            Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
+            Address::from_str(ENTRY_POINT_ADDRESS).unwrap(),
+            84532,
+        );
+
+        let target_address: Address = "0xA87395ef99Fc13Bb043245521C559030aA1827a7"
+            .parse()
+            .unwrap();
+
+        let user_op = UserOperation {
+            sender: target_address,
+            nonce: U256::from(1),
+            factory: None,
+            factory_data: None,
+            call_data: Bytes::default(),
+            call_gas_limit: U256::ZERO,
+            verification_gas_limit: U256::from(21000),
+            pre_verification_gas: U256::ZERO,
+            max_fee_per_gas: U256::ZERO,
+            max_priority_fee_per_gas: U256::ZERO,
+            paymaster: None,
+            paymaster_verification_gas_limit: None,
+            paymaster_post_op_gas_limit: None,
+            paymaster_data: None,
+            signature: Bytes::default(),
+        };
+
+        let result = account.sign_user_op(user_op, &signer).await.unwrap();
+
+        let expected_signature: Bytes = "0x20cef8f1e5b636465cabaa6091be01b06d06afe27591892668498e76b4bc9b2d0e454f5e4a42233b243880a92ea906e3be6f064523d67974da53306d4cc746ef1c".parse().unwrap();
+        
+        assert_eq!(result, expected_signature);
+    }
+
+    #[tokio::test]
+    async fn test_estimate_user_op() {
+        let signer: PrivateKeySigner =
+            "82aba1f2ce3d1a0f6eca0ade8877077b7fc6fd06fb0af48ab4a53650bde69979"
+                .parse()
+                .unwrap();
+
+        let wallet = EthereumWallet::from(signer.clone());
+        let rpc_url = Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx").unwrap();
+        let provider = ProviderBuilder::new()
+            .with_recommended_fillers()
+            .wallet(wallet)
+            .on_http(rpc_url);
+
+        let account = SimpleAccount::new(
+            Arc::new(provider.clone()),
+            signer.address(),
+            Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
+            Address::from_str(ENTRY_POINT_ADDRESS).unwrap(),
+            84532,
+        );
+
+        let nonce = account.get_nonce().await.unwrap();
+
+        let to_address: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
+            .parse()
+            .unwrap();
+
+        let sender: Address = "0xd03d38efd09e8ba5e2108d602059886c4c4ffefd"
+            .parse()
+            .unwrap();
+
+        let req = UserOperationRequest::new(AccountCall::Execute(ExecuteCall::new(
+            to_address,
+            U256::from(100),
+            Bytes::new(),
+        )))
+        .sender(sender)
+        .max_fee_per_gas(U256::from(100000))
+        .max_priority_fee_per_gas(U256::from(10000))
+        .factory(Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap())
+        .factory_data("0x5fbfb9cf000000000000000000000000a666d9ebcc3feecf8e09c050c9c2379df1e5b3330000000000000000000000000000000000000000000000000000000000000000")
+        .call_data("0xb61d27f6000000000000000000000000de3e943a1c2211cfb087dc6654af2a9728b15536000000000000000000000000000000000000000000000000000000000000006400000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000")
+        .signature("0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c")
+        .nonce(nonce);
+
+        let smart_account_provider = SmartAccountProvider::new(provider, account);
+        let result = smart_account_provider
+            .estimate_user_operation_gas(&req.with_defaults(), Address::from_str(ENTRY_POINT_ADDRESS).unwrap())
+            .await;
+
+        println!("Gas estimation result: {:?}", result);
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_send_transaction() {
+        let signer: PrivateKeySigner =
+            "82aba1f2ce3d1a0f6eca0ade8877077b7fc6fd06fb0af48ab4a53650bde69979"
+                .parse()
+                .unwrap();
+
+        println!("Signer address: {:?}", signer.address());
+
+        let wallet = EthereumWallet::from(signer.clone());
+        let rpc_url =
+            Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
+                .unwrap();
+        let provider = ProviderBuilder::new()
+            .with_recommended_fillers()
+            .wallet(wallet)
+            .on_http(rpc_url);
+
+        let account = SimpleAccount::new(
+            Arc::new(provider.clone()),
+            signer.address(),
+            Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
+            Address::from_str(ENTRY_POINT_ADDRESS).unwrap(),
+            84532,
+        );
+
+        let to_address: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
+            .parse()
+            .unwrap();
+
+        let req = UserOperationRequest::new(AccountCall::Execute(ExecuteCall::new(
+            to_address,
+            U256::from(100),
+            Bytes::default(),
+        )));
+
+        let smart_account_provider = SmartAccountProvider::new(provider, account);
+        let result = smart_account_provider
+            .send_user_operation(req, &signer, Address::from_str(ENTRY_POINT_ADDRESS).unwrap())
+            .await;
+
+        let user_op_hash = result.expect("Failed to send user operation");
+        println!("User operation hash: {:?}", user_op_hash);
+
+        let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(10));
+        let mut attempts = 0;
+        let max_attempts = 20;
+
+        loop {
+            interval.tick().await;
+            attempts += 1;
+
+            match smart_account_provider
+                .get_user_operation_receipt(user_op_hash)
+                .await
+            {
+                Ok(Some(receipt)) => {
+                    println!("Received receipt: {:?}", receipt);
+                    break;
+                }
+                Ok(None) => {
+                    println!("Receipt not available yet, retrying...");
+                }
+                Err(e) => {
+                    println!("Failed to get user operation receipt: {:?}", e);
+                    if attempts >= max_attempts {
+                        println!("Exceeded max attempts ({max_attempts}), stopping retries");
+                        break;
+                    }
+                }
+            }
+
+            if attempts >= max_attempts {
+                panic!("Failed to get receipt after {max_attempts} attempts");
+            }
+        }
     }
 }
