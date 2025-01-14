@@ -280,12 +280,8 @@ where
     where
         S: SmartAccountSigner + Send + Sync,
     {
-        let _user_op = user_op.build_user_operation().await.map_err(|e| {
-            SmartAccountError::Provider(format!("Failed to build user operation: {}", e))
-        })?;
-
         self.account
-            .sign_user_op(_user_op, signer)
+            .sign_user_op(user_op, signer)
             .await
             .map_err(|e| {
                 SmartAccountError::Provider(format!("Failed to sign user operation: {}", e))
