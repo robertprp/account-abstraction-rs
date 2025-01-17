@@ -123,8 +123,6 @@ pub trait SmartAccount<P: Provider<T, N>, T: Transport + Clone, N: Network = Eth
         user_op: U,
         signer: &S,
     ) -> Result<Bytes, AccountError> {
-        // can also be account.getEntryPoint().getUserOperationHash(request)
-
         let user_op_hash = self.get_user_op_hash(user_op).await?;
         let signature = self.sign_user_op_hash(&user_op_hash, signer).await;
 

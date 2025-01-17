@@ -93,25 +93,20 @@ where
     }
 
     async fn get_account_address(&self) -> Result<Address, AccountError> {
-        // Check if we have a cached address
         if let Some(addr) = *self.account_address.read().unwrap() {
             return Ok(addr);
         }
 
-        // If not deployed, get the counterfactual address
         let addr = self.get_counterfactual_address().await?;
 
-        // Cache the address
         *self.account_address.write().unwrap() = Some(addr);
 
         Ok(addr)
     }
 
     async fn get_init_code(&self) -> Result<Bytes, AccountError> {
-        // Create a vector to store the factory address and encoded call
         let mut init_code = Vec::new();
 
-        // Add the factory address bytes
         init_code.extend_from_slice(self.factory_address.as_slice());
 
         let call = SimpleAccountFactoryContractCalls::createAccount(createAccountCall {
@@ -119,7 +114,7 @@ where
             salt: U256::ZERO,
         })
         .abi_encode();
-        // Add the encoded call bytes
+
         init_code.extend_from_slice(&call);
 
         Ok(Bytes::from(init_code))
