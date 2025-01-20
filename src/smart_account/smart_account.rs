@@ -39,8 +39,6 @@ pub trait SmartAccount<P: Provider<T, N>, T: Transport + Clone, N: Network = Eth
     async fn get_account_address(&self) -> Result<Address, AccountError>;
 
     async fn get_nonce(&self) -> Result<U256, AccountError> {
-        // TODO: Use cache trait to cache nonce, address, etc. Can also initialize
-
         let account_address: Address = self.get_account_address().await?;
 
         self.entry_point()

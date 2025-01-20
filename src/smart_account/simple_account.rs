@@ -121,8 +121,6 @@ where
     }
 
     async fn is_account_deployed(&self) -> Result<bool, AccountError> {
-        // TODO: Add flag to check if account is deployed to avoid get_code call
-
         let addr = self.get_account_address().await?;
         let code = self
             .provider
