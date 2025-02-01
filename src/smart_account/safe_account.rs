@@ -15,7 +15,9 @@ use SafeL2Contract::{setupCall, SafeL2ContractCalls};
 use SafeProxyFactoryContract::{createProxyWithNonceCall, SafeProxyFactoryContractCalls};
 
 use crate::{
-    entry_point::EntryPointContractWrapper, signer::SmartAccountSigner, types::{ExecuteCall, UserOperation},
+    entry_point::EntryPointContractWrapper,
+    signer::SmartAccountSigner,
+    types::{ExecuteCall, UserOperation},
     utils,
 };
 
@@ -112,7 +114,7 @@ where
         let user_op: UserOperation = user_op.into();
         // Empty signature since the contract doesn't use it.
         let packed_signature = self.encode_signatures(0, 0, &Bytes::new().to_vec());
-        
+
         let packed_user_op = utils::pack_user_op(&user_op);
 
         let module_user_op = Safe4337ModuleContract::PackedUserOperation {
@@ -126,8 +128,11 @@ where
             paymasterAndData: packed_user_op.paymasterAndData,
             signature: packed_signature.into(),
         };
-        
-        let contract = Safe4337ModuleContract::new(SAFE_4337_MODULE_ADDRESS.parse().unwrap(), self.provider.clone());
+
+        let contract = Safe4337ModuleContract::new(
+            SAFE_4337_MODULE_ADDRESS.parse().unwrap(),
+            self.provider.clone(),
+        );
         let hash: [u8; 32] = contract
             .getOperationHash(module_user_op)
             .call()
@@ -297,7 +302,11 @@ mod tests {
             Arc::new(provider),
             vec![signer.address()],
             U256::from(1),
-            Some("0x001D57AdB1461d456541354BBcD515d433299113".parse().unwrap()),
+            Some(
+                "0x001D57AdB1461d456541354BBcD515d433299113"
+                    .parse()
+                    .unwrap(),
+            ),
             84532,
         );
 
@@ -325,7 +334,11 @@ mod tests {
             Arc::new(provider.clone()),
             vec![signer.address()],
             U256::from(1),
-            Some("0x001D57AdB1461d456541354BBcD515d433299113".parse().unwrap()),
+            Some(
+                "0x001D57AdB1461d456541354BBcD515d433299113"
+                    .parse()
+                    .unwrap(),
+            ),
             84532,
         );
 
