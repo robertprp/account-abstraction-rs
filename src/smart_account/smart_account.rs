@@ -148,8 +148,8 @@ pub enum AccountError {
     #[error("nonce error")]
     NonceError,
 
-    #[error("signer error")]
-    SignerError,
+    #[error("signer error: {0}")]
+    SignerError(String),
 
     #[error("invalid init code error")]
     InvalidInitCodeError,

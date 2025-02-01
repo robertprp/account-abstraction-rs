@@ -8,7 +8,6 @@ use thiserror::Error;
 
 #[async_trait]
 pub trait SmartAccountSigner: std::fmt::Debug + Send + Sync {
-    // type Error: Error + Send + Sync;
     type Error: Error + Send + Sync + 'static;
 
     fn get_address(&self) -> Address;

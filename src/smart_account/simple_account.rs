@@ -164,7 +164,7 @@ where
         signer
             .sign_message(user_op_hash)
             .await
-            .map_err(|_| AccountError::SignerError)
+            .map_err(|e| AccountError::SignerError(format!("Failed to sign user op hash: {}", e)))
     }
 }
 #[cfg(test)]
