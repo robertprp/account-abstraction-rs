@@ -74,6 +74,7 @@ where
         provider: Arc<P>,
         owners: Vec<Address>,
         threshold: U256,
+        account_address: Option<Address>,
         chain_id: ChainId,
     ) -> Self {
         let entry_point = Arc::new(EntryPointContractWrapper::new(
@@ -85,7 +86,7 @@ where
             provider,
             owners,
             threshold,
-            account_address: RwLock::new(None),
+            account_address: RwLock::new(account_address),
             entry_point,
             chain_id,
         }
@@ -109,7 +110,7 @@ where
         U: Into<UserOperation> + Send + Sync,
     {
         let user_op: UserOperation = user_op.into();
-        // Empty signature since get_operation_hash doesn't care about it.
+        // Empty signature since the contract doesn't use it.
         let packed_signature = self.encode_signatures(0, 0, &Bytes::new().to_vec());
         
         let packed_user_op = utils::pack_user_op(&user_op);
@@ -296,6 +297,7 @@ mod tests {
             Arc::new(provider),
             vec![signer.address()],
             U256::from(1),
+            Some("0x001D57AdB1461d456541354BBcD515d433299113".parse().unwrap()),
             84532,
         );
 
@@ -323,6 +325,7 @@ mod tests {
             Arc::new(provider.clone()),
             vec![signer.address()],
             U256::from(1),
+            Some("0x001D57AdB1461d456541354BBcD515d433299113".parse().unwrap()),
             84532,
         );
 
