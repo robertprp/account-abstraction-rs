@@ -23,6 +23,9 @@ use crate::{
 
 use super::{AccountError, SmartAccount};
 
+//
+// Generate Alloy interfaces for the Safe contracts
+//
 sol!(
     #[allow(missing_docs)]
     #[sol(rpc)]
@@ -58,6 +61,7 @@ const SAFE_SINGLETON_ADDRESS: &str = "0x29fcB43b46531BcA003ddC8FCB67FFE91900C762
 const SAFE_PROXY_FACTORY_ADDRESS: &str = "0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67";
 const ENTRYPOINT_ADDRESS: &str = "0x0000000071727De22E5E9d8BAf0edAc6f37da032";
 
+/// Safe smart account.
 #[derive(Debug)]
 pub struct SafeAccount<P: Provider<Http<Client>, Ethereum>> {
     provider: Arc<P>,
@@ -107,6 +111,7 @@ impl<P> SafeAccount<P>
 where
     P: Provider<Http<Client>, Ethereum> + Clone + std::fmt::Debug + Send + Sync,
 {
+    /// Gets the Safe-specific user operation hash based on a 4337 user operation. 
     async fn get_safe_user_op_hash<U>(&self, user_op: U) -> Result<[u8; 32], AccountError>
     where
         U: Into<UserOperation> + Send + Sync,
