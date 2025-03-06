@@ -4,7 +4,7 @@ use crate::utils;
 
 use alloy::contract::Error;
 use alloy::transports::RpcError;
-use alloy::{network::Network, providers::Provider, transports::Transport};
+use alloy::{network::Network, providers::Provider};
 use alloy::{
     primitives::{aliases::U192, Address, Bytes, U256},
     sol,
@@ -33,29 +33,25 @@ sol!(
 );
 
 #[derive(Debug)]
-pub struct EntryPointContractWrapper<P: Provider<T, N>, T: Transport + Clone, N: Network> {
+pub struct EntryPointContractWrapper<P: Provider<N>, N: Network> {
     address: Address,
     provider: P,
-    _transport: std::marker::PhantomData<T>,
     _network: std::marker::PhantomData<N>,
 }
 
-impl<P: Provider<T, N> + Clone + Debug, T: Transport + Clone + Debug, N: Network>
-    EntryPointContractWrapper<P, T, N>
-{
+impl<P: Provider<N> + Clone + Debug, N: Network> EntryPointContractWrapper<P, N> {
     pub fn new(address: Address, provider: P) -> Self {
         Self {
             address,
             provider,
-            _transport: std::marker::PhantomData,
             _network: std::marker::PhantomData,
         }
     }
 }
 
 #[async_trait]
-impl<P: Provider<T, N> + Clone + Debug, T: Transport + Clone + Debug, N: Network> EntryPointTrait
-    for EntryPointContractWrapper<P, T, N>
+impl<P: Provider<N> + Clone + Debug, N: Network> EntryPointTrait
+    for EntryPointContractWrapper<P, N>
 {
     fn get_address(&self) -> Address {
         self.address
@@ -128,10 +124,7 @@ mod tests {
             Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
                 .unwrap();
 
-        let provider = ProviderBuilder::new()
-            .with_recommended_fillers()
-            .wallet(wallet)
-            .on_http(rpc_url);
+        let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
         let entry_point = EntryPointContractWrapper::new(
             Address::from_str("0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789").unwrap(),

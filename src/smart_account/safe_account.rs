@@ -4,7 +4,6 @@ use alloy::{
     providers::Provider,
     sol,
     sol_types::SolInterface,
-    transports::http::{Client, Http},
 };
 use async_trait::async_trait;
 use SafeModuleSetupContract::{enableModulesCall, SafeModuleSetupContractCalls};
@@ -63,18 +62,18 @@ const ENTRYPOINT_ADDRESS: &str = "0x0000000071727De22E5E9d8BAf0edAc6f37da032";
 
 /// Safe smart account.
 #[derive(Debug)]
-pub struct SafeAccount<P: Provider<Http<Client>, Ethereum>> {
+pub struct SafeAccount<P: Provider<Ethereum>> {
     provider: Arc<P>,
     owners: Vec<Address>,
     threshold: U256,
     account_address: RwLock<Option<Address>>,
-    entry_point: Arc<EntryPointContractWrapper<P, Http<Client>, Ethereum>>,
+    entry_point: Arc<EntryPointContractWrapper<P, Ethereum>>,
     chain_id: ChainId,
 }
 
 impl<P> SafeAccount<P>
 where
-    P: Provider<Http<Client>, Ethereum> + Clone + std::fmt::Debug,
+    P: Provider<Ethereum> + Clone + std::fmt::Debug,
 {
     pub fn new(
         provider: Arc<P>,
@@ -109,9 +108,9 @@ where
 
 impl<P> SafeAccount<P>
 where
-    P: Provider<Http<Client>, Ethereum> + Clone + std::fmt::Debug + Send + Sync,
+    P: Provider<Ethereum> + Clone + std::fmt::Debug + Send + Sync,
 {
-    /// Gets the Safe-specific user operation hash based on a 4337 user operation. 
+    /// Gets the Safe-specific user operation hash based on a 4337 user operation.
     async fn get_safe_user_op_hash<U>(&self, user_op: U) -> Result<[u8; 32], AccountError>
     where
         U: Into<UserOperation> + Send + Sync,
@@ -152,12 +151,12 @@ where
 }
 
 #[async_trait]
-impl<P> SmartAccount<P, Http<Client>, Ethereum> for SafeAccount<P>
+impl<P> SmartAccount<P, Ethereum> for SafeAccount<P>
 where
-    P: Provider<Http<Client>, Ethereum> + Clone + std::fmt::Debug + Send + Sync,
+    P: Provider<Ethereum> + Clone + std::fmt::Debug + Send + Sync,
 {
     type P = P;
-    type EntryPoint = EntryPointContractWrapper<P, Http<Client>, Ethereum>;
+    type EntryPoint = EntryPointContractWrapper<P, Ethereum>;
 
     fn provider(&self) -> &Self::P {
         &self.provider
@@ -298,10 +297,7 @@ mod tests {
         let wallet = EthereumWallet::from(signer.clone());
 
         let rpc_url = Url::parse(RPC_URL).unwrap();
-        let provider = ProviderBuilder::new()
-            .with_recommended_fillers()
-            .wallet(wallet)
-            .on_http(rpc_url);
+        let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
         let account = SafeAccount::new(
             Arc::new(provider),
@@ -330,10 +326,7 @@ mod tests {
         let wallet = EthereumWallet::from(signer.clone());
 
         let rpc_url = Url::parse(RPC_URL).unwrap();
-        let provider = ProviderBuilder::new()
-            .with_recommended_fillers()
-            .wallet(wallet)
-            .on_http(rpc_url);
+        let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
         let account = SafeAccount::new(
             Arc::new(provider.clone()),

@@ -4,17 +4,14 @@ use alloy::{
     providers::Provider,
     sol,
     sol_types::SolInterface,
-    transports::http::{Client, Http},
 };
 use async_trait::async_trait;
+use std::sync::{Arc, RwLock};
 use ZeroDevKernelAccountContract::{executeCall, ZeroDevKernelAccountContractCalls};
 use ZeroDevKernelFactoryContract::{createAccountCall, ZeroDevKernelFactoryContractCalls};
-use std::sync::{Arc, RwLock};
 
 use crate::{
-    entry_point::EntryPointContractWrapper,
-    signer::SmartAccountSigner,
-    types::ExecuteCall,
+    entry_point::EntryPointContractWrapper, signer::SmartAccountSigner, types::ExecuteCall,
 };
 
 use super::{AccountError, SmartAccount};
@@ -44,18 +41,18 @@ sol!(
 
 /// An Alloy implementation of a ZeroDev kernel account.
 #[derive(Debug)]
-pub struct ZeroDevKernelAccount<P: Provider<Http<Client>, Ethereum>> {
+pub struct ZeroDevKernelAccount<P: Provider<Ethereum>> {
     provider: Arc<P>,
     owner: Address,
     account_address: RwLock<Option<Address>>,
     is_deployed: RwLock<bool>,
-    entry_point: Arc<EntryPointContractWrapper<P, Http<Client>, Ethereum>>,
+    entry_point: Arc<EntryPointContractWrapper<P, Ethereum>>,
     chain_id: ChainId,
 }
 
 impl<P> ZeroDevKernelAccount<P>
 where
-    P: Provider<Http<Client>, Ethereum> + Clone + std::fmt::Debug,
+    P: Provider<Ethereum> + Clone + std::fmt::Debug,
 {
     pub fn new(
         provider: Arc<P>,
@@ -86,12 +83,12 @@ where
 }
 
 #[async_trait]
-impl<P> SmartAccount<P, Http<Client>, Ethereum> for ZeroDevKernelAccount<P>
+impl<P> SmartAccount<P, Ethereum> for ZeroDevKernelAccount<P>
 where
-    P: Provider<Http<Client>, Ethereum> + Clone + std::fmt::Debug + Send + Sync,
+    P: Provider<Ethereum> + Clone + std::fmt::Debug + Send + Sync,
 {
     type P = P;
-    type EntryPoint = EntryPointContractWrapper<P, Http<Client>, Ethereum>;
+    type EntryPoint = EntryPointContractWrapper<P, Ethereum>;
 
     fn provider(&self) -> &Self::P {
         &self.provider
@@ -123,12 +120,11 @@ where
     /// Constructs the initialization code needed to deploy the account.
     async fn get_init_code(&self) -> Result<Bytes, AccountError> {
         let index = U256::ZERO;
-        let create_account_call = ZeroDevKernelFactoryContractCalls::createAccount(
-            createAccountCall {
+        let create_account_call =
+            ZeroDevKernelFactoryContractCalls::createAccount(createAccountCall {
                 _owner: self.owner,
                 _index: index,
-            },
-        );
+            });
         let factory_address: Address = FACTORY_ADDRESS.parse().unwrap();
         let mut init_code = Vec::new();
         init_code.extend_from_slice(factory_address.as_slice());
@@ -143,14 +139,12 @@ where
 
     /// Encodes an execute call against the ZeroDev account contract.
     async fn encode_execute(&self, call: ExecuteCall) -> Result<Vec<u8>, AccountError> {
-        let exec_call = ZeroDevKernelAccountContractCalls::execute(
-            executeCall {
-                to: call.target,
-                value: call.value,
-                data: call.data,
-                operation: 1.into(),
-            },
-        );
+        let exec_call = ZeroDevKernelAccountContractCalls::execute(executeCall {
+            to: call.target,
+            value: call.value,
+            data: call.data,
+            operation: 1.into(),
+        });
         Ok(exec_call.abi_encode().into())
     }
 

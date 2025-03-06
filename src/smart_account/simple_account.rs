@@ -4,7 +4,6 @@ use alloy::{
     providers::Provider,
     sol,
     sol_types::SolInterface,
-    transports::http::{Client, Http},
 };
 use async_trait::async_trait;
 use std::sync::{Arc, RwLock};
@@ -32,18 +31,18 @@ sol!(
 );
 
 #[derive(Debug)]
-pub struct SimpleAccount<P: Provider<Http<Client>, Ethereum>> {
+pub struct SimpleAccount<P: Provider<Ethereum>> {
     provider: Arc<P>,
     owner: Address,
     account_address: RwLock<Option<Address>>,
     factory_address: Address,
-    entry_point: Arc<EntryPointContractWrapper<P, Http<Client>, Ethereum>>,
+    entry_point: Arc<EntryPointContractWrapper<P, Ethereum>>,
     chain_id: ChainId,
 }
 
 impl<P> SimpleAccount<P>
 where
-    P: Provider<Http<Client>, Ethereum> + Clone + std::fmt::Debug,
+    P: Provider<Ethereum> + Clone + std::fmt::Debug,
 {
     pub fn new(
         provider: Arc<P>,
@@ -69,12 +68,12 @@ where
 }
 
 #[async_trait]
-impl<P> SmartAccount<P, Http<Client>, Ethereum> for SimpleAccount<P>
+impl<P> SmartAccount<P, Ethereum> for SimpleAccount<P>
 where
-    P: Provider<Http<Client>, Ethereum> + Clone + std::fmt::Debug + Send + Sync,
+    P: Provider<Ethereum> + Clone + std::fmt::Debug + Send + Sync,
 {
     type P = P;
-    type EntryPoint = EntryPointContractWrapper<P, Http<Client>, Ethereum>;
+    type EntryPoint = EntryPointContractWrapper<P, Ethereum>;
 
     fn provider(&self) -> &Self::P {
         &self.provider
@@ -201,10 +200,7 @@ mod tests {
         let rpc_url =
             Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
                 .unwrap();
-        let provider = ProviderBuilder::new()
-            .with_recommended_fillers()
-            .wallet(wallet)
-            .on_http(rpc_url);
+        let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
         let account = SimpleAccount::new(
             Arc::new(provider),
@@ -235,10 +231,7 @@ mod tests {
         let rpc_url =
             Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
                 .unwrap();
-        let provider = ProviderBuilder::new()
-            .with_recommended_fillers()
-            .wallet(wallet)
-            .on_http(rpc_url);
+        let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
         let account = SimpleAccount::new(
             Arc::new(provider),
@@ -282,10 +275,7 @@ mod tests {
         let rpc_url =
             Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
                 .unwrap();
-        let provider = ProviderBuilder::new()
-            .with_recommended_fillers()
-            .wallet(wallet)
-            .on_http(rpc_url);
+        let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
         let account = SimpleAccount::new(
             Arc::new(provider),
@@ -318,10 +308,7 @@ mod tests {
         let rpc_url =
             Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
                 .unwrap();
-        let provider = ProviderBuilder::new()
-            .with_recommended_fillers()
-            .wallet(wallet)
-            .on_http(rpc_url);
+        let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
         let account = SimpleAccount::new(
             Arc::new(provider),
@@ -371,10 +358,7 @@ mod tests {
         let rpc_url =
             Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
                 .unwrap();
-        let provider = ProviderBuilder::new()
-            .with_recommended_fillers()
-            .wallet(wallet)
-            .on_http(rpc_url);
+        let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
         let account = SimpleAccount::new(
             Arc::new(provider.clone()),
@@ -430,10 +414,7 @@ mod tests {
         let rpc_url =
             Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
                 .unwrap();
-        let provider = ProviderBuilder::new()
-            .with_recommended_fillers()
-            .wallet(wallet)
-            .on_http(rpc_url);
+        let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
         let account = SimpleAccount::new(
             Arc::new(provider.clone()),

@@ -2,7 +2,6 @@ use alloy::{
     network::{Ethereum, Network},
     primitives::{Address, Bytes, ChainId, U256},
     providers::Provider,
-    transports::Transport,
 };
 use async_trait::async_trait;
 use std::fmt::Debug;
@@ -13,10 +12,8 @@ use crate::signer::SmartAccountSigner;
 use crate::types::{ExecuteCall, UserOperation};
 
 #[async_trait]
-pub trait SmartAccount<P: Provider<T, N>, T: Transport + Clone, N: Network = Ethereum>:
-    Sync + Send + Debug
-{
-    type P: Provider<T, N>;
+pub trait SmartAccount<P: Provider<N>, N: Network = Ethereum>: Sync + Send + Debug {
+    type P: Provider<N>;
     type EntryPoint: EntryPointTrait;
 
     fn provider(&self) -> &Self::P;

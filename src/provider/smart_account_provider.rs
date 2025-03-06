@@ -9,17 +9,16 @@ use alloy::{
     primitives::{Address, Bytes, U256},
     providers::Provider,
     rpc::types::UserOperationReceipt,
-    transports::{Transport, TransportError},
+    transports::TransportError,
 };
 use async_trait::async_trait;
 use std::error::Error;
 use std::fmt::Debug;
 
 #[async_trait]
-pub trait SmartAccountProviderTrait<N, T>: Provider<T, N> + Debug
+pub trait SmartAccountProviderTrait<N>: Provider<N> + Debug
 where
     N: Network,
-    T: Transport + Clone,
 {
     type Error: Error + Send + Sync + From<TransportError>;
 
@@ -80,50 +79,45 @@ where
 }
 
 #[derive(Clone, Debug)]
-pub struct SmartAccountProvider<P, T, N, A> {
+pub struct SmartAccountProvider<P, N, A> {
     inner: P,
     account: A,
-    _transport: std::marker::PhantomData<T>,
     _network: std::marker::PhantomData<N>,
 }
 
-impl<P, T, N, A> SmartAccountProvider<P, T, N, A>
+impl<P, N, A> SmartAccountProvider<P, N, A>
 where
-    P: Provider<T, N>,
-    T: Transport + Clone,
+    P: Provider<N>,
     N: Network,
-    A: SmartAccount<P, T, N>,
+    A: SmartAccount<P, N>,
 {
     pub fn new(inner: P, account: A) -> Self {
         Self {
             inner,
             account,
-            _transport: std::marker::PhantomData,
             _network: std::marker::PhantomData,
         }
     }
 }
 
-impl<P, T, N, A> Provider<T, N> for SmartAccountProvider<P, T, N, A>
+impl<P, N, A> Provider<N> for SmartAccountProvider<P, N, A>
 where
-    P: Provider<T, N>,
-    T: Transport + Clone,
+    P: Provider<N>,
     N: Network,
-    A: SmartAccount<P, T, N>,
+    A: SmartAccount<P, N>,
 {
-    fn root(&self) -> &RootProvider<T, N> {
+    fn root(&self) -> &RootProvider<N> {
         self.inner.root()
     }
 }
 
 #[async_trait]
-impl<P, T, N, A> SmartAccountProviderTrait<N, T> for SmartAccountProvider<P, T, N, A>
+impl<P, N, A> SmartAccountProviderTrait<N> for SmartAccountProvider<P, N, A>
 where
-    P: Provider<T, N> + Send + Sync + std::fmt::Debug,
-    T: Transport + Clone + Send + Sync + std::fmt::Debug,
+    P: Provider<N> + Send + Sync + std::fmt::Debug,
     N: Network + Send + Sync,
-    A: SmartAccount<P, T, N>,
-    Self: Provider<T, N>,
+    A: SmartAccount<P, N>,
+    Self: Provider<N>,
 {
     type Error = SmartAccountError;
 
@@ -390,7 +384,6 @@ mod tests {
         primitives::{Address, Bytes, ChainId, U256},
         providers::ProviderBuilder,
         signers::local::PrivateKeySigner,
-        transports::http::{Client, Http},
     };
     use alloy_node_bindings::Anvil;
     use url::Url;
@@ -399,9 +392,9 @@ mod tests {
     struct MockSmartAccount;
 
     #[async_trait]
-    impl<P> SmartAccount<P, Http<Client>, Ethereum> for MockSmartAccount
+    impl<P> SmartAccount<P, Ethereum> for MockSmartAccount
     where
-        P: Provider<Http<Client>, Ethereum> + Clone + Debug + Send + Sync,
+        P: Provider<Ethereum> + Clone + Debug + Send + Sync,
     {
         type P = P;
         type EntryPoint = MockEntryPoint;
@@ -490,10 +483,7 @@ mod tests {
             Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
                 .unwrap();
 
-        let provider = ProviderBuilder::new()
-            .with_recommended_fillers()
-            .wallet(wallet)
-            .on_http(rpc_url);
+        let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
         let account = MockSmartAccount;
         let smart_account_provider = SmartAccountProvider::new(provider, account);
@@ -513,10 +503,7 @@ mod tests {
             Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
                 .unwrap();
 
-        let provider = ProviderBuilder::new()
-            .with_recommended_fillers()
-            .wallet(wallet)
-            .on_http(rpc_url);
+        let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
         let account = MockSmartAccount;
         let smart_account_provider = SmartAccountProvider::new(provider, account);
