@@ -338,6 +338,7 @@ mod tests {
             paymaster_post_op_gas_limit: None,
             paymaster_data: None,
             signature: Bytes::default(),
+            eip7702_auth: None,
         };
 
         let result = account.sign_user_op(user_op, &signer).await.unwrap();

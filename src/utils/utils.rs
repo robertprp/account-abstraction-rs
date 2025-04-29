@@ -188,6 +188,7 @@ mod tests {
             paymaster_post_op_gas_limit: Some(U256::from(700000)),
             paymaster_data: Some(Bytes::from(vec![5u8; 32])),
             signature: Bytes::from(vec![6u8; 65]),
+            eip7702_auth: None,
         };
 
         let entry_point = Address::from_str("0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789").unwrap();
