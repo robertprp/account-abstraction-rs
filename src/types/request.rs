@@ -134,7 +134,7 @@ impl UserOperationRequest {
         }
     }
 
-    pub fn with_defaults(self) -> Self {
+    pub fn with_gas_estimate_defaults(self, signature: Bytes) -> Self {
         Self {
             call: self.call,
             sender: Some(self.sender.unwrap_or_else(|| Address::ZERO)),
@@ -151,10 +151,11 @@ impl UserOperationRequest {
             paymaster_verification_gas_limit: self.paymaster_verification_gas_limit,
             paymaster_post_op_gas_limit: self.paymaster_post_op_gas_limit,
             paymaster_data: self.paymaster_data,
-            signature: Some(self.signature.unwrap_or_else(|| "0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c".parse().unwrap())),
+            signature: Some(signature),
+            eip7702_auth: self.eip7702_auth,
         }
     }
-
+    
     #[must_use]
     pub fn sender<T: Into<Address>>(mut self, sender: T) -> Self {
         self.sender = Some(sender.into());
@@ -316,6 +317,7 @@ impl From<UserOperationRequest> for UserOperation {
             paymaster_post_op_gas_limit: request.paymaster_post_op_gas_limit,
             paymaster_data: request.paymaster_data,
             signature: request.signature.unwrap_or_else(|| Bytes::new()),
+            eip7702_auth: request.eip7702_auth,
         }
     }
 }

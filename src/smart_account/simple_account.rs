@@ -368,6 +368,8 @@ mod tests {
             84532,
         );
 
+        let dummy_signature = account.get_dummy_signature();
+
         let nonce = account.get_nonce().await.unwrap();
 
         let to_address: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
@@ -394,7 +396,7 @@ mod tests {
 
         let smart_account_provider = SmartAccountProvider::new(provider, account);
         let result = smart_account_provider
-            .estimate_user_operation_gas(&req.with_defaults())
+            .estimate_user_operation_gas(&req.with_gas_estimate_defaults(dummy_signature))
             .await;
 
         println!("Gas estimation result: {:?}", result);

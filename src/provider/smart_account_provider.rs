@@ -253,7 +253,7 @@ where
             || user_op.pre_verification_gas.is_none()
         {
             let gas_estimate = self
-                .estimate_user_operation_gas(&user_op.clone().with_defaults())
+                .estimate_user_operation_gas(&user_op.clone().with_gas_estimate_defaults(self.account.get_dummy_signature()))
                 .await?;
 
             if user_op.call_gas_limit.is_none() {

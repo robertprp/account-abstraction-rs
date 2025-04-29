@@ -24,6 +24,11 @@ pub trait SmartAccount<P: Provider<N>, N: Network = Ethereum>: Sync + Send + Deb
 
     fn get_factory_address(&self) -> Address;
 
+    /// The dummy signature used for gas estimations.
+    fn get_dummy_signature(&self) -> Bytes {
+        "0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c".parse().unwrap()
+    }
+
     async fn get_factory_data(&self) -> Bytes {
         let init_code = self.get_init_code().await.unwrap_or_default();
         if init_code.len() <= 20 {
