@@ -1,4 +1,4 @@
-use alloy::primitives::{Address, Bytes, B256, U256};
+use alloy::{hex, primitives::{Address, Bytes, B256, U256}};
 use serde::Serialize;
 
 #[derive(Clone, Serialize, PartialEq, Eq, Debug)]
@@ -101,6 +101,14 @@ pub struct UserOperationRequest {
     /// Data passed into the account to verify authorization
     #[serde(skip_serializing_if = "Option::is_none")]
     pub signature: Option<Bytes>,
+
+    /// EIP-7702 authorization data
+    #[serde(
+        rename = "eip7702Auth",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub eip7702_auth: Option<Eip7702Auth>,
 }
 
 impl UserOperationRequest {
@@ -121,6 +129,7 @@ impl UserOperationRequest {
             paymaster_post_op_gas_limit: None,
             paymaster_data: None,
             signature: None,
+            eip7702_auth: None,
             call,
         }
     }
@@ -241,6 +250,12 @@ impl UserOperationRequest {
         self
     }
 
+    #[must_use]
+    pub fn eip7702_auth(mut self, auth: Eip7702Auth) -> Self {
+        self.eip7702_auth = Some(auth);
+        self
+    }
+
     pub async fn build_user_operation(self) -> Result<UserOperation, &'static str> {
         Ok(UserOperation {
             sender: self
@@ -276,6 +291,7 @@ impl UserOperationRequest {
             signature: self
                 .signature
                 .ok_or("Missing 'signature' field for UserOperation")?,
+            eip7702_auth: self.eip7702_auth,
         })
     }
 }
@@ -378,4 +394,18 @@ pub struct UserOperation {
     pub paymaster_data: Option<Bytes>,
     /// The signature of the transaction.
     pub signature: Bytes,
+    /// EIP-7702 authentication data
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub eip7702_auth: Option<Eip7702Auth>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Eip7702Auth {
+    pub chain_id: U256,
+    pub nonce: U256,
+    pub address: Address,
+    pub r: B256,
+    pub s: B256,
+    pub y_parity: U256,
 }
