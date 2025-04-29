@@ -361,6 +361,9 @@ where
     }
 }
 
+// impl<P, N, A> SmartAccountProvider<P, N, A>
+// where
+//                 (, user_op, entry_point_address),
 #[derive(Debug, thiserror::Error)]
 pub enum SmartAccountError {
     #[error(transparent)]
@@ -459,7 +462,7 @@ mod tests {
             Ok(Address::ZERO)
         }
 
-        async fn get_nonce(&self, _address: Address) -> Result<U256, EntryPointError> {
+        async fn get_nonce(&self, _address: Address, _key: U192) -> Result<U256, EntryPointError> {
             Ok(U256::ZERO)
         }
 
