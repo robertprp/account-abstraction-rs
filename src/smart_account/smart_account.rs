@@ -1,6 +1,6 @@
 use alloy::{
     network::{Ethereum, Network},
-    primitives::{Address, Bytes, ChainId, U256},
+    primitives::{aliases::U192, Address, Bytes, ChainId, U256},
     providers::Provider,
 };
 use async_trait::async_trait;
@@ -41,10 +41,14 @@ pub trait SmartAccount<P: Provider<N>, N: Network = Ethereum>: Sync + Send + Deb
     async fn get_account_address(&self) -> Result<Address, AccountError>;
 
     async fn get_nonce(&self) -> Result<U256, AccountError> {
+        self.get_nonce_with_key(U192::ZERO).await
+    }
+
+    async fn get_nonce_with_key(&self, key: U192) -> Result<U256, AccountError> {
         let account_address: Address = self.get_account_address().await?;
 
         self.entry_point()
-            .get_nonce(account_address)
+            .get_nonce(account_address, key)
             .await
             .map_err(AccountError::EntryPointError)
     }
