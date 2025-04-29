@@ -17,7 +17,7 @@ use thiserror::Error;
 pub trait EntryPointTrait: Sync + Send + Debug {
     fn get_address(&self) -> Address;
     async fn get_sender_address(&self, init_code: Bytes) -> Result<Address, EntryPointError>;
-    async fn get_nonce(&self, address: Address) -> Result<U256, EntryPointError>;
+    async fn get_nonce(&self, address: Address, key: U192) -> Result<U256, EntryPointError>;
     async fn get_user_op_hash(
         &self,
         user_op: &UserOperation,
@@ -81,11 +81,11 @@ impl<P: Provider<N> + Clone + Debug, N: Network> EntryPointTrait
         }
     }
 
-    async fn get_nonce(&self, address: Address) -> Result<U256, EntryPointError> {
+    async fn get_nonce(&self, address: Address, key: U192) -> Result<U256, EntryPointError> {
         let contract = EntryPointContract::new(self.address, self.provider.clone());
 
         let nonce = contract
-            .getNonce(address, U192::ZERO)
+            .getNonce(address, key)
             .call()
             .await
             .map_err(|e| EntryPointError::ContractError(format!("Error getting nonce: {:?}", e)))?
