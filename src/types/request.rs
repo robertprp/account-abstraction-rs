@@ -1,4 +1,4 @@
-use alloy::{hex, primitives::{Address, Bytes, B256, U256}};
+use alloy::primitives::{Address, Bytes, B256, U256};
 use serde::Serialize;
 
 #[derive(Clone, Serialize, PartialEq, Eq, Debug)]
@@ -146,7 +146,9 @@ impl UserOperationRequest {
             verification_gas_limit: Some(self.verification_gas_limit.unwrap_or_else(|| U256::ZERO)),
             pre_verification_gas: Some(self.pre_verification_gas.unwrap_or_else(|| U256::ZERO)),
             max_fee_per_gas: Some(self.max_fee_per_gas.unwrap_or_else(|| U256::ZERO)),
-            max_priority_fee_per_gas: Some(self.max_priority_fee_per_gas.unwrap_or_else(|| U256::ZERO)),
+            max_priority_fee_per_gas: Some(
+                self.max_priority_fee_per_gas.unwrap_or_else(|| U256::ZERO),
+            ),
             paymaster: self.paymaster,
             paymaster_verification_gas_limit: self.paymaster_verification_gas_limit,
             paymaster_post_op_gas_limit: self.paymaster_post_op_gas_limit,
@@ -155,7 +157,7 @@ impl UserOperationRequest {
             eip7702_auth: self.eip7702_auth,
         }
     }
-    
+
     #[must_use]
     pub fn sender<T: Into<Address>>(mut self, sender: T) -> Self {
         self.sender = Some(sender.into());
