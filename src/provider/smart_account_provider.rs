@@ -215,7 +215,7 @@ where
         }
 
         if user_op.max_fee_per_gas.is_none() || user_op.max_priority_fee_per_gas.is_none() {
-            let eip1559_fees = self.inner.estimate_eip1559_fees(None).await.map_err(|e| {
+            let eip1559_fees = self.inner.estimate_eip1559_fees().await.map_err(|e| {
                 SmartAccountError::Provider(format!("Failed to estimate EIP1559 fees: {}", e))
             })?;
 
