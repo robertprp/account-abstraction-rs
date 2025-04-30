@@ -397,7 +397,7 @@ mod tests {
 
         let smart_account_provider = SmartAccountProvider::new(provider, account);
         let result = smart_account_provider
-            .estimate_user_operation_gas(&req.with_gas_estimate_defaults(dummy_signature))
+            .estimate_user_operation_gas(&req.with_gas_estimate_defaults(dummy_signature, None))
             .await;
 
         println!("Gas estimation result: {:?}", result);

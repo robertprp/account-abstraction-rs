@@ -134,7 +134,20 @@ impl UserOperationRequest {
         }
     }
 
-    pub fn with_gas_estimate_defaults(self, signature: Bytes) -> Self {
+    pub fn with_gas_estimate_defaults(self, signature: Bytes, eip7702_address: Option<Address>) -> Self {
+        let _eip7702_auth: Option<Eip7702Auth> = if let Some(address) = eip7702_address {
+            Some(Eip7702Auth {
+                chain_id: U256::ZERO,
+                nonce: U256::ZERO,
+                address: address,
+                r: B256::ZERO,
+                s: B256::ZERO,
+                y_parity: U256::ZERO,
+            })
+        } else {
+            None
+        };
+        
         Self {
             call: self.call,
             sender: Some(self.sender.unwrap_or_else(|| Address::ZERO)),
@@ -154,7 +167,7 @@ impl UserOperationRequest {
             paymaster_post_op_gas_limit: self.paymaster_post_op_gas_limit,
             paymaster_data: self.paymaster_data,
             signature: Some(signature),
-            eip7702_auth: self.eip7702_auth,
+            eip7702_auth: Some(self.eip7702_auth).unwrap_or_else(|| _eip7702_auth),
         }
     }
 

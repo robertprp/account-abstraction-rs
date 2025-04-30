@@ -14,6 +14,7 @@ use alloy::{
 use async_trait::async_trait;
 use std::error::Error;
 use std::fmt::Debug;
+use std::str::FromStr;
 
 #[async_trait]
 pub trait SmartAccountProviderTrait<N>: Provider<N> + Debug
@@ -256,7 +257,7 @@ where
                 .estimate_user_operation_gas(
                     &user_op
                         .clone()
-                        .with_gas_estimate_defaults(self.account.get_dummy_signature()),
+                        .with_gas_estimate_defaults(self.account.get_dummy_signature(), Some(Address::from_str("0x69007702764179f14f51cdce752f4f775d74e139").unwrap())),
                 )
                 .await?;
 
