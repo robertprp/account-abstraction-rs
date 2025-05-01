@@ -36,10 +36,10 @@ sol!(
     "src/abi/alchemy/SemiModularAccount.json"
 );
 
-/// An Alloy implementation of a ZeroDev kernel account.
+/// An Alloy implementation of Alchemy's SemiModularAccount7702 account.
 #[derive(Debug)]
 pub struct AlchemyModularAccount7702<P: Provider<Ethereum>> {
-    provider: Arc<P>,
+    provider: P,
     account_address: Address,
     entry_point: Arc<EntryPointContractWrapper<P, Ethereum>>,
     chain_id: ChainId,
@@ -49,10 +49,10 @@ impl<P> AlchemyModularAccount7702<P>
 where
     P: Provider<Ethereum> + Clone + std::fmt::Debug,
 {
-    pub fn new(provider: Arc<P>, account_address: Address, chain_id: ChainId) -> Self {
+    pub fn new(provider: P, account_address: Address, chain_id: ChainId) -> Self {
         let entry_point = Arc::new(EntryPointContractWrapper::new(
             ENTRY_POINT_ADDRESS.parse().unwrap(),
-            (*provider).clone(),
+            provider.clone(),
         ));
 
         Self {
@@ -177,18 +177,18 @@ mod tests {
     use super::*;
     use crate::{
         provider::{SmartAccountProvider, SmartAccountProviderTrait},
-        types::{AccountCall, UserOperationRequest},
+        types::{AccountCall, Eip7702Auth, UserOperationRequest},
     };
     use alloy::{
         network::EthereumWallet,
         primitives::U256,
         providers::ProviderBuilder,
         rpc::types::Authorization,
-        signers::local::PrivateKeySigner,
+        signers::{local::PrivateKeySigner, Signature},
     };
     use url::Url;
 
-    const RPC_URL: &str = "https://eth-sepolia.g.alchemy.com/v2/HoWbfthBOcacceoQbcrf66uJfh0Y9aoW";
+    const RPC_URL: &str = "https://eth-sepolia.g.alchemy.com/v2/HoWbfthBOcacceoQbcrf66uJfh0Y9aoW";//"https://arb-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx";//"https://eth-sepolia.g.alchemy.com/v2/HoWbfthBOcacceoQbcrf66uJfh0Y9aoW";
 
     #[tokio::test]
     async fn test_send_transaction() {
@@ -203,7 +203,7 @@ mod tests {
         let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
         let account =
-            AlchemyModularAccount7702::new(Arc::new(provider.clone()), signer.address(), 11155111);
+            AlchemyModularAccount7702::new(provider.clone(), signer.address(), 11155111);//421614);//11155111);
 
         println!(
             "Code: {:?}",
@@ -214,32 +214,41 @@ mod tests {
                 .unwrap()
         );
 
-        let to_address: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
+        let to_address: Address = "0x3e0F3Db3D0169CCD841f9F92341843Db0479af10"//"0x3e0F3Db3D0169CCD841f9F92341843Db0479af10"//"0x9e032F3c28a1d39Eb3081CD076B66B1eC877a0fb"
             .parse()
             .unwrap();
 
+        let account_nonce = provider.get_transaction_count(signer.address()).await.unwrap();// + 1;
+
+        let delegation_address = Address::from_str("0x69007702764179f14f51cdce752f4f775d74e139").unwrap();
+
         let auth = Authorization {
             chain_id: U256::from(0),
-            address: Address::from_str("0x69007702764179f14f51cdce752f4f775d74e139").unwrap(),
-            nonce: 3,
+            address: delegation_address,
+            nonce: account_nonce,
         };
         let signed_auth = signer.sign_hash_data(&auth.signature_hash()).await.unwrap();
-        println!("Signed auth: {:?}", signed_auth);
+        
+        let signature = Signature::try_from(signed_auth.as_ref()).unwrap();
+        let y_parity = if signature.v() { U256::from(1) } else { U256::from(0) };
 
         let req = UserOperationRequest::new(AccountCall::Execute(ExecuteCall::new(
             to_address,
-            U256::from(100),
+            U256::from(100),//U256::from(10_000_000_000_000_000u64),
             Bytes::default(),
         )))
-        // .eip7702_auth(Eip7702Auth {
-        //     chain_id: U256::from(0),
-        //     nonce: U256::from(3),
-        //     address: Address::from_str("0x69007702764179f14f51cdce752f4f775d74e139").unwrap(),
-        //     r: signature.r().into(),//B256::from_str("80272866576590756272238033559756661884484513719315537840184035893196945600562").unwrap(),
-        //     s: signature.s().into(),//B256::from_str("27048359638535030316012546281053842977443639923339062128509724997388419800846").unwrap(),
-        //     y_parity: U256::from(1),
-        // })
-        .max_priority_fee_per_gas(U256::from(318999872));
+        .eip7702_auth(Eip7702Auth {
+            chain_id: U256::from(0),
+            nonce: U256::from(account_nonce),
+            address: delegation_address,
+            r: signature.r().into(),
+            s: signature.s().into(),
+            y_parity: y_parity,
+        })
+        .max_priority_fee_per_gas(U256::from(1174138679u64))//125521899987200u64))
+        .max_fee_per_gas(U256::from(1674153867u64))
+        .sender(signer.address());
+
 
         let smart_account_provider = SmartAccountProvider::new(provider.clone(), account);
 
@@ -248,11 +257,10 @@ mod tests {
             .await;
 
         let user_op_hash = result.expect("Failed to send user operation");
-        println!("User operation hash: {:?}", user_op_hash);
 
-        let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(10));
+        let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(5));
         let mut attempts = 0;
-        let max_attempts = 20;
+        let max_attempts = 5;
 
         loop {
             interval.tick().await;
