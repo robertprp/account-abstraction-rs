@@ -37,7 +37,7 @@ sol!(
 );
 
 /// An Alloy implementation of Alchemy's SemiModularAccount7702 account.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct AlchemyModularAccount7702<P: Provider<Ethereum>> {
     provider: P,
     account_address: Address,
