@@ -1,4 +1,4 @@
-use alloy::primitives::{Address, Bytes, B256, U256};
+use alloy::{eips::eip7702::SignedAuthorization, primitives::{Address, Bytes, B256, U256}, rpc::types::Authorization};
 use serde::Serialize;
 
 #[derive(Clone, Serialize, PartialEq, Eq, Debug)]
@@ -267,8 +267,8 @@ impl UserOperationRequest {
     }
 
     #[must_use]
-    pub fn eip7702_auth(mut self, auth: Eip7702Auth) -> Self {
-        self.eip7702_auth = Some(auth);
+    pub fn eip7702_auth<T: Into<Eip7702Auth>>(mut self, auth: T) -> Self {
+        self.eip7702_auth = Some(auth.into());
         self
     }
 
@@ -425,4 +425,34 @@ pub struct Eip7702Auth {
     pub r: B256,
     pub s: B256,
     pub y_parity: U256,
+}
+
+impl From<SignedAuthorization> for Eip7702Auth {
+    fn from(auth: SignedAuthorization) -> Self {
+        Self {
+            chain_id: auth.inner().chain_id().clone(),
+            nonce: U256::from(auth.inner().nonce()),
+            address: auth.inner().address().clone(),
+            r: auth.r().into(),
+            s: auth.s().into(),
+            y_parity: U256::from(auth.y_parity()),
+        }
+    }
+}
+
+impl From<Eip7702Auth> for SignedAuthorization {
+    fn from(auth: Eip7702Auth) -> Self {
+        let inner = Authorization {
+            chain_id: auth.chain_id,
+            address: auth.address,
+            nonce: auth.nonce.try_into().unwrap_or(0),
+        };
+        
+        Self::new_unchecked(
+            inner,
+            auth.y_parity.try_into().unwrap_or(0),
+            auth.r.into(),
+            auth.s.into(),
+        )
+    }
 }
