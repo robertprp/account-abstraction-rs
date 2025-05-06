@@ -246,6 +246,15 @@ where
         unimplemented!()
     }
 
+    async fn get_user_op_hash<U: Into<UserOperation> + Send + Sync>(
+        &self,
+        user_op: U,
+    ) -> Result<[u8; 32], AccountError> {
+        let user_op_hash = self.get_safe_user_op_hash(user_op).await?;
+
+        Ok(user_op_hash)
+    }
+
     async fn sign_user_op_hash<S: SmartAccountSigner>(
         &self,
         user_op_hash: &[u8; 32],
