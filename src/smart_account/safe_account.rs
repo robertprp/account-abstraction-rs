@@ -8,7 +8,6 @@ use alloy::{
 use async_trait::async_trait;
 use SafeModuleSetupContract::{enableModulesCall, SafeModuleSetupContractCalls};
 
-use std::sync::{Arc, RwLock};
 use Safe4337ModuleContract::{executeUserOpCall, Safe4337ModuleContractCalls};
 use SafeL2Contract::{setupCall, SafeL2ContractCalls};
 use SafeProxyFactoryContract::{createProxyWithNonceCall, SafeProxyFactoryContractCalls};
@@ -61,13 +60,13 @@ const SAFE_PROXY_FACTORY_ADDRESS: &str = "0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820
 const ENTRYPOINT_ADDRESS: &str = "0x0000000071727De22E5E9d8BAf0edAc6f37da032";
 
 /// Safe smart account.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct SafeAccount<P: Provider<Ethereum>> {
-    provider: Arc<P>,
+    provider: P,
     owners: Vec<Address>,
     threshold: U256,
-    account_address: RwLock<Option<Address>>,
-    entry_point: Arc<EntryPointContractWrapper<P, Ethereum>>,
+    account_address: Option<Address>,
+    entry_point: EntryPointContractWrapper<P, Ethereum>,
     chain_id: ChainId,
 }
 
@@ -76,22 +75,22 @@ where
     P: Provider<Ethereum> + Clone + std::fmt::Debug,
 {
     pub fn new(
-        provider: Arc<P>,
+        provider: P,
         owners: Vec<Address>,
         threshold: U256,
         account_address: Option<Address>,
         chain_id: ChainId,
     ) -> Self {
-        let entry_point = Arc::new(EntryPointContractWrapper::new(
+        let entry_point = EntryPointContractWrapper::new(
             ENTRYPOINT_ADDRESS.parse().unwrap(),
-            (*provider).clone(),
-        ));
+            provider.clone(),
+        );
 
         Self {
             provider,
             owners,
             threshold,
-            account_address: RwLock::new(account_address),
+            account_address,
             entry_point,
             chain_id,
         }
@@ -175,12 +174,12 @@ where
     }
 
     async fn get_account_address(&self) -> Result<Address, AccountError> {
-        if let Some(addr) = *self.account_address.read().unwrap() {
+        if let Some(addr) = self.account_address {
             return Ok(addr);
         }
 
         let addr = self.get_counterfactual_address().await?;
-        *self.account_address.write().unwrap() = Some(addr);
+        
         Ok(addr)
     }
 
@@ -224,6 +223,7 @@ where
             .get_code_at(addr)
             .await
             .map_err(|e| AccountError::RpcError(e.to_string()))?;
+        
         Ok(!code.is_empty())
     }
 
@@ -300,7 +300,7 @@ mod tests {
         let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
         let account = SafeAccount::new(
-            Arc::new(provider),
+            provider,
             vec![signer.address()],
             U256::from(1),
             Some(
@@ -329,7 +329,7 @@ mod tests {
         let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
         let account = SafeAccount::new(
-            Arc::new(provider.clone()),
+            provider.clone(),
             vec![signer.address()],
             U256::from(1),
             Some(

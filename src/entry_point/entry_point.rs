@@ -32,7 +32,7 @@ sol!(
     "src/abi/EntryPoint_0_7.json"
 );
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct EntryPointContractWrapper<P: Provider<N>, N: Network> {
     address: Address,
     provider: P,
