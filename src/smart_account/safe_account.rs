@@ -136,6 +136,7 @@ where
             SAFE_4337_MODULE_ADDRESS.parse().unwrap(),
             self.provider.clone(),
         );
+
         let hash: [u8; 32] = contract
             .getOperationHash(module_user_op)
             .call()
@@ -260,10 +261,14 @@ where
         user_op_hash: &[u8; 32],
         signer: &S,
     ) -> Result<Bytes, AccountError> {
-        signer
-            .sign_message(user_op_hash)
+        let signature = signer
+            .sign_hash_data(user_op_hash.into())
             .await
-            .map_err(|e| AccountError::SignerError(format!("Failed to sign user op hash: {}", e)))
+            .map_err(|e| AccountError::SignerError(format!("Failed to sign user op hash: {}", e)))?;
+
+        let packed_signature = self.encode_signatures(0, 0, &signature.to_vec());
+
+        Ok(Bytes::from(packed_signature))
     }
 
     async fn sign_user_op<U: Into<UserOperation> + Send + Sync, S: SmartAccountSigner>(
@@ -271,15 +276,9 @@ where
         user_op: U,
         signer: &S,
     ) -> Result<Bytes, AccountError> {
-        let safe_user_op_hash = self.get_safe_user_op_hash(user_op).await?;
-        let signature = signer
-            .sign_hash_data(&safe_user_op_hash.into())
-            .await
-            .map_err(|e| AccountError::SignerError(format!("Failed to sign user op: {}", e)))?;
+        let safe_user_op_hash = self.get_user_op_hash(user_op).await?;
 
-        let packed_signature = self.encode_signatures(0, 0, &signature.to_vec());
-
-        Ok(Bytes::from(packed_signature))
+        self.sign_user_op_hash(&safe_user_op_hash, signer).await
     }
 }
 
@@ -341,6 +340,7 @@ mod tests {
             provider.clone(),
             vec![signer.address()],
             U256::from(1),
+            // None,
             Some(
                 "0x001D57AdB1461d456541354BBcD515d433299113"
                     .parse()
