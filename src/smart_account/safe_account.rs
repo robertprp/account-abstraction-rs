@@ -12,8 +12,8 @@ use SafeModuleSetupContract::{enableModulesCall, SafeModuleSetupContractCalls};
 
 use Safe4337ModuleContract::{executeUserOpCall, Safe4337ModuleContractCalls};
 use SafeL2Contract::{setupCall, SafeL2ContractCalls};
-use SafeProxyFactoryContract::{createProxyWithNonceCall, SafeProxyFactoryContractCalls};
 use SafeMultiSendContract::SafeMultiSendContractCalls;
+use SafeProxyFactoryContract::{createProxyWithNonceCall, SafeProxyFactoryContractCalls};
 
 use crate::{
     entry_point::EntryPointContractWrapper,
@@ -69,13 +69,6 @@ const SAFE_SINGLETON_ADDRESS: &str = "0x29fcB43b46531BcA003ddC8FCB67FFE91900C762
 const SAFE_PROXY_FACTORY_ADDRESS: &str = "0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67";
 const ENTRYPOINT_ADDRESS: &str = "0x0000000071727De22E5E9d8BAf0edAc6f37da032";
 
-// Constants for multisend contracts
-const MULTISEND_CANONICAL_ADDRESS: &str = "0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526";
-const MULTISEND_ZKSYNC_ADDRESS: &str = "0x309D0B190FeCCa8e1D5D8309a16F7e3CB133E885";
-
-// Chain IDs that use zksync multisend
-const ZKSYNC_CHAIN_IDS: [u64; 3] = [232, 300, 324];
-
 /// Safe smart account.
 #[derive(Clone, Debug)]
 pub struct SafeAccount<P: Provider<Ethereum>> {
@@ -98,10 +91,8 @@ where
         account_address: Option<Address>,
         chain_id: ChainId,
     ) -> Self {
-        let entry_point = EntryPointContractWrapper::new(
-            ENTRYPOINT_ADDRESS.parse().unwrap(),
-            provider.clone(),
-        );
+        let entry_point =
+            EntryPointContractWrapper::new(ENTRYPOINT_ADDRESS.parse().unwrap(), provider.clone());
 
         Self {
             provider,
@@ -152,7 +143,7 @@ where
         }
 
         let addr = self.get_counterfactual_address().await?;
-        
+
         Ok(addr)
     }
 
@@ -196,7 +187,7 @@ where
             .get_code_at(addr)
             .await
             .map_err(|e| AccountError::RpcError(e.to_string()))?;
-        
+
         Ok(!code.is_empty())
     }
 
@@ -211,10 +202,7 @@ where
         Ok(call.abi_encode().into())
     }
 
-    async fn encode_execute_batch(
-        &self,
-        calls: Vec<ExecuteCall>,
-    ) -> Result<Vec<u8>, AccountError> {
+    async fn encode_execute_batch(&self, calls: Vec<ExecuteCall>) -> Result<Vec<u8>, AccountError> {
         self.encode_execute_batch(calls).await
     }
 
@@ -235,7 +223,9 @@ where
         let signature = signer
             .sign_hash_data(user_op_hash.into())
             .await
-            .map_err(|e| AccountError::SignerError(format!("Failed to sign user op hash: {}", e)))?;
+            .map_err(|e| {
+                AccountError::SignerError(format!("Failed to sign user op hash: {}", e))
+            })?;
 
         let packed_signature = self.encode_signatures(0, 0, &signature.to_vec());
 
@@ -297,10 +287,7 @@ where
         Ok(hash)
     }
 
-    async fn encode_execute_batch(
-        &self,
-        calls: Vec<ExecuteCall>,
-    ) -> Result<Vec<u8>, AccountError> {
+    async fn encode_execute_batch(&self, calls: Vec<ExecuteCall>) -> Result<Vec<u8>, AccountError> {
         if calls.is_empty() {
             return Err(AccountError::InvalidInput("No calls provided".into()));
         }
@@ -308,9 +295,10 @@ where
         let multisend_address = self.get_multisend_address()?;
         let encoded_transactions = self.encode_multisend_transactions(&calls);
 
-        let multisend_call = SafeMultiSendContractCalls::multiSend(SafeMultiSendContract::multiSendCall {
-            transactions: Bytes::from(encoded_transactions),
-        });
+        let multisend_call =
+            SafeMultiSendContractCalls::multiSend(SafeMultiSendContract::multiSendCall {
+                transactions: Bytes::from(encoded_transactions),
+            });
 
         let call = Safe4337ModuleContractCalls::executeUserOp(executeUserOpCall {
             to: multisend_address,
@@ -325,49 +313,58 @@ where
     // Based on https://github.com/safe-global/safe-deployments/blob/main/src/assets/v1.4.1/multi_send.json
     fn get_multisend_address(&self) -> Result<Address, AccountError> {
         let chain_id = self.chain_id;
-        
+
         let config_path = std::path::Path::new("src/abi/safe/MultiSend.json");
-        let config_str = std::fs::read_to_string(config_path)
-            .map_err(|e| AccountError::InvalidInput(format!("Failed to read MultiSend.json: {}", e)))?;
-        
-        let config: MultiSendConfig = serde_json::from_str(&config_str)
-            .map_err(|e| AccountError::InvalidInput(format!("Failed to parse MultiSend.json: {}", e)))?;
-        
+        let config_str = std::fs::read_to_string(config_path).map_err(|e| {
+            AccountError::InvalidInput(format!("Failed to read MultiSend.json: {}", e))
+        })?;
+
+        let config: MultiSendConfig = serde_json::from_str(&config_str).map_err(|e| {
+            AccountError::InvalidInput(format!("Failed to parse MultiSend.json: {}", e))
+        })?;
+
         let chain_id_str = chain_id.to_string();
-        let deployment_type = config.network_addresses.get(&chain_id_str)
-            .ok_or_else(|| AccountError::InvalidInput(format!("No multisend address found for chain ID {}", chain_id)))?;
-        
-        let deployment = config.deployments.get(deployment_type)
-            .ok_or_else(|| AccountError::InvalidInput(format!("No deployment found for type {}", deployment_type)))?;
-        
-        deployment.address.parse()
+        let deployment_type = config.network_addresses.get(&chain_id_str).ok_or_else(|| {
+            AccountError::InvalidInput(format!(
+                "No multisend address found for chain ID {}",
+                chain_id
+            ))
+        })?;
+
+        let deployment = config.deployments.get(deployment_type).ok_or_else(|| {
+            AccountError::InvalidInput(format!("No deployment found for type {}", deployment_type))
+        })?;
+
+        deployment
+            .address
+            .parse()
             .map_err(|e| AccountError::InvalidInput(format!("Failed to parse address: {}", e)))
     }
 
     // Based on https://github.com/safe-global/safe-core-sdk/blob/82cfd46b2d905cea2138adb4a65a7b02c74632aa/packages/protocol-kit/src/utils/transactions/utils.ts#L140
     fn encode_multisend_transactions(&self, calls: &[ExecuteCall]) -> Vec<u8> {
         let mut out = Vec::new();
-    
+
         for call in calls {
             // operation: uint8
             out.push(0);
-    
+
             // to: address
             out.extend_from_slice(call.target.as_slice());
-    
+
             // value: uint256
             let vbuf: [u8; 32] = call.value.to_be_bytes();
             out.extend_from_slice(&vbuf);
-    
+
             // dataLength: uint256
             let len = U256::from(call.data.len());
             let lbuf: [u8; 32] = len.to_be_bytes();
             out.extend_from_slice(&lbuf);
-    
+
             // data: raw bytes
             out.extend_from_slice(&call.data);
         }
-    
+
         out
     }
 }
@@ -398,7 +395,7 @@ mod tests {
     };
     use url::Url;
 
-    const RPC_URL: &str = "https://eth-sepolia.g.alchemy.com/v2/HoWbfthBOcacceoQbcrf66uJfh0Y9aoW";//"https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx";
+    const RPC_URL: &str = "https://eth-sepolia.g.alchemy.com/v2/HoWbfthBOcacceoQbcrf66uJfh0Y9aoW"; //"https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx";
 
     #[tokio::test]
     async fn test_get_safe_address() {
@@ -447,7 +444,7 @@ mod tests {
             U256::from(1),
             // None,
             Some(
-                "0x297A942A35916cC643a265EC5A8B46f1d376cA46"//"0x001D57AdB1461d456541354BBcD515d433299113"
+                "0x297A942A35916cC643a265EC5A8B46f1d376cA46" //"0x001D57AdB1461d456541354BBcD515d433299113"
                     .parse()
                     .unwrap(),
             ),
@@ -464,25 +461,16 @@ mod tests {
         //     to_address,
         //     U256::from(1),
         //     Bytes::default(),
-        // )); 
+        // ));
         let call = AccountCall::ExecuteBatch(vec![
-            ExecuteCall::new(
-                to_address,
-                U256::from(1),
-                Bytes::default(),
-            ),
-            ExecuteCall::new(
-                to_address,
-                U256::from(1),
-                Bytes::default(),
-            ),
-        ]); 
+            ExecuteCall::new(to_address, U256::from(1), Bytes::default()),
+            ExecuteCall::new(to_address, U256::from(1), Bytes::default()),
+        ]);
 
         let req = UserOperationRequest::new(call)
-        .sender(sender)
-        .max_priority_fee_per_gas(U256::from(150000000u64))
-        .max_fee_per_gas(U256::from(190003687u64));
-    
+            .sender(sender)
+            .max_priority_fee_per_gas(U256::from(150000000u64))
+            .max_fee_per_gas(U256::from(190003687u64));
 
         let smart_account_provider = SmartAccountProvider::new(provider, account);
         let result = smart_account_provider

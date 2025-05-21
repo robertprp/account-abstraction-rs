@@ -1,4 +1,8 @@
-use alloy::{eips::eip7702::SignedAuthorization, primitives::{Address, Bytes, B256, U256}, rpc::types::Authorization};
+use alloy::{
+    eips::eip7702::SignedAuthorization,
+    primitives::{Address, Bytes, B256, U256},
+    rpc::types::Authorization,
+};
 use serde::Serialize;
 
 #[derive(Clone, Serialize, PartialEq, Eq, Debug)]
@@ -134,7 +138,11 @@ impl UserOperationRequest {
         }
     }
 
-    pub fn with_gas_estimate_defaults(self, signature: Bytes, eip7702_address: Option<Address>) -> Self {
+    pub fn with_gas_estimate_defaults(
+        self,
+        signature: Bytes,
+        eip7702_address: Option<Address>,
+    ) -> Self {
         let _eip7702_auth: Option<Eip7702Auth> = if let Some(address) = eip7702_address {
             Some(Eip7702Auth {
                 chain_id: U256::ZERO,
@@ -147,7 +155,7 @@ impl UserOperationRequest {
         } else {
             None
         };
-        
+
         Self {
             call: self.call,
             sender: Some(self.sender.unwrap_or_else(|| Address::ZERO)),
@@ -447,7 +455,7 @@ impl From<Eip7702Auth> for SignedAuthorization {
             address: auth.address,
             nonce: auth.nonce.try_into().unwrap_or(0),
         };
-        
+
         Self::new_unchecked(
             inner,
             auth.y_parity.try_into().unwrap_or(0),
