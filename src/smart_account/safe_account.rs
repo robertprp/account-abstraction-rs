@@ -11,6 +11,7 @@ use SafeModuleSetupContract::{enableModulesCall, SafeModuleSetupContractCalls};
 use Safe4337ModuleContract::{executeUserOpCall, Safe4337ModuleContractCalls};
 use SafeL2Contract::{setupCall, SafeL2ContractCalls};
 use SafeProxyFactoryContract::{createProxyWithNonceCall, SafeProxyFactoryContractCalls};
+use SafeMultiSendContract::SafeMultiSendContractCalls;
 
 use crate::{
     entry_point::EntryPointContractWrapper,
@@ -52,12 +53,26 @@ sol!(
     "src/abi/safe/SafeModuleSetup.json"
 );
 
+sol!(
+    #[allow(missing_docs)]
+    #[sol(rpc)]
+    SafeMultiSendContract,
+    "src/abi/safe/SafeMultiSend.json"
+);
+
 // Constants
 const SAFE_4337_MODULE_ADDRESS: &str = "0x75cf11467937ce3F2f357CE24ffc3DBF8fD5c226";
 const SAFE_MODULE_SETUP_ADDRESS: &str = "0x2dd68b007B46fBe91B9A7c3EDa5A7a1063cB5b47";
 const SAFE_SINGLETON_ADDRESS: &str = "0x29fcB43b46531BcA003ddC8FCB67FFE91900C762";
 const SAFE_PROXY_FACTORY_ADDRESS: &str = "0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67";
 const ENTRYPOINT_ADDRESS: &str = "0x0000000071727De22E5E9d8BAf0edAc6f37da032";
+
+// Constants for multisend contracts
+const MULTISEND_CANONICAL_ADDRESS: &str = "0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526";
+const MULTISEND_ZKSYNC_ADDRESS: &str = "0x309D0B190FeCCa8e1D5D8309a16F7e3CB133E885";
+
+// Chain IDs that use zksync multisend
+const ZKSYNC_CHAIN_IDS: [u64; 3] = [232, 300, 324];
 
 /// Safe smart account.
 #[derive(Clone, Debug)]
@@ -102,51 +117,6 @@ where
         buffer.extend_from_slice(&valid_after.to_le_bytes()[..6]);
         buffer.extend_from_slice(signatures);
         buffer
-    }
-}
-
-impl<P> SafeAccount<P>
-where
-    P: Provider<Ethereum> + Clone + std::fmt::Debug + Send + Sync,
-{
-    /// Gets the Safe-specific user operation hash based on a 4337 user operation.
-    async fn get_safe_user_op_hash<U>(&self, user_op: U) -> Result<[u8; 32], AccountError>
-    where
-        U: Into<UserOperation> + Send + Sync,
-    {
-        let user_op: UserOperation = user_op.into();
-        // Empty signature since the contract doesn't use it.
-        let packed_signature = self.encode_signatures(0, 0, &Bytes::new().to_vec());
-
-        let packed_user_op = utils::pack_user_op(&user_op);
-
-        let module_user_op = Safe4337ModuleContract::PackedUserOperation {
-            sender: packed_user_op.sender,
-            nonce: packed_user_op.nonce,
-            initCode: packed_user_op.initCode,
-            callData: packed_user_op.callData,
-            accountGasLimits: packed_user_op.accountGasLimits,
-            preVerificationGas: packed_user_op.preVerificationGas,
-            gasFees: packed_user_op.gasFees,
-            paymasterAndData: packed_user_op.paymasterAndData,
-            signature: packed_signature.into(),
-        };
-
-        let contract = Safe4337ModuleContract::new(
-            SAFE_4337_MODULE_ADDRESS.parse().unwrap(),
-            self.provider.clone(),
-        );
-
-        let hash: [u8; 32] = contract
-            .getOperationHash(module_user_op)
-            .call()
-            .await
-            .map_err(|e| AccountError::SignerError(format!("Failed to get user op hash: {}", e)))
-            .unwrap()
-            .operationHash
-            .into();
-
-        Ok(hash)
     }
 }
 
@@ -241,10 +211,9 @@ where
 
     async fn encode_execute_batch(
         &self,
-        _calls: Vec<ExecuteCall>,
+        calls: Vec<ExecuteCall>,
     ) -> Result<Vec<u8>, AccountError> {
-        // TODO: Implement batch execution
-        unimplemented!()
+        self.encode_execute_batch(calls).await
     }
 
     async fn get_user_op_hash<U: Into<UserOperation> + Send + Sync>(
@@ -279,6 +248,111 @@ where
         let safe_user_op_hash = self.get_user_op_hash(user_op).await?;
 
         self.sign_user_op_hash(&safe_user_op_hash, signer).await
+    }
+}
+
+impl<P> SafeAccount<P>
+where
+    P: Provider<Ethereum> + Clone + std::fmt::Debug + Send + Sync,
+{
+    /// Gets the Safe-specific user operation hash based on a 4337 user operation.
+    async fn get_safe_user_op_hash<U>(&self, user_op: U) -> Result<[u8; 32], AccountError>
+    where
+        U: Into<UserOperation> + Send + Sync,
+    {
+        let user_op: UserOperation = user_op.into();
+        // Empty signature since the contract doesn't use it.
+        let packed_signature = self.encode_signatures(0, 0, &Bytes::new().to_vec());
+
+        let packed_user_op = utils::pack_user_op(&user_op);
+
+        let module_user_op = Safe4337ModuleContract::PackedUserOperation {
+            sender: packed_user_op.sender,
+            nonce: packed_user_op.nonce,
+            initCode: packed_user_op.initCode,
+            callData: packed_user_op.callData,
+            accountGasLimits: packed_user_op.accountGasLimits,
+            preVerificationGas: packed_user_op.preVerificationGas,
+            gasFees: packed_user_op.gasFees,
+            paymasterAndData: packed_user_op.paymasterAndData,
+            signature: packed_signature.into(),
+        };
+
+        let contract = Safe4337ModuleContract::new(
+            SAFE_4337_MODULE_ADDRESS.parse().unwrap(),
+            self.provider.clone(),
+        );
+
+        let hash: [u8; 32] = contract
+            .getOperationHash(module_user_op)
+            .call()
+            .await
+            .map_err(|e| AccountError::SignerError(format!("Failed to get user op hash: {}", e)))
+            .unwrap()
+            .operationHash
+            .into();
+
+        Ok(hash)
+    }
+
+    async fn encode_execute_batch(
+        &self,
+        calls: Vec<ExecuteCall>,
+    ) -> Result<Vec<u8>, AccountError> {
+        if calls.is_empty() {
+            return Err(AccountError::InvalidInput("No calls provided".into()));
+        }
+
+        let multisend_address = self.get_multisend_address();
+        let encoded_transactions = self.encode_multisend_transactions(&calls);
+
+        let multisend_call = SafeMultiSendContractCalls::multiSend(SafeMultiSendContract::multiSendCall {
+            transactions: Bytes::from(encoded_transactions),
+        });
+
+        let call = Safe4337ModuleContractCalls::executeUserOp(executeUserOpCall {
+            to: multisend_address,
+            value: U256::ZERO,
+            data: multisend_call.abi_encode().into(),
+            operation: 1, // DelegateCall operation
+        });
+
+        Ok(call.abi_encode().into())
+    }
+
+    fn get_multisend_address(&self) -> Address {
+        if ZKSYNC_CHAIN_IDS.contains(&self.chain_id) {
+            MULTISEND_ZKSYNC_ADDRESS.parse().unwrap()
+        } else {
+            MULTISEND_CANONICAL_ADDRESS.parse().unwrap()
+        }
+    }
+
+    // Based on https://github.com/safe-global/safe-core-sdk/blob/82cfd46b2d905cea2138adb4a65a7b02c74632aa/packages/protocol-kit/src/utils/transactions/utils.ts#L140
+    fn encode_multisend_transactions(&self, calls: &[ExecuteCall]) -> Vec<u8> {
+        let mut out = Vec::new();
+    
+        for call in calls {
+            // operation: uint8
+            out.push(0);
+    
+            // to: address
+            out.extend_from_slice(call.target.as_slice());
+    
+            // value: uint256
+            let vbuf: [u8; 32] = call.value.to_be_bytes();
+            out.extend_from_slice(&vbuf);
+    
+            // dataLength: uint256
+            let len = U256::from(call.data.len());
+            let lbuf: [u8; 32] = len.to_be_bytes();
+            out.extend_from_slice(&lbuf);
+    
+            // data: raw bytes
+            out.extend_from_slice(&call.data);
+        }
+    
+        out
     }
 }
 

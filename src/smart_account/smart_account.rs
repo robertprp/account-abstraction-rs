@@ -159,4 +159,7 @@ pub enum AccountError {
 
     #[error("invalid init code error")]
     InvalidInitCodeError,
+
+    #[error("invalid input: {0}")]
+    InvalidInput(String),
 }
