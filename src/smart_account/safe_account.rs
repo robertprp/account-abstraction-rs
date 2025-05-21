@@ -398,7 +398,7 @@ mod tests {
     };
     use url::Url;
 
-    const RPC_URL: &str = "https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx";
+    const RPC_URL: &str = "https://eth-sepolia.g.alchemy.com/v2/HoWbfthBOcacceoQbcrf66uJfh0Y9aoW";//"https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx";
 
     #[tokio::test]
     async fn test_get_safe_address() {
@@ -415,12 +415,13 @@ mod tests {
             provider,
             vec![signer.address()],
             U256::from(1),
-            Some(
-                "0x001D57AdB1461d456541354BBcD515d433299113"
-                    .parse()
-                    .unwrap(),
-            ),
-            84532,
+            None,
+            // Some(
+            //     "0x001D57AdB1461d456541354BBcD515d433299113"
+            //         .parse()
+            //         .unwrap(),
+            // ),
+            11155111,
         );
 
         let safe_address = account.get_account_address().await.unwrap();
@@ -436,7 +437,7 @@ mod tests {
                 .parse()
                 .unwrap();
         let wallet = EthereumWallet::from(signer.clone());
-
+        println!("Wallet: {:?}", signer.address());
         let rpc_url = Url::parse(RPC_URL).unwrap();
         let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
@@ -446,11 +447,11 @@ mod tests {
             U256::from(1),
             // None,
             Some(
-                "0x001D57AdB1461d456541354BBcD515d433299113"
+                "0x297A942A35916cC643a265EC5A8B46f1d376cA46"//"0x001D57AdB1461d456541354BBcD515d433299113"
                     .parse()
                     .unwrap(),
             ),
-            84532,
+            11155111,
         );
 
         let to_address: Address = "0xde3e943a1c2211cfb087dc6654af2a9728b15536"
@@ -458,12 +459,30 @@ mod tests {
             .unwrap();
 
         let sender = account.get_account_address().await.unwrap();
-        let req = UserOperationRequest::new(AccountCall::Execute(ExecuteCall::new(
-            to_address,
-            U256::from(100),
-            Bytes::default(),
-        )))
-        .sender(sender);
+
+        // let call = AccountCall::Execute(ExecuteCall::new(
+        //     to_address,
+        //     U256::from(1),
+        //     Bytes::default(),
+        // )); 
+        let call = AccountCall::ExecuteBatch(vec![
+            ExecuteCall::new(
+                to_address,
+                U256::from(1),
+                Bytes::default(),
+            ),
+            ExecuteCall::new(
+                to_address,
+                U256::from(1),
+                Bytes::default(),
+            ),
+        ]); 
+
+        let req = UserOperationRequest::new(call)
+        .sender(sender)
+        .max_priority_fee_per_gas(U256::from(150000000u64))
+        .max_fee_per_gas(U256::from(190003687u64));
+    
 
         let smart_account_provider = SmartAccountProvider::new(provider, account);
         let result = smart_account_provider
