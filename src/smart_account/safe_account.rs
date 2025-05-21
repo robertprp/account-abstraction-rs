@@ -6,6 +6,8 @@ use alloy::{
     sol_types::SolInterface,
 };
 use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use SafeModuleSetupContract::{enableModulesCall, SafeModuleSetupContractCalls};
 
 use Safe4337ModuleContract::{executeUserOpCall, Safe4337ModuleContractCalls};
@@ -303,7 +305,7 @@ where
             return Err(AccountError::InvalidInput("No calls provided".into()));
         }
 
-        let multisend_address = self.get_multisend_address();
+        let multisend_address = self.get_multisend_address()?;
         let encoded_transactions = self.encode_multisend_transactions(&calls);
 
         let multisend_call = SafeMultiSendContractCalls::multiSend(SafeMultiSendContract::multiSendCall {
@@ -320,12 +322,26 @@ where
         Ok(call.abi_encode().into())
     }
 
-    fn get_multisend_address(&self) -> Address {
-        if ZKSYNC_CHAIN_IDS.contains(&self.chain_id) {
-            MULTISEND_ZKSYNC_ADDRESS.parse().unwrap()
-        } else {
-            MULTISEND_CANONICAL_ADDRESS.parse().unwrap()
-        }
+    // Based on https://github.com/safe-global/safe-deployments/blob/main/src/assets/v1.4.1/multi_send.json
+    fn get_multisend_address(&self) -> Result<Address, AccountError> {
+        let chain_id = self.chain_id;
+        
+        let config_path = std::path::Path::new("src/abi/safe/MultiSend.json");
+        let config_str = std::fs::read_to_string(config_path)
+            .map_err(|e| AccountError::InvalidInput(format!("Failed to read MultiSend.json: {}", e)))?;
+        
+        let config: MultiSendConfig = serde_json::from_str(&config_str)
+            .map_err(|e| AccountError::InvalidInput(format!("Failed to parse MultiSend.json: {}", e)))?;
+        
+        let chain_id_str = chain_id.to_string();
+        let deployment_type = config.network_addresses.get(&chain_id_str)
+            .ok_or_else(|| AccountError::InvalidInput(format!("No multisend address found for chain ID {}", chain_id)))?;
+        
+        let deployment = config.deployments.get(deployment_type)
+            .ok_or_else(|| AccountError::InvalidInput(format!("No deployment found for type {}", deployment_type)))?;
+        
+        deployment.address.parse()
+            .map_err(|e| AccountError::InvalidInput(format!("Failed to parse address: {}", e)))
     }
 
     // Based on https://github.com/safe-global/safe-core-sdk/blob/82cfd46b2d905cea2138adb4a65a7b02c74632aa/packages/protocol-kit/src/utils/transactions/utils.ts#L140
@@ -354,6 +370,20 @@ where
     
         out
     }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct MultiSendConfig {
+    deployments: HashMap<String, Deployment>,
+    network_addresses: HashMap<String, String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct Deployment {
+    address: String,
+    code_hash: String,
 }
 
 #[cfg(test)]
