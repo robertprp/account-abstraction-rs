@@ -314,13 +314,13 @@ where
     fn get_multisend_address(&self) -> Result<Address, AccountError> {
         let chain_id = self.chain_id;
 
-        let config_path = std::path::Path::new("src/abi/safe/MultiSend.json");
+        let config_path = std::path::Path::new("src/abi/safe/MultiSendDeployments.json");
         let config_str = std::fs::read_to_string(config_path).map_err(|e| {
-            AccountError::InvalidInput(format!("Failed to read MultiSend.json: {}", e))
+            AccountError::InvalidInput(format!("Failed to read MultiSendDeployments.json: {}", e))
         })?;
 
         let config: MultiSendConfig = serde_json::from_str(&config_str).map_err(|e| {
-            AccountError::InvalidInput(format!("Failed to parse MultiSend.json: {}", e))
+            AccountError::InvalidInput(format!("Failed to parse MultiSendDeployments.json: {}", e))
         })?;
 
         let chain_id_str = chain_id.to_string();
