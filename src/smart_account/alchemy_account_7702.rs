@@ -232,9 +232,9 @@ mod tests {
         let signature = Signature::try_from(signed_auth.as_ref()).unwrap();
         let y_parity = if signature.v() { U256::from(1) } else { U256::from(0) };
 
-        let req = UserOperationRequest::new(AccountCall::Execute(ExecuteCall::new(
+        let req = UserOperationRequest::new_with_call(AccountCall::Execute(ExecuteCall::new(
             to_address,
-            U256::from(100),//U256::from(10_000_000_000_000_000u64),
+            U256::from(100), //U256::from(10_000_000_000_000_000u64),
             Bytes::default(),
         )))
         .eip7702_auth(Eip7702Auth {

@@ -8,7 +8,7 @@ use serde::Serialize;
 #[derive(Clone, Serialize, PartialEq, Eq, Debug)]
 pub struct UserOperationRequest {
     #[serde(skip_serializing)]
-    pub call: AccountCall,
+    pub call: Option<AccountCall>,
 
     /// The account making the operation
     #[serde(skip_serializing_if = "Option::is_none", default)]
@@ -116,7 +116,7 @@ pub struct UserOperationRequest {
 }
 
 impl UserOperationRequest {
-    pub fn new(call: AccountCall) -> Self {
+    pub fn new() -> Self {
         Self {
             sender: None,
             nonce: None,
@@ -134,7 +134,14 @@ impl UserOperationRequest {
             paymaster_data: None,
             signature: None,
             eip7702_auth: None,
-            call,
+            call: None,
+        }
+    }
+
+    pub fn new_with_call(call: AccountCall) -> Self {
+        Self {
+            call: Some(call),
+            ..Self::new()
         }
     }
 

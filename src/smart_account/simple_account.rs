@@ -381,7 +381,7 @@ mod tests {
             .parse()
             .unwrap();
 
-        let req = UserOperationRequest::new(AccountCall::Execute(ExecuteCall::new(
+        let req = UserOperationRequest::new_with_call(AccountCall::Execute(ExecuteCall::new(
             to_address,
             U256::from(100),
             Bytes::new(),
@@ -431,7 +431,7 @@ mod tests {
             .parse()
             .unwrap();
 
-        let req = UserOperationRequest::new(AccountCall::Execute(ExecuteCall::new(
+        let req = UserOperationRequest::new_with_call(AccountCall::Execute(ExecuteCall::new(
             to_address,
             U256::from(100),
             Bytes::default(),

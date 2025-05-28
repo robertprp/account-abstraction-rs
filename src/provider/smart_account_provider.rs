@@ -158,22 +158,31 @@ where
         user_op: &mut UserOperationRequest,
     ) -> Result<(), Self::Error> {
         if user_op.call_data.is_none() {
-            let call_data: Bytes = match user_op.call.clone() {
+            let Some(call_data) = user_op.call.clone() else {
+                return Err(SmartAccountError::Provider(
+                    "No call data provided".to_string(),
+                ));
+            };
+
+            let encoded_call_data = match call_data {
                 AccountCall::Execute(execute_call) => {
-                    let call_data = self
-                        .account
-                        .encode_execute(execute_call.clone())
-                        .await
-                        .map_err(|e| {
-                            SmartAccountError::Provider(format!("Failed to encode execute: {}", e))
-                        })?;
+                    let call_data =
+                        self.account
+                            .encode_execute(execute_call)
+                            .await
+                            .map_err(|e| {
+                                SmartAccountError::Provider(format!(
+                                    "Failed to encode execute: {}",
+                                    e
+                                ))
+                            })?;
 
                     call_data.into()
                 }
                 AccountCall::ExecuteBatch(execute_calls) => {
                     let call_data = self
                         .account
-                        .encode_execute_batch(execute_calls.clone())
+                        .encode_execute_batch(execute_calls)
                         .await
                         .map_err(|e| {
                             SmartAccountError::Provider(format!(
@@ -186,7 +195,7 @@ where
                 }
             };
 
-            user_op.call_data = Some(call_data);
+            user_op.call_data = Some(encoded_call_data);
         }
 
         if user_op.nonce.is_none() {
@@ -254,11 +263,10 @@ where
             || user_op.pre_verification_gas.is_none()
         {
             let gas_estimate = self
-                .estimate_user_operation_gas(
-                    &user_op
-                        .clone()
-                        .with_gas_estimate_defaults(self.account.get_dummy_signature(), Some(Address::from_str("0x69007702764179f14f51cdce752f4f775d74e139").unwrap())),
-                )
+                .estimate_user_operation_gas(&user_op.clone().with_gas_estimate_defaults(
+                    self.account.get_dummy_signature(),
+                    Some(Address::from_str("0x69007702764179f14f51cdce752f4f775d74e139").unwrap()),
+                ))
                 .await?;
 
             if user_op.call_gas_limit.is_none() {
