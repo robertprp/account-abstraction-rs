@@ -188,12 +188,12 @@ mod tests {
     };
     use url::Url;
 
-    const RPC_URL: &str = "https://eth-sepolia.g.alchemy.com/v2/HoWbfthBOcacceoQbcrf66uJfh0Y9aoW";//"https://arb-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx";//"https://eth-sepolia.g.alchemy.com/v2/HoWbfthBOcacceoQbcrf66uJfh0Y9aoW";
+    const RPC_URL: &str = "https://eth-sepolia.g.alchemy.com/v2/HoWbfthBOcacceoQbcrf66uJfh0Y9aoW"; //"https://arb-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx";//"https://eth-sepolia.g.alchemy.com/v2/HoWbfthBOcacceoQbcrf66uJfh0Y9aoW";
 
     #[tokio::test]
     async fn test_send_transaction() {
         let signer: PrivateKeySigner =
-            "5dde9fdb15a6794db681fd1c2a9b97dd43c0500057c9446fdf1668a604c25164"
+            "5dde9fdb15a6794db681fd1c2a9b97dd43c0500057c9446fdf1668a604c25166"
                 .parse()
                 .unwrap();
         let wallet = EthereumWallet::from(signer.clone());
@@ -202,8 +202,7 @@ mod tests {
         let rpc_url = Url::parse(RPC_URL).unwrap();
         let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
-        let account =
-            AlchemyModularAccount7702::new(provider.clone(), signer.address(), 11155111);//421614);//11155111);
+        let account = AlchemyModularAccount7702::new(provider.clone(), signer.address(), 11155111); //421614);//11155111);
 
         println!(
             "Code: {:?}",
@@ -214,13 +213,17 @@ mod tests {
                 .unwrap()
         );
 
-        let to_address: Address = "0x3e0F3Db3D0169CCD841f9F92341843Db0479af10"//"0x3e0F3Db3D0169CCD841f9F92341843Db0479af10"//"0x9e032F3c28a1d39Eb3081CD076B66B1eC877a0fb"
+        let to_address: Address = "0x3e0F3Db3D0169CCD841f9F92341843Db0479af10" //"0x3e0F3Db3D0169CCD841f9F92341843Db0479af10"//"0x9e032F3c28a1d39Eb3081CD076B66B1eC877a0fb"
             .parse()
             .unwrap();
 
-        let account_nonce = provider.get_transaction_count(signer.address()).await.unwrap();// + 1;
+        let account_nonce = provider
+            .get_transaction_count(signer.address())
+            .await
+            .unwrap(); // + 1;
 
-        let delegation_address = Address::from_str("0x69007702764179f14f51cdce752f4f775d74e139").unwrap();
+        let delegation_address =
+            Address::from_str("0x69007702764179f14f51cdce752f4f775d74e139").unwrap();
 
         let auth = Authorization {
             chain_id: U256::from(0),
@@ -228,9 +231,13 @@ mod tests {
             nonce: account_nonce,
         };
         let signed_auth = signer.sign_hash_data(&auth.signature_hash()).await.unwrap();
-        
+
         let signature = Signature::try_from(signed_auth.as_ref()).unwrap();
-        let y_parity = if signature.v() { U256::from(1) } else { U256::from(0) };
+        let y_parity = if signature.v() {
+            U256::from(1)
+        } else {
+            U256::from(0)
+        };
 
         let req = UserOperationRequest::new_with_call(AccountCall::Execute(ExecuteCall::new(
             to_address,
@@ -245,10 +252,14 @@ mod tests {
             s: signature.s().into(),
             y_parity: y_parity,
         })
-        .max_priority_fee_per_gas(U256::from(1174138679u64))//125521899987200u64))
+        .max_priority_fee_per_gas(U256::from(1174138679u64)) //125521899987200u64))
         .max_fee_per_gas(U256::from(1674153867u64))
+        // .call_gas_limit(U256::from(200000))
+        // .verification_gas_limit(U256::from(200000))
+        // .pre_verification_gas(U256::from(200000))
         .sender(signer.address());
 
+        // user_operation: UserOperation { sender: 0x3e0f3db3d0169ccd841f9f92341843db0479af10, nonce: 18446744073709551616, factory: None, factory_data: None, call_data: 0xb61d27f60000000000000000000000009e032f3c28a1d39eb3081cd076b66b1ec877a0fb000000000000000000000000000000000000000000000000000000000000006400000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000, call_gas_limit: 19384, verification_gas_limit: 85796, pre_verification_gas: 82728, max_fee_per_gas: 26741538679, max_priority_fee_per_gas: 21741538679, paymaster: None, paymaster_verification_gas_limit: None, paymaster_post_op_gas_limit: None, paymaster_data: Some(0x), signature: 0xff0029f3e3f6e7c99f6cb933f4e9281be54b20df4122b2b6889fc0bbecbfcc22a426167aa8d7b3eb0f2346da18de07510fbb1fd88c5c070793f8d0d1afdaa350e70b1b, eip7702_auth: Some(Eip7702Auth { chain_id: 0, nonce: 1, address: 0x69007702764179f14f51cdce752f4f775d74e139, r: 0xc1bc97b94f891b9f22fef9561c9970692af2bbf355e1194a3a4967f9ea9d0d6a, s: 0x3be08893cce6d636ba8828153b0fc63bdf4addd96009d67cc37cf52d89881eba, y_parity: 0 }) }
 
         let smart_account_provider = SmartAccountProvider::new(provider.clone(), account);
 
