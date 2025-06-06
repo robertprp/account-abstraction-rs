@@ -1,6 +1,6 @@
 use alloy::{
     network::Ethereum,
-    primitives::{Address, Bytes, ChainId, U256},
+    primitives::{keccak256, Address, Bytes, ChainId, FixedBytes, U160, U256},
     providers::Provider,
     sol,
     sol_types::SolInterface,
@@ -62,6 +62,7 @@ sol!(
     "src/abi/safe/SafeMultiSend.json"
 );
 
+// TODO: Get addresses dynamically instead of hardcoding them
 // Constants
 const SAFE_4337_MODULE_ADDRESS: &str = "0x75cf11467937ce3F2f357CE24ffc3DBF8fD5c226";
 const SAFE_MODULE_SETUP_ADDRESS: &str = "0x2dd68b007B46fBe91B9A7c3EDa5A7a1063cB5b47";
@@ -142,33 +143,60 @@ where
             return Ok(addr);
         }
 
-        let addr = self.get_counterfactual_address().await?;
+        let addr: Address = self.get_counterfactual_address().await?;
 
         Ok(addr)
+    }
+
+    /// Computes the counterfactual address of the Safe account.
+    /// The Safe proxy factory reverts when the account is deployed, so we need to compute the address locally.
+    async fn get_counterfactual_address(&self) -> Result<Address, AccountError> {
+        let proxy_factory =
+            SafeProxyFactoryContract::new(self.get_factory_address(), self.provider());
+
+        let proxy_creation_code: Bytes = proxy_factory
+            .proxyCreationCode()
+            .call()
+            .await
+            .map_err(|e| AccountError::RpcError(e.to_string()))?
+            ._0;
+
+        let init_code: Bytes = self.get_init_setup_code()?;
+
+        let initializer_hash = keccak256(&init_code);
+
+        // Pack salt as keccak256(abi.encodePacked(keccak256(initializer), saltNonce))
+        let mut salt_input = Vec::new();
+        salt_input.extend_from_slice(initializer_hash.as_slice());
+        salt_input.extend_from_slice(&U256::ZERO.to_be_bytes::<32>());
+        let salt: FixedBytes<32> = keccak256(&salt_input);
+
+        // Pack deployment code as abi.encodePacked(proxyCreationCode, uint256(uint160(singleton)))
+        let mut deployment_code = Vec::new();
+        deployment_code.extend_from_slice(&proxy_creation_code);
+
+        let singleton: Address = SAFE_SINGLETON_ADDRESS.parse().unwrap();
+        let singleton_uint160 = U160::try_from_be_slice(singleton.as_slice()).unwrap();
+
+        let singleton_uint256 = U256::from(singleton_uint160);
+        deployment_code.extend_from_slice(&singleton_uint256.to_be_bytes::<32>());
+
+        // Generate address using create2
+        let proxy_address: Address = self.get_factory_address();
+        let create2_address = proxy_address.create2_from_code(salt, Bytes::from(deployment_code));
+
+        Ok(create2_address)
     }
 
     async fn get_init_code(&self) -> Result<Bytes, AccountError> {
         let index = U256::ZERO;
 
-        let enable_modules_call = SafeModuleSetupContractCalls::enableModules(enableModulesCall {
-            modules: vec![SAFE_4337_MODULE_ADDRESS.parse().unwrap()],
-        });
-
-        let setup_call = SafeL2ContractCalls::setup(setupCall {
-            _owners: self.owners.clone(),
-            _threshold: self.threshold,
-            to: SAFE_MODULE_SETUP_ADDRESS.parse().unwrap(),
-            data: enable_modules_call.abi_encode().into(),
-            fallbackHandler: SAFE_4337_MODULE_ADDRESS.parse().unwrap(),
-            paymentToken: Address::ZERO,
-            payment: U256::ZERO,
-            paymentReceiver: Address::ZERO,
-        });
+        let setup_call: Bytes = self.get_init_setup_code()?;
 
         let create_proxy_call =
             SafeProxyFactoryContractCalls::createProxyWithNonce(createProxyWithNonceCall {
                 _singleton: SAFE_SINGLETON_ADDRESS.parse().unwrap(),
-                initializer: setup_call.abi_encode().into(),
+                initializer: setup_call,
                 saltNonce: index,
             });
 
@@ -364,6 +392,25 @@ where
 
         out
     }
+
+    fn get_init_setup_code(&self) -> Result<Bytes, AccountError> {
+        let enable_modules_call = SafeModuleSetupContractCalls::enableModules(enableModulesCall {
+            modules: vec![SAFE_4337_MODULE_ADDRESS.parse().unwrap()],
+        });
+
+        let setup_call = SafeL2ContractCalls::setup(setupCall {
+            _owners: self.owners.clone(),
+            _threshold: self.threshold,
+            to: SAFE_MODULE_SETUP_ADDRESS.parse().unwrap(),
+            data: enable_modules_call.abi_encode().into(),
+            fallbackHandler: SAFE_4337_MODULE_ADDRESS.parse().unwrap(),
+            paymentToken: Address::ZERO,
+            payment: U256::ZERO,
+            paymentReceiver: Address::ZERO,
+        });
+
+        Ok(setup_call.abi_encode().into())
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -384,6 +431,7 @@ struct Deployment {
 mod tests {
     use super::*;
     use crate::{
+        entry_point::EntryPointTrait,
         provider::{SmartAccountProvider, SmartAccountProviderTrait},
         types::{AccountCall, UserOperationRequest},
     };
@@ -464,7 +512,7 @@ mod tests {
             ExecuteCall::new(to_address, U256::from(1), Bytes::default()),
         ]);
 
-        let req = UserOperationRequest::new(call)
+        let req = UserOperationRequest::new_with_call(call)
             .sender(sender)
             .max_priority_fee_per_gas(U256::from(150000000u64))
             .max_fee_per_gas(U256::from(190003687u64));
@@ -509,5 +557,34 @@ mod tests {
                 panic!("Failed to get receipt after {max_attempts} attempts");
             }
         }
+    }
+
+    #[tokio::test]
+    async fn test_create2_from_code() {
+        let rpc_url = Url::parse(RPC_URL).unwrap();
+        let provider = ProviderBuilder::new().on_http(rpc_url);
+
+        let account = SafeAccount::new(
+            provider.clone(),
+            vec!["0x1ed2e054e5a2dc847d6cfbe78ffcd19bf1417a95"
+                .parse()
+                .unwrap()],
+            U256::from(1),
+            None,
+            84532,
+        );
+
+        let account_address_computed_locally = account.get_account_address().await.unwrap();
+
+        let account_address_computed_on_chain = account
+            .entry_point()
+            .get_sender_address(account.get_init_code().await.unwrap())
+            .await
+            .unwrap();
+
+        assert_eq!(
+            account_address_computed_locally, account_address_computed_on_chain,
+            "Counterfactual address does not match create2 address"
+        );
     }
 }
