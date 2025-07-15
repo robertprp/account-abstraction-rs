@@ -76,6 +76,7 @@ pub struct SafeAccount<P: Provider<Ethereum>> {
     provider: P,
     owners: Vec<Address>,
     threshold: U256,
+    nonce: U256,
     account_address: Option<Address>,
     entry_point: EntryPointContractWrapper<P, Ethereum>,
     chain_id: ChainId,
@@ -89,6 +90,7 @@ where
         provider: P,
         owners: Vec<Address>,
         threshold: U256,
+        nonce: U256,
         account_address: Option<Address>,
         chain_id: ChainId,
     ) -> Self {
@@ -99,6 +101,7 @@ where
             provider,
             owners,
             threshold,
+            nonce,
             account_address,
             entry_point,
             chain_id,
@@ -168,7 +171,7 @@ where
         // Pack salt as keccak256(abi.encodePacked(keccak256(initializer), saltNonce))
         let mut salt_input = Vec::new();
         salt_input.extend_from_slice(initializer_hash.as_slice());
-        salt_input.extend_from_slice(&U256::ZERO.to_be_bytes::<32>());
+        salt_input.extend_from_slice(&self.nonce.to_be_bytes::<32>());
         let salt: FixedBytes<32> = keccak256(&salt_input);
 
         // Pack deployment code as abi.encodePacked(proxyCreationCode, uint256(uint160(singleton)))
@@ -189,15 +192,13 @@ where
     }
 
     async fn get_init_code(&self) -> Result<Bytes, AccountError> {
-        let index = U256::ZERO;
-
         let setup_call: Bytes = self.get_init_setup_code()?;
 
         let create_proxy_call =
             SafeProxyFactoryContractCalls::createProxyWithNonce(createProxyWithNonceCall {
                 _singleton: SAFE_SINGLETON_ADDRESS.parse().unwrap(),
                 initializer: setup_call,
-                saltNonce: index,
+                saltNonce: self.nonce,
             });
 
         let mut init_code = Vec::new();
@@ -457,6 +458,7 @@ mod tests {
             provider,
             vec![signer.address()],
             U256::from(1),
+            U256::ZERO,
             None,
             // Some(
             //     "0x001D57AdB1461d456541354BBcD515d433299113"
@@ -487,6 +489,7 @@ mod tests {
             provider.clone(),
             vec![signer.address()],
             U256::from(1),
+            U256::ZERO,
             // None,
             Some(
                 "0x297A942A35916cC643a265EC5A8B46f1d376cA46" //"0x001D57AdB1461d456541354BBcD515d433299113"
@@ -570,6 +573,7 @@ mod tests {
                 .parse()
                 .unwrap()],
             U256::from(1),
+            U256::ZERO,
             None,
             84532,
         );
