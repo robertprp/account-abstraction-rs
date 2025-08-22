@@ -45,7 +45,26 @@ impl<P> SimpleAccount<P>
 where
     P: Provider<Ethereum> + Clone + std::fmt::Debug,
 {
+    /// Creates a new SimpleAccount with default salt (0) - maintains backward compatibility
     pub fn new(
+        provider: Arc<P>,
+        owner: Address,
+        factory_address: Address,
+        entry_point_address: Address,
+        chain_id: ChainId,
+    ) -> Self {
+        Self::new_with_salt(
+            provider,
+            owner,
+            factory_address,
+            entry_point_address,
+            chain_id,
+            U256::ZERO,
+        )
+    }
+
+    /// Creates a new SimpleAccount with a custom salt for deterministic address generation
+    pub fn new_with_salt(
         provider: Arc<P>,
         owner: Address,
         factory_address: Address,
@@ -67,24 +86,6 @@ where
             chain_id,
             salt,
         }
-    }
-
-    /// Creates a new SimpleAccount with default salt (0) for backward compatibility
-    pub fn new_with_default_salt(
-        provider: Arc<P>,
-        owner: Address,
-        factory_address: Address,
-        entry_point_address: Address,
-        chain_id: ChainId,
-    ) -> Self {
-        Self::new(
-            provider,
-            owner,
-            factory_address,
-            entry_point_address,
-            chain_id,
-            U256::ZERO,
-        )
     }
 }
 
@@ -223,7 +224,7 @@ mod tests {
                 .unwrap();
         let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
-        let account = SimpleAccount::new_with_default_salt(
+        let account = SimpleAccount::new(
             Arc::new(provider),
             address,
             Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
@@ -254,7 +255,7 @@ mod tests {
                 .unwrap();
         let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
-        let account = SimpleAccount::new_with_default_salt(
+        let account = SimpleAccount::new(
             Arc::new(provider),
             address,
             Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
@@ -298,7 +299,7 @@ mod tests {
                 .unwrap();
         let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
-        let account = SimpleAccount::new_with_default_salt(
+        let account = SimpleAccount::new(
             Arc::new(provider),
             address,
             Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
@@ -331,7 +332,7 @@ mod tests {
                 .unwrap();
         let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
-        let account = SimpleAccount::new_with_default_salt(
+        let account = SimpleAccount::new(
             Arc::new(provider),
             address,
             Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
@@ -386,7 +387,7 @@ mod tests {
         let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
         // Create accounts with different salt values
-        let account_salt_0 = SimpleAccount::new(
+        let account_salt_0 = SimpleAccount::new_with_salt(
             Arc::new(provider.clone()),
             address,
             Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
@@ -395,7 +396,7 @@ mod tests {
             U256::ZERO,
         );
 
-        let account_salt_1 = SimpleAccount::new(
+        let account_salt_1 = SimpleAccount::new_with_salt(
             Arc::new(provider.clone()),
             address,
             Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
@@ -404,7 +405,7 @@ mod tests {
             U256::from(1),
         );
 
-        let account_salt_custom = SimpleAccount::new(
+        let account_salt_custom = SimpleAccount::new_with_salt(
             Arc::new(provider.clone()),
             address,
             Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
@@ -433,8 +434,8 @@ mod tests {
         assert_ne!(address_0, address_custom);
         assert_ne!(address_1, address_custom);
 
-        // Verify that default salt account matches new_with_default_salt
-        let account_default = SimpleAccount::new_with_default_salt(
+        // Verify that default salt account matches regular new()
+        let account_default = SimpleAccount::new(
             Arc::new(provider.clone()),
             address,
             Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
@@ -458,7 +459,7 @@ mod tests {
                 .unwrap();
         let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
-        let account = SimpleAccount::new_with_default_salt(
+        let account = SimpleAccount::new(
             Arc::new(provider.clone()),
             signer.address(),
             Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
@@ -516,7 +517,7 @@ mod tests {
                 .unwrap();
         let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
 
-        let account = SimpleAccount::new_with_default_salt(
+        let account = SimpleAccount::new(
             Arc::new(provider.clone()),
             signer.address(),
             Address::from_str(SIMPLE_ACCOUNT_FACTORY_ADDRESS).unwrap(),
