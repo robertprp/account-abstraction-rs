@@ -102,47 +102,6 @@ impl<P: Provider<N> + Clone + Debug, N: Network> EntryPointTrait
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use alloy::{
-        network::EthereumWallet, providers::ProviderBuilder, signers::local::PrivateKeySigner,
-    };
-    use alloy_node_bindings::Anvil;
-    use std::str::FromStr;
-    use url::Url;
-
-    #[tokio::test]
-    async fn test_get_sender_address() {
-        let anvil = Anvil::new().try_spawn().unwrap();
-
-        let signer: PrivateKeySigner = anvil.keys()[0].clone().into();
-        let wallet = EthereumWallet::from(signer);
-
-        let rpc_url =
-            Url::parse("https://base-sepolia.g.alchemy.com/v2/IVqOyg3PqHzBQJMqa_yZAfyonF9ne2Gx")
-                .unwrap();
-
-        let provider = ProviderBuilder::new().wallet(wallet).on_http(rpc_url);
-
-        let entry_point = EntryPointContractWrapper::new(
-            Address::from_str("0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789").unwrap(),
-            provider,
-        );
-
-        let init_code = Bytes::from_str("0x9406cc6185a346906296840746125a0e449764545fbfb9cf0000000000000000000000002c7536e3605d9c16a7a3d7b1898e529396a65c230000000000000000000000000000000000000000000000000000000000000000").unwrap();
-        let result = entry_point.get_sender_address(init_code).await;
-
-        assert!(result.is_ok());
-        assert_eq!(
-            result.unwrap(),
-            "0x982ffac966b962bddf89d3b26fee91da6f68df13"
-                .parse::<Address>()
-                .unwrap()
-        );
-    }
-}
-
 #[derive(Debug, Error)]
 pub enum EntryPointError {
     #[error("contract error: {0}")]

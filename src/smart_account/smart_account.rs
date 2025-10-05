@@ -1,7 +1,5 @@
 use alloy::{
-    network::{Ethereum, Network},
-    primitives::{aliases::U192, Address, Bytes, ChainId, U256},
-    providers::Provider,
+    consensus::TypedTransaction, network::{Ethereum, Network, TransactionBuilder}, primitives::{aliases::U192, Address, Bytes, ChainId, U256}, providers::Provider, rpc::types::TransactionRequest
 };
 use async_trait::async_trait;
 use std::fmt::Debug;
@@ -77,30 +75,31 @@ pub trait SmartAccount<P: Provider<N>, N: Network = Ethereum>: Sync + Send + Deb
         Ok(address)
     }
 
-    // async fn estimate_creation_gas(&self) -> Result<U256, AccountError> {
-    //     let init_code: Bytes = self.get_init_code().await?;
+    async fn estimate_creation_gas(&self) -> Result<U256, AccountError> {
+        let init_code: Bytes = self.get_init_code().await?;
 
-    //     if init_code.is_empty() {
-    //         Ok(U256::zero())
-    //     } else {
-    //         let deployer_address = &init_code[0..20];
-    //         let deployer_address = Address::from_slice(deployer_address);
-    //         let deployer_call_data = &init_code[20..];
+        if init_code.is_empty() {
+            Ok(U256::ZERO)
+        } else {
+            let deployer_address = &init_code[0..20];
+            let deployer_address = Address::from_slice(deployer_address);
+            let deployer_call_data = &init_code[20..];
 
-    //         let typed_tx: TypedTransaction = TransactionRequest::new()
-    //             .to(deployer_address)
-    //             .data(deployer_call_data.to_vec())
-    //             .into();
+            let typed_tx = self
+                .provider()
+                .transaction_request()
+                .with_to(deployer_address)
+                .with_input(deployer_call_data.to_vec());
+                
+            let gas_estimate = self
+                .provider()
+                .estimate_gas(typed_tx)
+                .await
+                .unwrap();
 
-    //         let gas_estimate: U256 = self
-    //             .provider()
-    //             .estimate_gas(&typed_tx, None)
-    //             .await
-    //             .map_err(AccountError::ProviderError)?;
-
-    //         Ok(gas_estimate)
-    //     }
-    // }
+            Ok(U256::from(gas_estimate))
+        }
+    }
 
     async fn get_user_op_hash<U: Into<UserOperation> + Send + Sync>(
         &self,
