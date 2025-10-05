@@ -1,6 +1,7 @@
 use crate::entry_point::EntryPointTrait;
 use crate::signer::SmartAccountSigner;
 use crate::smart_account::SmartAccount;
+use std::ops::Add;
 use crate::types::request::{UserOpHash, UserOperation, UserOperationRequest};
 use crate::types::{AccountCall, UserOperationGasEstimation};
 use alloy::providers::RootProvider;
@@ -239,24 +240,16 @@ where
             }
         }
 
-        // if user_op.pre_verification_gas.is_none() {
-        //     let init_gas: U256 = self
-        //         .account
-        //         .estimate_creation_gas()
-        //         .await
-        //         .map_err(SmartAccountProviderError::AccountError)?;
-        //     user_op.verification_gas_limit =
-        //         Some(self.account.get_verification_gas_limit().add(init_gas));
-        // }
-
-        // // TODO: Only add factory fields if account not deployed
-        // if user_op.factory.is_none() {
-        //     user_op.factory = Some(self.account.get_factory_address());
-        // }
-
-        // if user_op.factory_data.is_none() {
-        //     user_op.factory_data = Some(self.account.get_factory_data().await);
-        // }
+        if user_op.pre_verification_gas.is_none() {
+            let init_gas: U256 = self
+                .account
+                .estimate_creation_gas()
+                .await
+                .map_err(|e| SmartAccountError::Provider(format!("Failed to estimate creation gas: {}", e)))?;
+            
+            let verification_gas_limit = U256::from(600_000);
+            user_op.verification_gas_limit = Some(verification_gas_limit.add(init_gas));
+        }
 
         if user_op.call_gas_limit.is_none()
             || user_op.verification_gas_limit.is_none()
@@ -265,7 +258,7 @@ where
             let gas_estimate = self
                 .estimate_user_operation_gas(&user_op.clone().with_gas_estimate_defaults(
                     self.account.get_dummy_signature(),
-                    Some(Address::from_str("0x69007702764179f14f51cdce752f4f775d74e139").unwrap()),
+                    None
                 ))
                 .await?;
 
@@ -273,9 +266,7 @@ where
                 user_op.call_gas_limit = Some(gas_estimate.call_gas_limit);
             }
 
-            if user_op.verification_gas_limit.is_none() {
-                user_op.verification_gas_limit = Some(gas_estimate.verification_gas_limit);
-            }
+            user_op.verification_gas_limit = Some(gas_estimate.verification_gas_limit);
 
             if user_op.pre_verification_gas.is_none() {
                 user_op.pre_verification_gas = Some(gas_estimate.pre_verification_gas);
