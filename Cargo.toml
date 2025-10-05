@@ -1,5 +1,5 @@
 [package]
-name = "aa-sdk-rs"
+name = "account-abstraction-rs"
 version = "0.1.0"
 edition = "2021"
 
