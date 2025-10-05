@@ -88,8 +88,7 @@ impl<P: Provider<N> + Clone + Debug, N: Network> EntryPointTrait
             .getNonce(address, key)
             .call()
             .await
-            .map_err(|e| EntryPointError::ContractError(format!("Error getting nonce: {:?}", e)))?
-            .nonce;
+            .map_err(|e| EntryPointError::ContractError(format!("Error getting nonce: {:?}", e)))?;
 
         Ok(nonce)
     }

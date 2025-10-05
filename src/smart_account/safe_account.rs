@@ -157,12 +157,11 @@ where
         let proxy_factory =
             SafeProxyFactoryContract::new(self.get_factory_address(), self.provider());
 
-        let proxy_creation_code: Bytes = proxy_factory
+        let proxy_creation_code = proxy_factory
             .proxyCreationCode()
             .call()
             .await
-            .map_err(|e| AccountError::RpcError(e.to_string()))?
-            ._0;
+            .map_err(|e| AccountError::RpcError(e.to_string()))?;
 
         let init_code: Bytes = self.get_init_setup_code()?;
 
@@ -308,9 +307,7 @@ where
             .getOperationHash(module_user_op)
             .call()
             .await
-            .map_err(|e| AccountError::SignerError(format!("Failed to get user op hash: {}", e)))
-            .unwrap()
-            .operationHash
+            .map_err(|e| AccountError::SignerError(format!("Failed to get user op hash: {}", e)))?
             .into();
 
         Ok(hash)
